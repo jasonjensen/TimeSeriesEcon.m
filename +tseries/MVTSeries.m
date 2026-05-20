@@ -816,7 +816,7 @@ classdef MVTSeries
         end
 
         function L = LinearIndices(x)
-            L = builtin('LinearIndices', size(x.values));
+            L = 1:numel(x.values);
         end
 
         % ---------- find / isassigned ----------

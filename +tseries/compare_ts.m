@@ -31,11 +31,6 @@ function tf = compare_ts(a, b, varargin)
     ignoreMissing = p.Results.ignoreMissing;
     trange       = p.Results.trange;
 
-    if isnumeric(a) && isnumeric(b)
-        tf = approxScalarOrArray(a, b, atol, rtol, nansEqual);
-        return
-    end
-
     if isa(a, 'tseries.TSeries') && isa(b, 'tseries.TSeries')
         if ~eq(a.firstdate.frequency, b.firstdate.frequency)
             tf = false; return
@@ -100,6 +95,11 @@ function tf = compare_ts(a, b, varargin)
         va = a(trng, cols).values;
         vb = b(trng, cols).values;
         tf = approxScalarOrArray(va, vb, atol, rtol, nansEqual);
+        return
+    end
+
+    if isnumeric(a) && isnumeric(b)
+        tf = approxScalarOrArray(a, b, atol, rtol, nansEqual);
         return
     end
 

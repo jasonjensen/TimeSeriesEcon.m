@@ -714,7 +714,7 @@ classdef TSeries
         end
 
         function L = LinearIndices(t)
-            L = builtin('LinearIndices', size(t.values));
+            L = 1:numel(t.values);
         end
 
         % ---------- find / isassigned ----------

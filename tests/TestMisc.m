@@ -47,7 +47,7 @@ classdef TestMisc < matlab.unittest.TestCase
 
         function linearindices_matches_values(tc)
             X = tseries.MVTSeries(tseries.qq(2020,1), {'a','b'}, rand(10, 2));
-            tc.verifyEqual(LinearIndices(X), LinearIndices(X.values));
+            tc.verifyEqual(LinearIndices(X), tseries.LinearIndices(X.values));
         end
     end
 end

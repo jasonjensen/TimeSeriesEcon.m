@@ -65,7 +65,8 @@ classdef TestLinalg < matlab.unittest.TestCase
             s2 = tseries.TSeries(tseries.qq(2020,1), [2]);
             % s / s2 = 12x1 / 1x1 column = nan-error... actually MATLAB's
             % column-vector / scalar-vector returns the same shape.
-            tc.verifyEqual(s / s2, s.values / s2.values, 'AbsTol', 1e-10);
+            r = s / s2;
+            tc.verifyEqual(r.values, s.values / s2.values, 'AbsTol', 1e-10); 
         end
     end
 end
