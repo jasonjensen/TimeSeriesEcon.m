@@ -13,8 +13,10 @@ function results = runAllTests()
 
     import matlab.unittest.TestSuite
     import matlab.unittest.TestRunner
+    import matlab.unittest.plugins.StopOnFailuresPlugin
 
     suite  = TestSuite.fromFolder(here);
     runner = TestRunner.withTextOutput('Verbosity', 2);
+    runner.addPlugin(StopOnFailuresPlugin);
     results = runner.run(suite);
 end

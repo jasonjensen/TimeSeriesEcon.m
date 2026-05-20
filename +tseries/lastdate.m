@@ -1,6 +1,6 @@
 function m = lastdate(x)
 %LASTDATE  Last MIT of a TSeries (or MITRange).
-    if isa(x, 'tseries.TSeries')
+    if isa(x, 'tseries.TSeries') || isa(x, 'tseries.MVTSeries')
         n = length(x.values);
         if n == 0
             m = x.firstdate - 1;

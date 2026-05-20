@@ -10,7 +10,7 @@ classdef TestMVTSeriesIndex < matlab.unittest.TestCase
             for i = 1:10
                 a(i) = i;
             end
-            tc.verifyEqual(a(1:10), (1:10)');
+            tc.verifyEqual(a(1:10), (1:10)); %TODO: should this be transposed?
         end
 
         function colon_returns_self(tc)

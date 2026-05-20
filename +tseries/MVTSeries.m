@@ -266,10 +266,6 @@ classdef MVTSeries
             rng = rangeof(x, varargin{:});
         end
 
-        function names = colnames(x)
-            names = x.colnames;
-        end
-
         function v = rawdata(x)
             v = x.values;
         end

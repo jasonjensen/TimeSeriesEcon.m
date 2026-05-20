@@ -10,7 +10,7 @@ function rng = rangeof(x, varargin)
     parse(p, varargin{:});
     drop = p.Results.drop;
 
-    if isa(x, 'tseries.TSeries')
+    if isa(x, 'tseries.TSeries') || isa(x, 'tseries.MVTSeries')
         rng = tseries.MITRange(x.firstdate, tseries.lastdate(x));
     elseif isa(x, 'tseries.MITRange')
         rng = x;
