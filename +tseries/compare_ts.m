@@ -65,7 +65,51 @@ function tf = compare_ts(a, b, varargin)
         return
     end
 
+    if isa(a, 'tseries.MVTSeries') && isa(b, 'tseries.MVTSeries')
+        if ~eq(a.firstdate.frequency, b.firstdate.frequency)
+            tf = false; return
+        end
+        % column-name handling
+        if ignoreMissing
+            cols = intersect_strings(a.colnames, b.colnames);
+        else
+            if ~isequal(a.colnames, b.colnames)
+                tf = false; return
+            end
+            cols = a.colnames;
+        end
+        rngA = tseries.rangeof(a);
+        rngB = tseries.rangeof(b);
+        if ~isempty(trange) && isa(trange, 'tseries.MITRange') ...
+                && eq(trange.startMIT.frequency, a.firstdate.frequency)
+            rngA = intersect(trange, rngA);
+            rngB = intersect(trange, rngB);
+        end
+        if ignoreMissing
+            trng = intersect(rngA, rngB);
+        else
+            if isequal(rngA, rngB)
+                trng = rngA;
+            else
+                tf = false; return
+            end
+        end
+        if isempty(trng) || isempty(cols)
+            tf = true; return
+        end
+        va = a(trng, cols).values;
+        vb = b(trng, cols).values;
+        tf = approxScalarOrArray(va, vb, atol, rtol, nansEqual);
+        return
+    end
+
     tf = isequal(a, b);
+end
+
+function out = intersect_strings(a, b)
+% Preserve order in `a`.
+    [~, ia] = ismember(a, b);
+    out = a(ia > 0);
 end
 
 function tf = approxScalarOrArray(x, y, atol, rtol, nansEqual)

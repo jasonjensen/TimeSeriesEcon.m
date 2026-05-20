@@ -690,6 +690,72 @@ classdef TSeries
         function r = copy(t)
             r = t;
         end
+
+        % ---------- linear algebra (delegate to .values) ----------
+
+        function r = ctranspose(t)
+            r = t.values';
+        end
+
+        function r = transpose(t)
+            r = t.values.';
+        end
+
+        function r = adjoint(t)
+            r = t.values';
+        end
+
+        function p = parent(t)
+            p = t.values;
+        end
+
+        function ax = axes1(t)
+            ax = rangeof(t);
+        end
+
+        function L = LinearIndices(t)
+            L = builtin('LinearIndices', size(t.values));
+        end
+
+        % ---------- find / isassigned ----------
+
+        function out = find(t, varargin)
+            % find(t) returns MITs of nonzero entries.  Pass-through extra
+            % args (e.g. n, 'first') falls back to integer indices then
+            % converts.
+            idx = find(t.values, varargin{:});
+            n = numel(idx);
+            if n == 0
+                out = tseries.MIT.empty(1, 0);
+                return
+            end
+            F = t.firstdate.frequency;
+            v0 = t.firstdate.value;
+            out = repmat(tseries.MIT(F, 0), 1, n);
+            for k = 1:n
+                out(k) = tseries.MIT(F, v0 + int64(idx(k)) - 1);
+            end
+        end
+
+        function tf = isassigned(t, idx)
+            if nargin < 2 || isempty(idx)
+                tf = false; return
+            end
+            if isa(idx, 'tseries.MIT')
+                if ~eq(idx.frequency, t.firstdate.frequency)
+                    error('tseries:mixedFreq', ...
+                        'isassigned: mixed frequencies.');
+                end
+                k = double(idx.value - t.firstdate.value) + 1;
+                tf = (k >= 1) && (k <= length(t.values));
+                return
+            end
+            if isnumeric(idx) && isscalar(idx)
+                tf = (idx >= 1) && (idx <= length(t.values));
+                return
+            end
+            tf = false;
+        end
     end
 
     methods (Static, Access = private)
@@ -1021,8 +1087,8 @@ function r = binaryOp(a, b, op)
 end
 
 function v = tseriesValues(x)
-% Helper: extract numeric storage from either a TSeries or a plain array.
-    if isa(x, 'tseries.TSeries')
+% Helper: extract numeric storage from a TSeries / MVTSeries / plain array.
+    if isa(x, 'tseries.TSeries') || isa(x, 'tseries.MVTSeries')
         v = x.values;
     else
         v = x;

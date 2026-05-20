@@ -803,6 +803,88 @@ classdef MVTSeries
         function tf = islogical(x), tf = islogical(x.values); end
         function tf = haskey(x, name), tf = ~isempty(colIndexOf(x, string(name))); end
         function ks = keys(x), ks = cellstr(x.colnames); end
+
+        % ---------- linear algebra (delegate to .values) ----------
+
+        function r = ctranspose(x), r = x.values'; end
+        function r = transpose(x),  r = x.values.'; end
+        function r = adjoint(x),    r = x.values'; end
+        function p = parent(x),     p = x.values; end
+
+        function ax = axes1(x)
+            ax = rangeof(x);
+        end
+
+        function L = LinearIndices(x)
+            L = builtin('LinearIndices', size(x.values));
+        end
+
+        % ---------- find / isassigned ----------
+
+        function out = find(x, varargin)
+            % For logical MVTSeries, return [row col] subs; for numeric
+            % MVTSeries returns linear indices of nonzero values.
+            % If two outputs are requested, behave like builtin find.
+            if nargout >= 2
+                [r, c] = find(x.values, varargin{:});
+                out = [r, c];
+                return
+            end
+            if islogical(x.values)
+                [r, c] = find(x.values, varargin{:});
+                out = [r, c];   % CartesianIndex analogue: Nx2 [row, col]
+            else
+                out = find(x.values, varargin{:});
+            end
+        end
+
+        function tf = isassigned(x, varargin)
+            if isempty(varargin)
+                tf = false; return
+            end
+            if numel(varargin) == 1
+                idx = varargin{1};
+                if isnumeric(idx) && isscalar(idx)
+                    tf = (idx >= 1) && (idx <= numel(x.values));
+                else
+                    tf = false;
+                end
+                return
+            end
+            if numel(varargin) == 2
+                rowIdx = varargin{1};
+                colIdx = varargin{2};
+                if isa(rowIdx, 'tseries.MIT')
+                    if ~eq(rowIdx.frequency, x.firstdate.frequency)
+                        error('tseries:mixedFreq', ...
+                            'isassigned: mixed frequencies.');
+                    end
+                    k = double(rowIdx.value - x.firstdate.value) + 1;
+                    if k < 1 || k > size(x.values, 1)
+                        tf = false; return
+                    end
+                    if ischar(colIdx) || isstring(colIdx)
+                        c = colIndexOf(x, string(colIdx));
+                        tf = ~isempty(c);
+                        return
+                    end
+                    if isnumeric(colIdx) && isscalar(colIdx)
+                        tf = (colIdx >= 1) && (colIdx <= size(x.values, 2));
+                        return
+                    end
+                    tf = false; return
+                end
+                if isnumeric(rowIdx) && isscalar(rowIdx) ...
+                        && isnumeric(colIdx) && isscalar(colIdx)
+                    tf = (rowIdx >= 1) && (rowIdx <= size(x.values, 1)) ...
+                        && (colIdx >= 1) && (colIdx <= size(x.values, 2));
+                    return
+                end
+                tf = false;
+                return
+            end
+            tf = false;
+        end
     end
 end
 
@@ -1278,6 +1360,10 @@ function v = mvValues(x)
     else
         v = x;
     end
+end
+
+function tf = isMITRangeLike(x)
+    tf = isa(x, 'tseries.MITRange');
 end
 
 function common = intersectColnames(a, b)
