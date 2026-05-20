@@ -77,10 +77,10 @@ classdef TSeries
                     obj.values = zeros(0, 1);
                 else
                     second = varargin{2};
-                    if isnumeric(second) && ~isscalar(second)
+                    if isnumeric(second)
                         obj.firstdate = first;
                         obj.values = second(:);
-                    elseif islogical(second) && ~isscalar(second)
+                    elseif islogical(second)
                         obj.firstdate = first;
                         obj.values = second(:);
                     else
@@ -233,7 +233,15 @@ classdef TSeries
             F = t.firstdate.frequency;
         end
 
+        function F = frequency(t)
+            F = t.firstdate.frequency;
+        end
+
         function rng = rangeof(t, varargin)
+            rng = tseries.rangeof(t, varargin{:});
+        end
+
+        function rng = range(t, varargin)
             rng = tseries.rangeof(t, varargin{:});
         end
 

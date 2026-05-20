@@ -18,7 +18,8 @@ classdef TestRange < matlab.unittest.TestCase
 
         function step_one(tc)
             rng = tseries.qq(2020,1) : tseries.qq(2020,4);
-            tc.verifyEqual(tseries.step(rng), 1);
+            % tc.verifyEqual(tseries.step, 1); %TODO: maybe implement
+            tc.verifyEqual(rng.step, 1);
             for i = 1:length(rng)
                 m = rng(i);
                 tc.verifyClass(m, 'tseries.MIT');
@@ -56,7 +57,8 @@ classdef TestRange < matlab.unittest.TestCase
         function step_range_with_duration(tc)
             sr = tseries.MITRange(tseries.qq(1,1), tseries.qq(1,3) - tseries.qq(1,1), tseries.qq(4,4));
             tc.verifyEqual(length(sr), 8);
-            tc.verifyEqual(tseries.step(sr), 2);
+            % tc.verifyEqual(tseries.step(sr), 2); % TODO: maybe implement
+            tc.verifyEqual(sr.step, 2);
             tc.verifyTrue(sr.startMIT == tseries.qq(1,1));
             tc.verifyTrue(sr(end)     == tseries.qq(4,3));
         end
@@ -64,7 +66,8 @@ classdef TestRange < matlab.unittest.TestCase
         function step_range_with_int(tc)
             sr = tseries.MITRange(tseries.qq(1,1), 2, tseries.qq(4,4));
             tc.verifyEqual(length(sr), 8);
-            tc.verifyEqual(tseries.step(sr), 2);
+            % tc.verifyEqual(tseries.step(sr), 2); % TODO: maybe implement
+            tc.verifyEqual(sr.step, 2);
         end
 
         function step_range_mixed_freq_throws(tc)

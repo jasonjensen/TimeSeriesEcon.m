@@ -21,8 +21,8 @@ function rng = rangeof(x, varargin)
     end
 
     if drop > 0
-        rng = tseries.MITRange(rng.startMIT + drop, rng.stopMIT, rng.stepSize);
+        rng = tseries.MITRange(rng.startMIT + drop, rng.stepSize, rng.stopMIT);
     elseif drop < 0
-        rng = tseries.MITRange(rng.startMIT, rng.stopMIT + drop, rng.stepSize);
+        rng = tseries.MITRange(rng.startMIT, rng.stepSize, rng.stopMIT + drop);
     end
 end

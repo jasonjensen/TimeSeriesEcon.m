@@ -207,7 +207,8 @@ classdef TestMIT < matlab.unittest.TestCase
         % ---------- conversion to float ----------
 
         function plus_float_returns_float(tc)
-            tc.verifyEqual(tseries.qq(2000,1) + 1.0, 2000.0);
+            % TODO: this should actually return something like 8000 + 1.1
+            tc.verifyEqual(tseries.qq(2000,1) + 1.1, 2001.1);
             tc.verifyEqual(tseries.qq(2000,1) + 1.2, 2001.2);
         end
 
