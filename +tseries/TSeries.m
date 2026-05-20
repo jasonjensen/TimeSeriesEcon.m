@@ -414,11 +414,296 @@ classdef TSeries
         function s = summary(t)
             s = summaryStr(t);
         end
+
+        % ---------- arithmetic ----------
+
+        function r = plus(a, b)
+            r = binaryOp(a, b, @plus);
+        end
+
+        function r = minus(a, b)
+            r = binaryOp(a, b, @minus);
+        end
+
+        function r = times(a, b)
+            r = binaryOp(a, b, @times);
+        end
+
+        function r = rdivide(a, b)
+            r = binaryOp(a, b, @rdivide);
+        end
+
+        function r = ldivide(a, b)
+            r = binaryOp(a, b, @ldivide);
+        end
+
+        function r = power(a, b)
+            r = binaryOp(a, b, @power);
+        end
+
+        function r = uminus(t)
+            r = t;
+            r.values = -t.values;
+        end
+
+        function r = uplus(t)
+            r = t;
+        end
+
+        function r = mtimes(a, b)
+            % Scalar * TSeries / TSeries * scalar => element-wise.
+            % Anything else defers to numeric mtimes (will usually error
+            % for vector*vector, which matches Julia behaviour).
+            if isa(a, 'tseries.TSeries') && isscalar(b) && isnumeric(b)
+                r = a;
+                r.values = a.values * b;
+                return
+            end
+            if isa(b, 'tseries.TSeries') && isscalar(a) && isnumeric(a)
+                r = b;
+                r.values = a * b.values;
+                return
+            end
+            va = tseriesValues(a);
+            vb = tseriesValues(b);
+            r = va * vb;
+        end
+
+        function r = mrdivide(a, b)
+            if isa(a, 'tseries.TSeries') && isscalar(b) && isnumeric(b)
+                r = a;
+                r.values = a.values / b;
+                return
+            end
+            r = tseriesValues(a) / tseriesValues(b);
+        end
+
+        function r = mldivide(a, b)
+            if isa(b, 'tseries.TSeries') && isscalar(a) && isnumeric(a)
+                r = b;
+                r.values = a \ b.values;
+                return
+            end
+            r = tseriesValues(a) \ tseriesValues(b);
+        end
+
+        % ---------- comparison (element-wise) ----------
+
+        function r = eq(a, b)
+            r = binaryOp(a, b, @eq);
+        end
+
+        function r = ne(a, b)
+            r = binaryOp(a, b, @ne);
+        end
+
+        function r = lt(a, b)
+            r = binaryOp(a, b, @lt);
+        end
+
+        function r = le(a, b)
+            r = binaryOp(a, b, @le);
+        end
+
+        function r = gt(a, b)
+            r = binaryOp(a, b, @gt);
+        end
+
+        function r = ge(a, b)
+            r = binaryOp(a, b, @ge);
+        end
+
+        function tf = isequal(a, b)
+            if ~isa(a, 'tseries.TSeries') || ~isa(b, 'tseries.TSeries')
+                tf = false; return
+            end
+            tf = eq(a.firstdate, b.firstdate) ...
+                && isequal(a.values, b.values);
+        end
+
+        function tf = isequaln(a, b)
+            if ~isa(a, 'tseries.TSeries') || ~isa(b, 'tseries.TSeries')
+                tf = false; return
+            end
+            tf = eq(a.firstdate, b.firstdate) ...
+                && isequaln(a.values, b.values);
+        end
+
+        % ---------- reductions ----------
+
+        function r = sum(t, varargin)
+            r = sum(t.values, varargin{:});
+        end
+
+        function r = prod(t, varargin)
+            r = prod(t.values, varargin{:});
+        end
+
+        function r = mean(t, varargin)
+            r = mean(t.values, varargin{:});
+        end
+
+        function r = median(t, varargin)
+            r = median(t.values, varargin{:});
+        end
+
+        function r = std(t, varargin)
+            r = std(t.values, varargin{:});
+        end
+
+        function r = var(t, varargin)
+            r = var(t.values, varargin{:});
+        end
+
+        function r = min(t, varargin)
+            r = min(t.values, varargin{:});
+        end
+
+        function r = max(t, varargin)
+            r = max(t.values, varargin{:});
+        end
+
+        function r = any(t, varargin)
+            r = any(t.values, varargin{:});
+        end
+
+        function r = all(t, varargin)
+            r = all(t.values, varargin{:});
+        end
+
+        % ---------- cumulative / difference ----------
+
+        function r = cumsum(t, varargin)
+            r = t;
+            r.values = cumsum(t.values, varargin{:});
+        end
+
+        function r = cumprod(t, varargin)
+            r = t;
+            r.values = cumprod(t.values, varargin{:});
+        end
+
+        % NB: not overriding `diff` because Julia's diff has a different
+        % sign convention from MATLAB's.  Use tseries.diff_ts() or the
+        % diff_ts method below.
+        function r = diff_ts(t, k)
+            if nargin < 2, k = -1; end
+            r = t - lag(t, -k);
+        end
+
+        % ---------- shift / lag / lead ----------
+
+        function r = shift(t, k)
+            % Shift dates by k (negative = lag, positive = lead).
+            r = t;
+            r.firstdate = t.firstdate - k;
+        end
+
+        function r = lag(t, k)
+            if nargin < 2, k = 1; end
+            r = shift(t, -k);
+        end
+
+        function r = lead(t, k)
+            if nargin < 2, k = 1; end
+            r = shift(t, k);
+        end
+
+        % ---------- percent change ----------
+
+        function r = pct(t, shiftValue, varargin)
+            % pct(t, shift_value=-1, 'islog', false)
+            if nargin < 2, shiftValue = -1; end
+            p = inputParser; addParameter(p, 'islog', false);
+            parse(p, varargin{:});
+            if p.Results.islog
+                a = t;  a.values = exp(t.values);
+                b = shift(a, shiftValue);
+            else
+                a = t;
+                b = shift(t, shiftValue);
+            end
+            r = times(minus(a, b), rdivide(1, b)) * 100;
+        end
+
+        function r = apct(t, islog)
+            if nargin < 2, islog = false; end
+            F = t.firstdate.frequency;
+            if ~isa(F, 'tseries.YPFrequency')
+                error('tseries:noMatch', 'apct for frequency %s not implemented.', class(F));
+            end
+            N = double(F.PeriodsPerYear);
+            if islog
+                a = t;  a.values = exp(t.values);
+            else
+                a = t;
+            end
+            b = shift(a, -1);
+            r = (power(rdivide(a, b), N) - 1) * 100;
+        end
+
+        function r = ytypct(t)
+            F = t.firstdate.frequency;
+            if ~isa(F, 'tseries.YPFrequency')
+                error('tseries:noMatch', 'ytypct for frequency %s not implemented.', class(F));
+            end
+            N = double(F.PeriodsPerYear);
+            r = (rdivide(t, shift(t, -N)) - 1) * 100;
+        end
+
+        % ---------- moving ----------
+
+        function r = moving_sum(t, n)
+            r = movingSumImpl(t, n, false);
+        end
+
+        function r = moving_average(t, n)
+            r = movingSumImpl(t, n, true);
+        end
+
+        function r = moving(t, n)
+            r = movingSumImpl(t, n, true);
+        end
+
+        % ---------- conversion ----------
+
+        function v = double(t)
+            v = double(t.values);
+        end
+
+        function tf = islogical(t)
+            tf = islogical(t.values);
+        end
+
+        function tf = isnumeric(t)
+            tf = isnumeric(t.values);
+        end
+
+        function r = copy(t)
+            r = t;
+        end
     end
 
     methods (Static, Access = private)
         function out = doGet(t, idx)
             % Dispatcher for t(idx) reads.
+            if isa(idx, 'tseries.TSeries') && islogical(idx.values)
+                if ~eq(idx.firstdate.frequency, t.firstdate.frequency)
+                    mixed_freq_error(idx.firstdate.frequency, t.firstdate.frequency);
+                end
+                % Align idx onto t's range
+                rng = intersect(rangeof(t), rangeof(idx));
+                if isempty(rng)
+                    out = zeros(0, 1, class(t.values));
+                    return
+                end
+                kT = double(rng.startMIT.value - t.firstdate.value) + 1;
+                nL = length(rng);
+                kI = double(rng.startMIT.value - idx.firstdate.value) + 1;
+                mask = idx.values(kI : kI + nL - 1);
+                out = t.values(kT - 1 + find(mask));
+                return
+            end
             if isa(idx, 'tseries.MIT')
                 if isscalar(idx)
                     if ~eq(idx.frequency, t.firstdate.frequency)
@@ -478,6 +763,23 @@ classdef TSeries
 
         function t = doSet(t, idx, val)
             % Dispatcher for t(idx) = val writes.
+            if isa(idx, 'tseries.TSeries') && islogical(idx.values)
+                if ~eq(idx.firstdate.frequency, t.firstdate.frequency)
+                    mixed_freq_error(idx.firstdate.frequency, t.firstdate.frequency);
+                end
+                rng = intersect(rangeof(t), rangeof(idx));
+                kT = double(rng.startMIT.value - t.firstdate.value) + 1;
+                nL = length(rng);
+                kI = double(rng.startMIT.value - idx.firstdate.value) + 1;
+                mask = idx.values(kI : kI + nL - 1);
+                targetIdx = kT - 1 + find(mask);
+                if isscalar(val)
+                    t.values(targetIdx) = val;
+                else
+                    t.values(targetIdx) = val(:);
+                end
+                return
+            end
             if isa(idx, 'tseries.MIT')
                 if isscalar(idx)
                     if ~eq(idx.frequency, t.firstdate.frequency)
@@ -651,4 +953,96 @@ function tf = issubrange(child, parent)
     else
         tf = false;
     end
+end
+
+% ---------- binary-op alignment helper ----------
+
+function r = binaryOp(a, b, op)
+% Apply op element-wise on numeric storage, returning a TSeries when at
+% least one input is a TSeries.  Mixed frequencies error.
+    if isa(a, 'tseries.TSeries') && isa(b, 'tseries.TSeries')
+        if ~eq(a.firstdate.frequency, b.firstdate.frequency)
+            mixed_freq_error(a.firstdate.frequency, b.firstdate.frequency);
+        end
+        rngA = rangeof(a);
+        rngB = rangeof(b);
+        rng = intersect(rngA, rngB);
+        if isempty(rng)
+            r = tseries.TSeries(rng.startMIT);  % empty
+            return
+        end
+        kA = double(rng.startMIT.value - a.firstdate.value) + 1;
+        nL = length(rng);
+        kB = double(rng.startMIT.value - b.firstdate.value) + 1;
+        va = a.values(kA : kA + nL - 1);
+        vb = b.values(kB : kB + nL - 1);
+        r = tseries.TSeries(rng.startMIT, op(va, vb));
+        return
+    end
+    if isa(a, 'tseries.TSeries')
+        va = a.values;
+        if isnumeric(b) || islogical(b)
+            if isscalar(b)
+                r = tseries.TSeries(a.firstdate, op(va, b));
+            elseif numel(b) == numel(va)
+                r = tseries.TSeries(a.firstdate, op(va, b(:)));
+            else
+                error('tseries:dimMismatch', ...
+                    'Vector length %d does not match TSeries length %d.', ...
+                    numel(b), numel(va));
+            end
+            return
+        end
+    end
+    if isa(b, 'tseries.TSeries')
+        vb = b.values;
+        if isnumeric(a) || islogical(a)
+            if isscalar(a)
+                r = tseries.TSeries(b.firstdate, op(a, vb));
+            elseif numel(a) == numel(vb)
+                r = tseries.TSeries(b.firstdate, op(a(:), vb));
+            else
+                error('tseries:dimMismatch', ...
+                    'Vector length %d does not match TSeries length %d.', ...
+                    numel(a), numel(vb));
+            end
+            return
+        end
+    end
+    error('tseries:noMatch', 'Unsupported binary operands for TSeries.');
+end
+
+function v = tseriesValues(x)
+% Helper: extract numeric storage from either a TSeries or a plain array.
+    if isa(x, 'tseries.TSeries')
+        v = x.values;
+    else
+        v = x;
+    end
+end
+
+function r = movingSumImpl(t, n, avg)
+    if ~(isnumeric(n) && isscalar(n) && n ~= 0 && n == fix(n))
+        error('tseries:noMatch', 'moving window n must be a non-zero integer.');
+    end
+    n = double(n);
+    an = abs(n);
+    len = length(t.values) - an;
+    if len < 0
+        error('tseries:dimMismatch', 'Window %d is larger than the series length.', an);
+    end
+    if n > 0
+        startDate = t.firstdate + (n - 1);
+    else
+        startDate = t.firstdate;
+    end
+    cls = class(t.values);
+    out = zeros(len + 1, 1, cls);
+    for i = 1:an
+        out = out + t.values(i : i + len);
+    end
+    if avg
+        out = out / an;
+    end
+    r = tseries.TSeries(startDate, out);
 end
