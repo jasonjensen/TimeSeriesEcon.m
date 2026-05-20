@@ -14,6 +14,14 @@ function r = overlay(varargin)
         error('tseries:noMatch', 'overlay requires at least one argument.');
     end
 
+    % Multivariate overlay: every arg is an MVTSeries (with optional MITRange first).
+    if isa(varargin{1}, 'tseries.MVTSeries') ...
+            || (isa(varargin{1}, 'tseries.MITRange') ...
+                && numel(varargin) >= 2 && isa(varargin{2}, 'tseries.MVTSeries'))
+        r = overlayMVTSeries(varargin{:});
+        return
+    end
+
     % Scalar/array overlay (everything that's not a TSeries)
     if ~isa(varargin{1}, 'tseries.MITRange') && ~isa(varargin{1}, 'tseries.TSeries')
         head = varargin{1};
@@ -101,5 +109,65 @@ function c = sumtype(a, b)
         c = 'double';
     else
         c = order{max(ia, ib)};
+    end
+end
+
+function r = overlayMVTSeries(varargin)
+% Overlay multiple MVTSeries onto a common range and column-union.
+
+    if isa(varargin{1}, 'tseries.MITRange')
+        rng = varargin{1};
+        mvtsArgs = varargin(2:end);
+    else
+        rngs = cellfun(@tseries.rangeof, varargin, 'UniformOutput', false);
+        rng = tseries.rangeof_span(rngs{:});
+        mvtsArgs = varargin;
+    end
+
+    if isempty(mvtsArgs)
+        r = tseries.MVTSeries();
+        return
+    end
+
+    F = mvtsArgs{1}.firstdate.frequency;
+    for k = 2:numel(mvtsArgs)
+        if ~eq(mvtsArgs{k}.firstdate.frequency, F)
+            mixed_freq_error(F, mvtsArgs{k}.firstdate.frequency);
+        end
+    end
+
+    % Ordered union of column names
+    allNames = mvtsArgs{1}.colnames;
+    for k = 2:numel(mvtsArgs)
+        for j = 1:numel(mvtsArgs{k}.colnames)
+            nm = mvtsArgs{k}.colnames(j);
+            if ~any(allNames == nm)
+                allNames = [allNames, nm]; %#ok<AGROW>
+            end
+        end
+    end
+
+    % Element type
+    cls = class(mvtsArgs{1}.values);
+    for k = 2:numel(mvtsArgs)
+        cls = sumtype(cls, class(mvtsArgs{k}.values));
+    end
+
+    nrows = length(rng);
+    out = repmat(tseries.typenan(cls), nrows, numel(allNames));
+    out = cast(out, cls);
+    r = tseries.MVTSeries(rng, allNames, out);
+
+    for c = 1:numel(allNames)
+        nm = allNames(c);
+        % Collect TSeries for this column across all args that have it.
+        cols = {};
+        for k = 1:numel(mvtsArgs)
+            if any(mvtsArgs{k}.colnames == nm)
+                cols{end+1} = mvtsArgs{k}.(char(nm)); %#ok<AGROW>
+            end
+        end
+        ts = tseries.overlay(rng, cols{:});
+        r.(char(nm)) = ts;
     end
 end
