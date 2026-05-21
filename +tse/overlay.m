@@ -58,7 +58,7 @@ function r = overlay(varargin)
         cls = sumtype(cls, class(tseries_args{k}.values));
     end
 
-    F = tseries_args{1}.firstdate.frequency;
+    F = tseries_args{1}.frequency;
     n = length(rng);
     out = repmat(tse.typenan(cls), n, 1);
     out = cast(out, cls);
@@ -67,8 +67,8 @@ function r = overlay(varargin)
 
     for k = 1:numel(tseries_args)
         ts = tseries_args{k};
-        if ~eq(ts.firstdate.frequency, F)
-            mixed_freq_error(F, ts.firstdate.frequency);
+        if ~eq(ts.frequency, F)
+            mixed_freq_error(F, ts.frequency);
         end
         tsFirst = ts.firstdate.value;
         nts = length(ts.values);
@@ -129,10 +129,10 @@ function r = overlayMVTSeries(varargin)
         return
     end
 
-    F = mvtsArgs{1}.firstdate.frequency;
+    F = mvtsArgs{1}.frequency;
     for k = 2:numel(mvtsArgs)
-        if ~eq(mvtsArgs{k}.firstdate.frequency, F)
-            mixed_freq_error(F, mvtsArgs{k}.firstdate.frequency);
+        if ~eq(mvtsArgs{k}.frequency, F)
+            mixed_freq_error(F, mvtsArgs{k}.frequency);
         end
     end
 

@@ -1,38 +1,53 @@
 Scenario                                        Median (µs)
 ------------------------------------------------------------
-construct_tseries_qq_100                             10.738
-construct_mvts_qq_100x5                              69.093
-indexing_mit_lookup_100                            5256.739
-indexing_int_lookup_100                            1554.738
-indexing_mitrange_slice                             481.738
-indexing_mvts_column                                 61.061
-arith_add_misaligned                                997.738
-arith_add_aligned                                  1008.738
-arith_mul_scalar                                      8.769
-shift_quarterly_lag1                                136.738
-lead_quarterly_lag1                                 135.268
-diff_quarterly                                     1070.738
-pct_quarterly                                      2112.738
-ytypct_quarterly_100                               1170.738
-mean_quarterly_100                                  106.269
-std_quarterly_100                                   101.769
-quantile_quarterly_100                               90.361
-cor_two_tseries                                     227.445
-cov_two_tseries                                     152.587
-cor_mvts_5_columns                                  166.784
-cov_mvts_5_columns                                  100.788
+construct_tseries_qq_100                             52.654
+construct_mvts_qq_100x5                              65.654
+indexing_mit_lookup_100                            3070.654
+indexing_int_lookup_100                            1507.654
+indexing_mitrange_slice                             473.654
+indexing_mvts_column                                 66.654
+arith_add_misaligned                                963.654
+arith_add_aligned                                   897.654
+arith_mul_scalar                                      9.224
+shift_quarterly_lag1                                130.654
+lead_quarterly_lag1                                 136.224
+diff_quarterly                                     1124.654
+pct_quarterly                                      2157.654
+ytypct_quarterly_100                               1109.654
+mean_quarterly_100                                   95.654
+std_quarterly_100                                   101.654
+quantile_quarterly_100                               94.654
+cor_two_tseries                                     256.654
+cov_two_tseries                                     161.654
+cor_mvts_5_columns                                  171.654
+cov_mvts_5_columns                                  100.224
 mean_mvts_axis0_5cols                                   n/a  [ERROR: Index in position 1 exceeds array bounds. Index must not exceed 1.]
 mean_mvts_axis1_100rows                                 n/a  [ERROR: Index in position 1 exceeds array bounds. Index must not exceed 1.]
-moving_average_quarterly_4                          165.738
-moving_sum_quarterly_4                              155.768
-undiff_quarterly                                   9626.739
-rec_ar2_100                                       54346.738
-rec_backcasting_via_lambda                        46747.738
-overlay_three_tseries                             10213.739
-reindex_tseries_100                                 269.779
-rangeof_tseries_drop1                               555.738
-linalg_matrix_tseries_100                             5.665
+moving_average_quarterly_4                          181.654
+moving_sum_quarterly_4                              152.724
+undiff_quarterly                                        n/a  [ERROR: Mixing frequencies not allowed: Quarterly and Unit.]
+rec_ar2_100                                       49546.654
+rec_backcasting_via_lambda                        44583.654
+overlay_three_tseries                             10718.654
+reindex_tseries_100                                 324.654
+rangeof_tseries_drop1                               614.654
+linalg_matrix_tseries_100                             5.724
 
 All times are median µs per call (timeit).
-Budget per scenario: 2.0 s total.
-Run startup_tseries.m if +tseries is not on the path.
+
+
+
+COMPARISON TimeSeriesEconPy
+Scenario                                        Median (µs)
+------------------------------------------------------------
+construct_tseries_qq_100                              1.49
+indexing_mit_lookup_100                             108.7
+arith_add_misaligned                                 17.62
+arith_add_aligned                                    17.43
+arith_mul_scalar                                     15.98
+shift_quarterly_lag1                                  4.2
+diff_quarterly                                       24.26
+pct_quarterly                                        59.39
+ytypct_quarterly_100                                 58.59
+mean_quarterly_100                                    2.08
+moving_average_quarterly_4                           11.74

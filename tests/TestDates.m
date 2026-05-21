@@ -19,7 +19,7 @@ classdef TestDates < matlab.unittest.TestCase
         function daily_range(tc)
             rng = tse.daily('2022-01-01', '2022-01-20');
             tc.verifyClass(rng, 'tse.MITRange');
-            tc.verifyTrue(isa(rng.startMIT.frequency, 'tse.Daily'));
+            tc.verifyTrue(isa(tse.frequencyof(rng.startMIT), 'tse.Daily'));
             tc.verifyEqual(datetime(2022,1,1),  tse.toDate(rng.startMIT));
             tc.verifyEqual(datetime(2022,1,20), tse.toDate(rng.stopMIT));
         end
@@ -65,14 +65,14 @@ classdef TestDates < matlab.unittest.TestCase
         function bdaily_range(tc)
             r = tse.bdaily('2022-01-01', '2022-01-22');
             tc.verifyClass(r, 'tse.MITRange');
-            tc.verifyTrue(isa(r.startMIT.frequency, 'tse.BDaily'));
+            tc.verifyTrue(isa(tse.frequencyof(r.startMIT), 'tse.BDaily'));
             tc.verifyEqual(datetime(2022,1,3),  tse.toDate(r.startMIT));
             tc.verifyEqual(datetime(2022,1,21), tse.toDate(r.stopMIT));
         end
 
         function weekly_basic(tc)
             w1 = tse.MIT(tse.Weekly(7), 105451);
-            tc.verifyTrue(isa(w1.frequency, 'tse.Weekly'));
+            tc.verifyTrue(isa(tse.frequencyof(w1), 'tse.Weekly'));
             tc.verifyTrue(tse.weekly('2022-01-01') == w1);
             tc.verifyTrue(tse.weekly('2022-01-01', 7) == w1);
 

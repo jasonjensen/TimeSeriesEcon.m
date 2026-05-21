@@ -11,6 +11,7 @@ classdef MITRange
         startMIT
         stopMIT
         stepSize (1,1) int64 = int64(1)
+        frequency
     end
 
     methods
@@ -18,6 +19,7 @@ classdef MITRange
             if nargin == 0
                 obj.startMIT = tse.MIT(tse.Unit(), 1);
                 obj.stopMIT  = tse.MIT(tse.Unit(), 0);
+                obj.frequency = obj.startMIT.frequency;
                 return
             end
             if ~isa(a, 'tse.MIT')
@@ -35,6 +37,7 @@ classdef MITRange
                     obj.startMIT = a;
                     obj.stopMIT  = b;
                     obj.stepSize = int64(1);
+                    obj.frequency = obj.startMIT.frequency;
                 case 2
                     s = varargin{1};
                     b = varargin{2};
@@ -56,13 +59,14 @@ classdef MITRange
                     end
                     obj.startMIT = a;
                     obj.stopMIT  = b;
+                    obj.frequency = obj.startMIT.frequency;
                 otherwise
                     error('tseries:noMatch', 'MITRange takes 2 or 3 arguments.');
             end
         end
 
         function F = frequencyof(rng)
-            F = rng.startMIT.frequency;
+            F = rng.frequency;
         end
 
         function n = length(rng)
@@ -143,10 +147,10 @@ classdef MITRange
                         error('tseries:bounds', 'MITRange index out of bounds.');
                     end
                     if isscalar(idx)
-                        out = tse.MIT(rng.startMIT.frequency, ...
+                        out = tse.MIT(rng.frequency, ...
                             rng.startMIT.value + (idx - 1) * rng.stepSize);
                     else
-                        out = arrayfun(@(k) tse.MIT(rng.startMIT.frequency, ...
+                        out = arrayfun(@(k) tse.MIT(rng.frequency, ...
                             rng.startMIT.value + (k - 1) * rng.stepSize), idx);
                     end
                 else
@@ -163,7 +167,7 @@ classdef MITRange
                 out = tse.MIT.empty(1,0);
                 return
             end
-            F = rng.startMIT.frequency;
+            F = rng.frequency;
             out = repmat(tse.MIT(F, 0), 1, n);
             v0 = rng.startMIT.value;
             for k = 1:n
@@ -173,7 +177,7 @@ classdef MITRange
 
         function tf = ismember(rng, m)
             if isa(rng, 'tse.MITRange') && isa(m, 'tse.MIT')
-                if ~eq(rng.startMIT.frequency, m.frequency)
+                if ~eq(rng.frequency, m.frequency)
                     tf = false;
                     return
                 end
@@ -201,12 +205,12 @@ classdef MITRange
             if a.stepSize ~= 1 || b.stepSize ~= 1
                 error('tseries:noMatch', 'intersect on stepped MITRanges not supported.');
             end
-            if ~eq(a.startMIT.frequency, b.startMIT.frequency)
-                mixed_freq_error(a.startMIT.frequency, b.startMIT.frequency);
+            if a.frequency ~= b.frequency
+                mixed_freq_error(a.frequency, b.frequency);
             end
             lo = max(a.startMIT.value, b.startMIT.value);
             hi = min(a.stopMIT.value, b.stopMIT.value);
-            F  = a.startMIT.frequency;
+            F  = a.frequency;
             r  = tse.MITRange(tse.MIT(F, lo), tse.MIT(F, hi));
         end
 
@@ -217,12 +221,12 @@ classdef MITRange
             if a.stepSize ~= 1 || b.stepSize ~= 1
                 error('tseries:noMatch', 'union on stepped MITRanges not supported.');
             end
-            if ~eq(a.startMIT.frequency, b.startMIT.frequency)
-                mixed_freq_error(a.startMIT.frequency, b.startMIT.frequency);
+            if a.frequency ~= b.frequency
+                mixed_freq_error(a.frequency, b.frequency);
             end
             lo = min(a.startMIT.value, b.startMIT.value);
             hi = max(a.stopMIT.value, b.stopMIT.value);
-            F  = a.startMIT.frequency;
+            F  = a.frequency;
             r  = tse.MITRange(tse.MIT(F, lo), tse.MIT(F, hi));
         end
 
@@ -240,14 +244,14 @@ classdef MITRange
         function rng = plus(a, b)
             if isa(a, 'tse.MITRange') && (isnumeric(b) || isa(b, 'tse.Duration'))
                 if isa(b, 'tse.Duration')
-                    if ~eq(a.startMIT.frequency, b.frequency)
-                        mixed_freq_error(a.startMIT.frequency, b.frequency);
+                    if a.frequency ~= b.frequency
+                        mixed_freq_error(a.frequency, b.frequency);
                     end
                     shift = b.value;
                 else
                     shift = int64(b);
                 end
-                F = a.startMIT.frequency;
+                F = a.frequency;
                 rng = tse.MITRange( ...
                     tse.MIT(F, a.startMIT.value + shift), ...
                     a.stepSize, ...
@@ -263,14 +267,14 @@ classdef MITRange
         function rng = minus(a, b)
             if isa(a, 'tse.MITRange') && (isnumeric(b) || isa(b, 'tse.Duration'))
                 if isa(b, 'tse.Duration')
-                    if ~eq(a.startMIT.frequency, b.frequency)
-                        mixed_freq_error(a.startMIT.frequency, b.frequency);
+                    if a.frequency ~= b.frequency
+                        mixed_freq_error(a.frequency, b.frequency);
                     end
                     shift = b.value;
                 else
                     shift = int64(b);
                 end
-                F = a.startMIT.frequency;
+                F = a.frequency;
                 rng = tse.MITRange( ...
                     tse.MIT(F, a.startMIT.value - shift), ...
                     tse.MIT(F, a.stopMIT.value  - shift), ...
@@ -293,7 +297,7 @@ classdef MITRange
         end
 
         function disp(rng)
-            F = rng.startMIT.frequency;
+            F = int2freq(rng.frequency);
             if isa(F, 'tse.CalendarFrequency') && ~isa(F, 'tse.YPFrequency') && ~isa(F, 'tse.Unit')
                 fprintf('%s %s\n', prettyprint_frequency(F), char(rng));
             else

@@ -7,7 +7,7 @@ function d = mitToDate(m, ref)
     if nargin < 2
         ref = 'end';
     end
-    F = m.frequency;
+    F = int2freq(m.frequency);
     epoch = datetime(0, 12, 31);
     val = double(m.value);
     if isa(F, 'tse.Daily')

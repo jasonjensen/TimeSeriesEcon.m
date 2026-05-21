@@ -62,8 +62,23 @@ function run_benchmarks(varargin)
         % Wrap RUN in a no-output closure for timeit.
         fn = @() runFn(state);
 
+        
+        % profile clear
+        % profile on
+        % fn();                    % or for k=1:10, f(); end
+        % profile off
+        % profile viewer
+        % keyboard
+
         % timeit estimates the median time per call.
         try
+            % nreps = 500;
+            % tstart=tic;
+            % for i = 1:nreps
+            %     fn();
+            % end
+            % tSec = toc(tstart);
+
             tSec = timeit(fn);
             tUs  = tSec * 1e6;
             fprintf('%-45s  %12.3f\n', name, tUs);

@@ -5,7 +5,7 @@ classdef Duration
 
     properties (SetAccess = immutable)
         value (1,1) int64       = int64(0)
-        frequency               = tse.Unit()
+        frequency (1,1) int32   = int32(11)   % integer code; see freq2int / int2freq
     end
 
     methods
@@ -13,14 +13,18 @@ classdef Duration
             if nargin == 0
                 return
             end
-            if ~isa(F, 'tse.Frequency')
+            % Accept either a tse.Frequency object or an int32 frequency code.
+            if isa(F, 'tse.Frequency')
+                obj.frequency = freq2int(F);
+            elseif isnumeric(F) && isscalar(F)
+                obj.frequency = int32(F);
+            else
                 error('tseries:noMatch', ...
-                    'Duration(F, n) requires a tse.Frequency as first argument.');
+                    'Duration(F, n) requires a tse.Frequency or integer frequency code.');
             end
             if nargin < 2
                 value = 0;
             end
-            obj.frequency = F;
             obj.value = int64(value);
         end
 
@@ -31,9 +35,10 @@ classdef Duration
         end
 
         function n = double(d)
-            if isa(d.frequency, 'tse.YPFrequency')
+            F = int2freq(d.frequency);
+            if isa(F, 'tse.YPFrequency')
                 % Julia: Float(d) = Int(d) / N for YP
-                n = double(d.value) / double(d.frequency.PeriodsPerYear);
+                n = double(d.value) / double(F.PeriodsPerYear);
             else
                 n = double(d.value);
             end
@@ -47,7 +52,7 @@ classdef Duration
 
         function r = plus(a, b)
             if isa(a, 'tse.Duration') && isa(b, 'tse.Duration')
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 r = tse.Duration(a.frequency, a.value + b.value);
@@ -65,7 +70,7 @@ classdef Duration
 
         function r = minus(a, b)
             if isa(a, 'tse.Duration') && isa(b, 'tse.Duration')
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 r = tse.Duration(a.frequency, a.value - b.value);
@@ -99,7 +104,7 @@ classdef Duration
 
         function r = rdivide(a, b)
             if isa(a, 'tse.Duration') && isa(b, 'tse.Duration')
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 r = double(a.value) / double(b.value);
@@ -116,7 +121,7 @@ classdef Duration
             if ~isa(b, 'tse.Duration')
                 error('tseries:invalidArith', 'Modulus only defined Duration vs Duration.');
             end
-            if ~eq(a.frequency, b.frequency)
+            if a.frequency ~= b.frequency
                 mixed_freq_error(a.frequency, b.frequency);
             end
             r = tse.Duration(a.frequency, rem(a.value, b.value));
@@ -134,7 +139,7 @@ classdef Duration
             if ~isa(b, 'tse.Duration')
                 error('tseries:invalidArith', 'Integer division only defined Duration vs Duration.');
             end
-            if ~eq(a.frequency, b.frequency)
+            if a.frequency ~= b.frequency
                 mixed_freq_error(a.frequency, b.frequency);
             end
             r = tse.Duration(a.frequency, idivide(a.value, b.value, 'fix'));
@@ -148,7 +153,7 @@ classdef Duration
 
         function tf = eq(a, b)
             if isa(a, 'tse.Duration') && isa(b, 'tse.Duration')
-                tf = eq(a.frequency, b.frequency) && (a.value == b.value);
+                tf = (a.frequency == b.frequency) && (a.value == b.value);
             elseif isa(a, 'tse.Duration') && isnumeric(b)
                 tf = (a.value == int64(b));
             elseif isnumeric(a) && isa(b, 'tse.Duration')
@@ -168,7 +173,7 @@ classdef Duration
 
         function tf = lt(a, b)
             if isa(a, 'tse.Duration') && isa(b, 'tse.Duration')
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 tf = (a.value < b.value);
@@ -201,7 +206,7 @@ classdef Duration
         end
 
         function F = frequencyof(d)
-            F = d.frequency;
+            F = int2freq(d.frequency);
         end
 
         function s = char(d)

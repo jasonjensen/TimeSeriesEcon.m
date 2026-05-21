@@ -13,7 +13,7 @@ classdef MIT
 
     properties (SetAccess = immutable)
         value (1,1) int64       = int64(0)
-        frequency               = tse.Unit()
+        frequency (1,1) int32   = int32(11)   % integer code; see freq2int / int2freq
     end
 
     methods
@@ -21,11 +21,17 @@ classdef MIT
             if nargin == 0
                 return  % default-constructed MIT, used internally
             end
-            if ~isa(F, 'tse.Frequency')
+            % Accept either a tse.Frequency object or an int32 frequency code.
+            if isa(F, 'tse.Frequency')
+                obj.frequency = freq2int(F);
+                fObj = F;          % keep original for yp2value (case 2)
+            elseif isnumeric(F) && isscalar(F)
+                obj.frequency = int32(F);
+                fObj = [];         % will reconstruct only if needed
+            else
                 error('tseries:noMatch', ...
-                    'MIT(F, ...) requires a tse.Frequency as first argument.');
+                    'MIT(F, ...) requires a tse.Frequency or integer frequency code.');
             end
-            obj.frequency = F;
             switch numel(varargin)
                 case 0
                     obj.value = int64(0);
@@ -34,7 +40,10 @@ classdef MIT
                 case 2
                     y = int64(varargin{1});
                     p = int64(varargin{2});
-                    obj.value = tse.MIT.yp2value(F, y, p);
+                    if isempty(fObj)
+                        fObj = int2freq(obj.frequency);
+                    end
+                    obj.value = tse.MIT.yp2value(fObj, y, p);
                 otherwise
                     error('tseries:noMatch', ...
                         'MIT accepts at most three arguments (frequency, year, period).');
@@ -57,9 +66,10 @@ classdef MIT
             % Floating-point representation as year + (period-1)/N for YP
             % frequencies; falls back to raw value otherwise.  Used for
             % plotting.
-            if isa(m.frequency, 'tse.YPFrequency')
+            F = int2freq(m.frequency);
+            if isa(F, 'tse.YPFrequency')
                 yp = mit2yp(m);
-                n = double(yp(1)) + (double(yp(2)) - 1) / double(m.frequency.PeriodsPerYear);
+                n = double(yp(1)) + (double(yp(2)) - 1) / double(F.PeriodsPerYear);
             else
                 n = double(m.value);
             end
@@ -75,7 +85,7 @@ classdef MIT
                 error('tseries:invalidArith', ...
                     'Illegal addition of Duration and MIT. Try MIT + Duration.');
             elseif isa(a, 'tse.MIT') && isa(b, 'tse.Duration')
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 r = tse.MIT(a.frequency, a.value + b.value);
@@ -99,12 +109,12 @@ classdef MIT
 
         function r = minus(a, b)
             if isa(a, 'tse.MIT') && isa(b, 'tse.MIT')
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 r = tse.Duration(a.frequency, a.value - b.value);
             elseif isa(a, 'tse.MIT') && isa(b, 'tse.Duration')
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 r = tse.MIT(a.frequency, a.value - b.value);
@@ -139,7 +149,7 @@ classdef MIT
 
         function r = rdivide(a, b)
             if isa(a, 'tse.MIT') && isa(b, 'tse.Duration')
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 r = double(a.value) / double(b.value);
@@ -152,7 +162,7 @@ classdef MIT
 
         function tf = eq(a, b)
             if isa(a, 'tse.MIT') && isa(b, 'tse.MIT')
-                tf = eq(a.frequency, b.frequency) && (a.value == b.value);
+                tf = (a.frequency == b.frequency) && (a.value == b.value);
             elseif isa(a, 'tse.MIT') && isnumeric(b)
                 tf = (a.value == int64(b));
             elseif isnumeric(a) && isa(b, 'tse.MIT')
@@ -172,7 +182,7 @@ classdef MIT
 
         function tf = lt(a, b)
             if isa(a, 'tse.MIT') && isa(b, 'tse.MIT')
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 tf = (a.value < b.value);
@@ -210,7 +220,7 @@ classdef MIT
         end
 
         function h = hash(m)
-            h = string(class(m.frequency)) + ":" + string(double(m.value));
+            h = string(double(m.frequency)) + ":" + string(double(m.value));
         end
 
         % ---------- ranges ----------
@@ -222,7 +232,7 @@ classdef MIT
                     error('tseries:invalidArith', ...
                         'Cannot mix Int and MIT in the same range.');
                 end
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 rng = tse.MITRange(a, b);
@@ -232,11 +242,11 @@ classdef MIT
                     error('tseries:invalidArith', ...
                         'Cannot mix Int and MIT in the same range.');
                 end
-                if ~eq(a.frequency, b.frequency)
+                if a.frequency ~= b.frequency
                     mixed_freq_error(a.frequency, b.frequency);
                 end
                 if isa(s, 'tse.Duration')
-                    if ~eq(a.frequency, s.frequency)
+                    if a.frequency ~= s.frequency
                         mixed_freq_error(a.frequency, s.frequency);
                     end
                     step = s.value;
@@ -277,7 +287,7 @@ classdef MIT
         % ---------- display ----------
 
         function s = char(m)
-            F = m.frequency;
+            F = int2freq(m.frequency);
             if isa(F, 'tse.Unit')
                 s = sprintf('%dU', double(m.value));
             elseif isa(F, 'tse.Yearly')

@@ -10,7 +10,7 @@ function yp = mit2yp(m)
     if ~isa(m, 'tse.MIT')
         error('tseries:noMatch', 'mit2yp expects an MIT.');
     end
-    F = m.frequency;
+    F = int2freq(m.frequency);
     if isa(F, 'tse.YPFrequency')
         N = int64(F.PeriodsPerYear);
         [y, p] = idivremFix(m.value, N);

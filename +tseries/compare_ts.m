@@ -31,13 +31,13 @@ function tf = compare_ts(a, b, varargin)
     ignoreMissing = p.Results.ignoreMissing;
     trange       = p.Results.trange;
 
-    if isa(a, 'tse.TSeries') && isa(b, 'tse.TSeries')
+    if isa(a, 'tseries.TSeries') && isa(b, 'tseries.TSeries')
         if ~eq(a.frequency, b.frequency)
             tf = false; return
         end
-        rngA = tse.rangeof(a);
-        rngB = tse.rangeof(b);
-        if ~isempty(trange) && isa(trange, 'tse.MITRange') ...
+        rngA = tseries.rangeof(a);
+        rngB = tseries.rangeof(b);
+        if ~isempty(trange) && isa(trange, 'tseries.MITRange') ...
                 && eq(trange.frequency, a.frequency)
             rngA = intersect(trange, rngA);
             rngB = intersect(trange, rngB);
@@ -60,7 +60,7 @@ function tf = compare_ts(a, b, varargin)
         return
     end
 
-    if isa(a, 'tse.MVTSeries') && isa(b, 'tse.MVTSeries')
+    if isa(a, 'tseries.MVTSeries') && isa(b, 'tseries.MVTSeries')
         if ~eq(a.frequency, b.frequency)
             tf = false; return
         end
@@ -73,9 +73,9 @@ function tf = compare_ts(a, b, varargin)
             end
             cols = a.colnames;
         end
-        rngA = tse.rangeof(a);
-        rngB = tse.rangeof(b);
-        if ~isempty(trange) && isa(trange, 'tse.MITRange') ...
+        rngA = tseries.rangeof(a);
+        rngB = tseries.rangeof(b);
+        if ~isempty(trange) && isa(trange, 'tseries.MITRange') ...
                 && eq(trange.frequency, a.frequency)
             rngA = intersect(trange, rngA);
             rngB = intersect(trange, rngB);

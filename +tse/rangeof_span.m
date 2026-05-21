@@ -17,12 +17,12 @@ function rng = rangeof_span(varargin)
             rng = r;
             haveRange = true;
         else
-            if ~eq(rng.startMIT.frequency, r.startMIT.frequency)
-                mixed_freq_error(rng.startMIT.frequency, r.startMIT.frequency);
+            if ~eq(rng.frequency, r.frequency)
+                mixed_freq_error(rng.frequency, r.frequency);
             end
             lo = min(rng.startMIT.value, r.startMIT.value);
             hi = max(rng.stopMIT.value,  r.stopMIT.value);
-            F  = rng.startMIT.frequency;
+            F  = rng.frequency;
             rng = tse.MITRange(tse.MIT(F, lo), tse.MIT(F, hi));
         end
     end

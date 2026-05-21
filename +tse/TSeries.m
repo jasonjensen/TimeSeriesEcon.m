@@ -39,6 +39,7 @@ classdef TSeries
     properties
         firstdate
         values
+        frequency
     end
 
     methods
@@ -47,6 +48,7 @@ classdef TSeries
         function obj = TSeries(varargin)
             if nargin == 0
                 obj.firstdate = tse.MIT(tse.Unit(), 1);
+                obj.frequency = obj.firstdate.frequency;
                 obj.values = zeros(0, 1);
                 return
             end
@@ -67,6 +69,7 @@ classdef TSeries
                     error('tseries:noMatch', 'TSeries(n) takes no initializer.');
                 end
                 obj.firstdate = tse.MIT(tse.Unit(), 1);
+                obj.frequency = obj.firstdate.frequency;
                 obj.values = nan(double(first), 1);
                 return
             end
@@ -74,15 +77,18 @@ classdef TSeries
             if isa(first, 'tse.MIT')
                 if nargin == 1
                     obj.firstdate = first;
+                    obj.frequency = obj.firstdate.frequency;
                     obj.values = zeros(0, 1);
                 else
                     second = varargin{2};
                     if isnumeric(second)
                         obj.firstdate = first;
                         obj.values = second(:);
+                        obj.frequency = obj.firstdate.frequency;
                     elseif islogical(second)
                         obj.firstdate = first;
                         obj.values = second(:);
+                        obj.frequency = obj.firstdate.frequency;
                     else
                         error('tseries:noMatch', ...
                             'TSeries(mit, vec) requires a vector of values.');
@@ -116,12 +122,14 @@ classdef TSeries
             if isempty(more)
                 obj = tse.TSeries();
                 obj.firstdate = rng.startMIT;
+                obj.frequency = obj.firstdate.frequency;
                 obj.values = nan(length(rng), 1);
                 return
             end
             init = more{1};
             obj = tse.TSeries();
             obj.firstdate = rng.startMIT;
+            obj.frequency = obj.firstdate.frequency;
             n = length(rng);
             if isempty(init) || (ischar(init) && strcmpi(init, 'undef')) ...
                     || (isstring(init) && strcmpi(init, 'undef'))
@@ -157,17 +165,20 @@ classdef TSeries
                 obj.firstdate = tse.MIT(tse.Unit(), 1);
                 obj.values = repmat(tse.typenan(T), double(first), 1);
                 obj.values = cast(obj.values, T);
+                obj.frequency = obj.firstdate.frequency;
                 return
             end
             if isa(first, 'tse.MIT')
                 if numel(args) == 1
                     obj.firstdate = first;
                     obj.values = zeros(0, 1, T);
+                    obj.frequency = obj.firstdate.frequency;
                 else
                     second = args{2};
                     if isnumeric(second) || islogical(second)
                         obj.firstdate = first;
                         obj.values = cast(second(:), T);
+                        obj.frequency = obj.firstdate.frequency;
                     else
                         error('tseries:noMatch', 'Unsupported TSeries(type, mit, ...) signature.');
                     end
@@ -178,6 +189,7 @@ classdef TSeries
                 rng = first;
                 n = length(rng);
                 obj.firstdate = rng.startMIT;
+                obj.frequency = obj.firstdate.frequency;
                 if numel(args) == 1
                     obj.values = repmat(tse.typenan(T), n, 1);
                     obj.values = cast(obj.values, T);
@@ -230,11 +242,7 @@ classdef TSeries
         end
 
         function F = frequencyof(t)
-            F = t.firstdate.frequency;
-        end
-
-        function F = frequency(t)
-            F = t.firstdate.frequency;
+            F = t.frequency;
         end
 
         function rng = rangeof(t, varargin)
@@ -347,8 +355,8 @@ classdef TSeries
         function t = resize(t, rng)
             % rng: MITRange (new range) or integer (new length, keep firstdate)
             if isa(rng, 'tse.MITRange')
-                if ~eq(rng.startMIT.frequency, t.firstdate.frequency)
-                    mixed_freq_error(rng.startMIT.frequency, t.firstdate.frequency);
+                if ~eq(rng.frequency, t.frequency)
+                    mixed_freq_error(rng.frequency, t.frequency);
                 end
                 fdNew = rng.startMIT;
                 nNew  = length(rng);
@@ -636,11 +644,11 @@ classdef TSeries
 
         function r = apct(t, islog)
             if nargin < 2, islog = false; end
-            F = t.firstdate.frequency;
-            if ~isa(F, 'tse.YPFrequency')
-                error('tseries:noMatch', 'apct for frequency %s not implemented.', class(F));
+            F = t.frequency;
+            if F < 32
+                error('tseries:noMatch', 'apct for frequency %s not implemented.', class(tse.int2freq(F)));
             end
-            N = double(F.PeriodsPerYear);
+            N = periodsPerYear(F);
             if islog
                 a = t;  a.values = exp(t.values);
             else
@@ -651,11 +659,11 @@ classdef TSeries
         end
 
         function r = ytypct(t)
-            F = t.firstdate.frequency;
-            if ~isa(F, 'tse.YPFrequency')
-                error('tseries:noMatch', 'ytypct for frequency %s not implemented.', class(F));
+            F = t.frequency;
+            if F < 32
+                error('tseries:noMatch', 'ytypct for frequency %s not implemented.', class(tse.int2freq(F)));
             end
-            N = double(F.PeriodsPerYear);
+            N = periodsPerYear(F);
             r = (rdivide(t, shift(t, -N)) - 1) * 100;
         end
 
@@ -729,7 +737,7 @@ classdef TSeries
                 out = tse.MIT.empty(1, 0);
                 return
             end
-            F = t.firstdate.frequency;
+            F = t.frequency;
             v0 = t.firstdate.value;
             out = repmat(tse.MIT(F, 0), 1, n);
             for k = 1:n
@@ -742,7 +750,8 @@ classdef TSeries
                 tf = false; return
             end
             if isa(idx, 'tse.MIT')
-                if ~eq(idx.frequency, t.firstdate.frequency)
+                % keyboard
+                if ~eq(idx.frequency, t.frequency)
                     error('tseries:mixedFreq', ...
                         'isassigned: mixed frequencies.');
                 end
@@ -760,200 +769,198 @@ classdef TSeries
 
     methods (Static, Access = private)
         function out = doGet(t, idx)
-            % Dispatcher for t(idx) reads.
-            if isa(idx, 'tse.TSeries') && islogical(idx.values)
-                if ~eq(idx.firstdate.frequency, t.firstdate.frequency)
-                    mixed_freq_error(idx.firstdate.frequency, t.firstdate.frequency);
-                end
-                % Align idx onto t's range
-                rng = intersect(rangeof(t), rangeof(idx));
-                if isempty(rng)
-                    out = zeros(0, 1, class(t.values));
-                    return
-                end
-                kT = double(rng.startMIT.value - t.firstdate.value) + 1;
-                nL = length(rng);
-                kI = double(rng.startMIT.value - idx.firstdate.value) + 1;
-                mask = idx.values(kI : kI + nL - 1);
-                out = t.values(kT - 1 + find(mask));
-                return
-            end
-            if isa(idx, 'tse.MIT')
-                if isscalar(idx)
-                    if ~eq(idx.frequency, t.firstdate.frequency)
-                        mixed_freq_error(idx.frequency, t.firstdate.frequency);
+            % Single-dispatch on index type: one class() lookup, no isa() chain.
+            switch class(idx)
+                case 'tse.MIT'
+                    if isscalar(idx)
+                        if idx.frequency ~= t.frequency
+                            mixed_freq_error(idx.frequency, t.frequency);
+                        end
+                        k = idx.value - t.firstdate.value + 1;
+                        if k < 1 || k > length(t.values)
+                            error('tseries:bounds', 'MIT %s is out of range.', char(idx));
+                        end
+                        out = t.values(k);
+                    else
+                        out = doMitVecGet(t, idx);
                     end
-                    k = double(idx.value - t.firstdate.value) + 1;
-                    if k < 1 || k > length(t.values)
-                        error('tseries:bounds', 'MIT %s is out of range.', char(idx));
+                case 'tse.MITRange'
+                    if idx.frequency ~= t.frequency
+                        mixed_freq_error(idx.frequency, t.frequency);
                     end
-                    out = t.values(k);
-                else
-                    out = doMitVecGet(t, idx);
-                end
-                return
+                    kStart = double(idx.startMIT.value - t.firstdate.value) + 1;
+                    kEnd   = double(idx.stopMIT.value  - t.firstdate.value) + 1;
+                    if kStart < 1 || kEnd > length(t.values)
+                        error('tseries:bounds', 'Range %s is outside %s.', ...
+                            char(idx), char(rangeof(t)));
+                    end
+                    if idx.stepSize == 1
+                        out = tse.TSeries();
+                        out.firstdate = idx.startMIT;
+                        out.values = t.values(kStart:kEnd);
+                        out.frequency = t.frequency;
+                    else
+                        step = double(idx.stepSize);
+                        out = t.values(kStart:step:kEnd);
+                    end
+                case 'tse.TSeries'
+                    if ~islogical(idx.values)
+                        error('tseries:bounds', 'TSeries index must have logical values.');
+                    end
+                    if idx.frequency ~= t.frequency
+                        mixed_freq_error(idx.frequency, t.frequency);
+                    end
+                    rng = intersect(rangeof(t), rangeof(idx));
+                    if isempty(rng)
+                        out = zeros(0, 1, class(t.values));
+                        return
+                    end
+                    kT = double(rng.startMIT.value - t.firstdate.value) + 1;
+                    nL = length(rng);
+                    kI = double(rng.startMIT.value - idx.firstdate.value) + 1;
+                    mask = idx.values(kI : kI + nL - 1);
+                    out = t.values(kT - 1 + find(mask));
+                case 'char'
+                    if strcmp(idx, ':')
+                        out = t;
+                    else
+                        error('tseries:bounds', 'Unsupported char index ''%s''.', idx);
+                    end
+                case 'logical'
+                    if numel(idx) ~= length(t.values)
+                        error('tseries:bounds', 'Boolean index length mismatch.');
+                    end
+                    out = t.values(idx);
+                case {'double','single','int8','uint8','int16','uint16', ...
+                        'int32','uint32','int64','uint64'}
+                    idx = double(idx);
+                    if any(idx(:) < 1) || any(idx(:) > length(t.values))
+                        error('tseries:bounds', 'Integer index out of range.');
+                    end
+                    out = t.values(idx);
+                otherwise
+                    error('tseries:bounds', 'Unsupported TSeries index of type %s.', class(idx));
             end
-            if isa(idx, 'tse.MITRange')
-                if ~eq(idx.startMIT.frequency, t.firstdate.frequency)
-                    mixed_freq_error(idx.startMIT.frequency, t.firstdate.frequency);
-                end
-                kStart = double(idx.startMIT.value - t.firstdate.value) + 1;
-                kEnd   = double(idx.stopMIT.value  - t.firstdate.value) + 1;
-                if kStart < 1 || kEnd > length(t.values)
-                    error('tseries:bounds', 'Range %s is outside %s.', ...
-                        char(idx), char(rangeof(t)));
-                end
-                if idx.stepSize == 1
-                    out = tse.TSeries();
-                    out.firstdate = idx.startMIT;
-                    out.values = t.values(kStart:kEnd);
-                else
-                    step = double(idx.stepSize);
-                    out = t.values(kStart:step:kEnd);
-                end
-                return
-            end
-            if ischar(idx) && strcmp(idx, ':')
-                out = t;
-                return
-            end
-            if islogical(idx)
-                if numel(idx) ~= length(t.values)
-                    error('tseries:bounds', 'Boolean index length mismatch.');
-                end
-                out = t.values(idx);
-                return
-            end
-            if isnumeric(idx)
-                idx = double(idx);
-                if any(idx(:) < 1) || any(idx(:) > length(t.values))
-                    error('tseries:bounds', 'Integer index out of range.');
-                end
-                out = t.values(idx);
-                return
-            end
-            error('tseries:bounds', 'Unsupported TSeries index of type %s.', class(idx));
         end
 
         function t = doSet(t, idx, val)
-            % Dispatcher for t(idx) = val writes.
-            if isa(idx, 'tse.TSeries') && islogical(idx.values)
-                if ~eq(idx.firstdate.frequency, t.firstdate.frequency)
-                    mixed_freq_error(idx.firstdate.frequency, t.firstdate.frequency);
-                end
-                rng = intersect(rangeof(t), rangeof(idx));
-                kT = double(rng.startMIT.value - t.firstdate.value) + 1;
-                nL = length(rng);
-                kI = double(rng.startMIT.value - idx.firstdate.value) + 1;
-                mask = idx.values(kI : kI + nL - 1);
-                targetIdx = kT - 1 + find(mask);
-                if isscalar(val)
-                    t.values(targetIdx) = val;
-                else
-                    t.values(targetIdx) = val(:);
-                end
-                return
-            end
-            if isa(idx, 'tse.MIT')
-                if isscalar(idx)
-                    if ~eq(idx.frequency, t.firstdate.frequency)
-                        mixed_freq_error(idx.frequency, t.firstdate.frequency);
+            % Single-dispatch on index type.
+            switch class(idx)
+                case 'tse.MIT'
+                    if isscalar(idx)
+                        if idx.frequency ~= t.frequency
+                            mixed_freq_error(idx.frequency, t.frequency);
+                        end
+                        if ~ismember(rangeof(t), idx)
+                            t = resize(t, tse.rangeof_span(rangeof(t), idx));
+                        end
+                        k = double(idx.value - t.firstdate.value) + 1;
+                        if isa(val, 'tse.TSeries')
+                            sub = tse.TSeries.doGet(val, idx);
+                            t.values(k) = sub;
+                        else
+                            t.values(k) = val;
+                        end
+                    else
+                        % Vector of MITs.
+                        for kk = 1:numel(idx)
+                            m = idx(kk);
+                            if m.frequency ~= t.frequency
+                                mixed_freq_error(m.frequency, t.frequency);
+                            end
+                            if ~ismember(rangeof(t), m)
+                                t = resize(t, tse.rangeof_span(rangeof(t), m));
+                            end
+                            pos = double(m.value - t.firstdate.value) + 1;
+                            if isscalar(val)
+                                t.values(pos) = val;
+                            else
+                                t.values(pos) = val(kk);
+                            end
+                        end
                     end
-                    if ~ismember(rangeof(t), idx)
+                case 'tse.MITRange'
+                    if idx.frequency ~= t.frequency
+                        mixed_freq_error(idx.frequency, t.frequency);
+                    end
+                    if ~issubrange(idx, rangeof(t))
                         t = resize(t, tse.rangeof_span(rangeof(t), idx));
                     end
-                    k = double(idx.value - t.firstdate.value) + 1;
-                    if isa(val, 'tse.TSeries')
-                        sub = tse.TSeries.doGet(val, idx);
-                        t.values(k) = sub;
-                    else
-                        t.values(k) = val;
-                    end
-                else
-                    % Vector of MITs.
-                    for kk = 1:numel(idx)
-                        m = idx(kk);
-                        if ~eq(m.frequency, t.firstdate.frequency)
-                            mixed_freq_error(m.frequency, t.firstdate.frequency);
-                        end
-                        if ~ismember(rangeof(t), m)
-                            t = resize(t, tse.rangeof_span(rangeof(t), m));
-                        end
-                        pos = double(m.value - t.firstdate.value) + 1;
-                        if isscalar(val)
-                            t.values(pos) = val;
+                    kStart =(idx.startMIT.value - t.firstdate.value) + 1;
+                    kEnd   =(idx.stopMIT.value  - t.firstdate.value) + 1;
+                    if idx.stepSize == 1
+                        if isa(val, 'tse.TSeries')
+                            if val.frequency ~= t.frequency
+                                mixed_freq_error(val.frequency, t.frequency);
+                            end
+                            sub = tse.TSeries.doGet(val, idx);
+                            t.values(kStart:kEnd) = sub.values;
+                        elseif isscalar(val)
+                            t.values(kStart:kEnd) = val;
                         else
-                            t.values(pos) = val(kk);
+                            if numel(val) ~= (kEnd - kStart + 1)
+                                error('tseries:dimMismatch', ...
+                                    'Vector length does not match range length.');
+                            end
+                            t.values(kStart:kEnd) = val(:);
                         end
-                    end
-                end
-                return
-            end
-            if isa(idx, 'tse.MITRange')
-                if ~eq(idx.startMIT.frequency, t.firstdate.frequency)
-                    mixed_freq_error(idx.startMIT.frequency, t.firstdate.frequency);
-                end
-                if ~issubrange(idx, rangeof(t))
-                    t = resize(t, tse.rangeof_span(rangeof(t), idx));
-                end
-                kStart = double(idx.startMIT.value - t.firstdate.value) + 1;
-                kEnd   = double(idx.stopMIT.value  - t.firstdate.value) + 1;
-                if idx.stepSize == 1
-                    if isa(val, 'tse.TSeries')
-                        if ~eq(val.firstdate.frequency, t.firstdate.frequency)
-                            mixed_freq_error(val.firstdate.frequency, t.firstdate.frequency);
-                        end
-                        sub = tse.TSeries.doGet(val, idx);
-                        t.values(kStart:kEnd) = sub.values;
-                    elseif isscalar(val)
-                        t.values(kStart:kEnd) = val;
                     else
-                        if numel(val) ~= (kEnd - kStart + 1)
-                            error('tseries:dimMismatch', ...
-                                'Vector length does not match range length.');
+                        step = double(idx.stepSize);
+                        if isa(val, 'tse.TSeries')
+                            sub = tse.TSeries.doGet(val, idx);
+                            t.values(kStart:step:kEnd) = sub;
+                        elseif isscalar(val)
+                            t.values(kStart:step:kEnd) = val;
+                        else
+                            t.values(kStart:step:kEnd) = val(:);
                         end
-                        t.values(kStart:kEnd) = val(:);
                     end
-                else
-                    step = double(idx.stepSize);
-                    if isa(val, 'tse.TSeries')
-                        sub = tse.TSeries.doGet(val, idx);
-                        t.values(kStart:step:kEnd) = sub;
-                    elseif isscalar(val)
-                        t.values(kStart:step:kEnd) = val;
+                case 'tse.TSeries'
+                    if ~islogical(idx.values)
+                        error('tseries:bounds', 'TSeries index must have logical values.');
+                    end
+                    if idx.frequency ~= t.frequency
+                        mixed_freq_error(idx.frequency, t.frequency);
+                    end
+                    rng = intersect(rangeof(t), rangeof(idx));
+                    kT = double(rng.startMIT.value - t.firstdate.value) + 1;
+                    nL = length(rng);
+                    kI = double(rng.startMIT.value - idx.firstdate.value) + 1;
+                    mask = idx.values(kI : kI + nL - 1);
+                    targetIdx = kT - 1 + find(mask);
+                    if isscalar(val)
+                        t.values(targetIdx) = val;
                     else
-                        t.values(kStart:step:kEnd) = val(:);
+                        t.values(targetIdx) = val(:);
                     end
-                end
-                return
-            end
-            if ischar(idx) && strcmp(idx, ':')
-                if isscalar(val)
-                    t.values(:) = val;
-                else
-                    if numel(val) ~= length(t.values)
-                        error('tseries:dimMismatch', 'Length mismatch on (:) assignment.');
+                case 'char'
+                    if strcmp(idx, ':')
+                        if isscalar(val)
+                            t.values(:) = val;
+                        else
+                            if numel(val) ~= length(t.values)
+                                error('tseries:dimMismatch', 'Length mismatch on (:) assignment.');
+                            end
+                            t.values(:) = val(:);
+                        end
+                    else
+                        error('tseries:bounds', 'Unsupported char index ''%s''.', idx);
                     end
-                    t.values(:) = val(:);
-                end
-                return
+                case 'logical'
+                    if numel(idx) ~= length(t.values)
+                        error('tseries:bounds', 'Boolean index length mismatch.');
+                    end
+                    t.values(idx) = val;
+                case {'double','single','int8','uint8','int16','uint16', ...
+                        'int32','uint32','int64','uint64'}
+                    idx = double(idx);
+                    if any(idx(:) < 1) || any(idx(:) > length(t.values))
+                        error('tseries:bounds', 'Integer index out of range.');
+                    end
+                    t.values(idx) = val;
+                otherwise
+                    error('tseries:bounds', 'Unsupported TSeries index of type %s.', class(idx));
             end
-            if islogical(idx)
-                if numel(idx) ~= length(t.values)
-                    error('tseries:bounds', 'Boolean index length mismatch.');
-                end
-                t.values(idx) = val;
-                return
-            end
-            if isnumeric(idx)
-                idx = double(idx);
-                if any(idx(:) < 1) || any(idx(:) > length(t.values))
-                    error('tseries:bounds', 'Integer index out of range.');
-                end
-                t.values(idx) = val;
-                return
-            end
-            error('tseries:bounds', 'Unsupported TSeries index of type %s.', class(idx));
         end
     end
 end
@@ -979,7 +986,7 @@ function summary_(t)
     if ~strcmp(cls, 'double')
         et = sprintf(',%s', cls);
     end
-    Fname = char(t.firstdate.frequency);
+    Fname = char(int2freq(t.frequency));
     typestr = sprintf('TSeries{%s%s}', Fname, et);
     if isempty(t)
         fprintf('Empty %s starting %s', typestr, char(t.firstdate));
@@ -995,7 +1002,7 @@ function s = summaryStr(t)
     if ~strcmp(cls, 'double')
         et = sprintf(',%s', cls);
     end
-    Fname = char(t.firstdate.frequency);
+    Fname = char(int2freq(t.frequency));
     typestr = sprintf('TSeries{%s%s}', Fname, et);
     if isempty(t)
         s = sprintf('Empty %s starting %s', typestr, char(t.firstdate));
@@ -1009,8 +1016,8 @@ function out = doMitVecGet(t, mits)
     out = zeros(numel(mits), 1, class(t.values));
     for k = 1:numel(mits)
         m = mits(k);
-        if ~eq(m.frequency, t.firstdate.frequency)
-            mixed_freq_error(m.frequency, t.firstdate.frequency);
+        if ~eq(m.frequency, t.frequency)
+            mixed_freq_error(m.frequency, t.frequency);
         end
         ki = double(m.value - t.firstdate.value) + 1;
         if ki < 1 || ki > length(t.values)
@@ -1035,8 +1042,8 @@ function r = binaryOp(a, b, op)
 % Apply op element-wise on numeric storage, returning a TSeries when at
 % least one input is a TSeries.  Mixed frequencies error.
     if isa(a, 'tse.TSeries') && isa(b, 'tse.TSeries')
-        if ~eq(a.firstdate.frequency, b.firstdate.frequency)
-            mixed_freq_error(a.firstdate.frequency, b.firstdate.frequency);
+        if ~eq(a.frequency, b.frequency)
+            mixed_freq_error(a.frequency, b.frequency);
         end
         rngA = rangeof(a);
         rngB = rangeof(b);

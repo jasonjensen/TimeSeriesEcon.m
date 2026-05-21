@@ -45,7 +45,7 @@ classdef TestMIT < matlab.unittest.TestCase
         function subtract_mit_int_yields_mit(tc)
             r = tse.qq(2020,1) - 2;
             tc.verifyClass(r, 'tse.MIT');
-            tc.verifyTrue(isa(r.frequency, 'tse.Quarterly'));
+            tc.verifyTrue(isa(tse.frequencyof(r), 'tse.Quarterly'));
         end
 
         function subtract_mit_duration_yields_mit(tc)
