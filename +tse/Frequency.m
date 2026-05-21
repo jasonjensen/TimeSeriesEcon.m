@@ -11,8 +11,10 @@ classdef (Abstract) Frequency
     %   See also: tse.Quarterly, tse.MIT.
 
     properties (SetAccess = protected)
-        % Set by subclass constructors; treat as immutable thereafter.
-        endPeriod (1,1) double {mustBeInteger, mustBePositive} = 1
+        % Set once by subclass constructors; treat as immutable thereafter.
+        % Validators stripped on the hot path -- subclass constructors are
+        % responsible for ensuring the value is a valid integer in range.
+        endPeriod = 1
     end
 
     properties (Abstract, Constant)

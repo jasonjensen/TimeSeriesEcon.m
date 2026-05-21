@@ -46,8 +46,8 @@ classdef MVTSeries
 
         function obj = MVTSeries(varargin)
             if nargin == 0
-                obj.firstdate = tse.MIT(tse.Unit(), 1);
-                obj.frequency = obj.firstdate.frequency;
+                obj.firstdate = tse.MIT(int32(11), int64(1));
+                obj.frequency = int32(11);
                 obj.colnames  = strings(1, 0);
                 obj.values    = zeros(0, 0);
                 return
@@ -319,21 +319,35 @@ classdef MVTSeries
                 name = S(1).subs;
                 if any(strcmp({'firstdate','colnames','values'}, name))
                     out = builtin('subsref', x, S(1));
+                    if numel(S) > 1
+                        out = subsref(out, S(2:end));
+                    end
+                    varargout = {out};
+                    return
                 elseif any(strcmp(string(name), x.colnames))
                     out = colTSeries(x, string(name));
-                else
-                    % Could be a method call (e.g. x.rangeof)
-                    try
-                        out = builtin('subsref', x, S(1));
-                    catch
-                        error('tseries:bounds', 'Unknown MVTSeries field: %s', name);
+                    if numel(S) > 1
+                        out = subsref(out, S(2:end));
                     end
+                    varargout = {out};
+                    return
+                else
+                    % Method call (e.g. x.mean('dims', 1)).  Pass the
+                    % FULL S chain to builtin so dot-method-call syntax
+                    % is dispatched as a method invocation, not a
+                    % property read followed by a separate ()-call.
+                    try
+                        [varargout{1:nargout}] = builtin('subsref', x, S);
+                    catch ME
+                        if strcmp(ME.identifier, 'MATLAB:nonExistentField') ...
+                                || strcmp(ME.identifier, 'MATLAB:noSuchMethodOrField')
+                            error('tseries:bounds', 'Unknown MVTSeries field: %s', name);
+                        else
+                            rethrow(ME);
+                        end
+                    end
+                    return
                 end
-                if numel(S) > 1
-                    out = subsref(out, S(2:end));
-                end
-                varargout = {out};
-                return
             end
 
             if strcmp(S(1).type, '()')
@@ -725,53 +739,98 @@ classdef MVTSeries
 
         function r = shift(x, k)
             r = x;
-            r.firstdate = x.firstdate - k;
+            r.firstdate = tse.MIT(x.frequency, x.firstdate.value - int64(k));
         end
 
         function r = lag(x, k)
             if nargin < 2, k = 1; end
-            r = shift(x, -k);
+            r = x;
+            r.firstdate = tse.MIT(x.frequency, x.firstdate.value + int64(k));
         end
 
         function r = lead(x, k)
             if nargin < 2, k = 1; end
-            r = shift(x, k);
+            r = x;
+            r.firstdate = tse.MIT(x.frequency, x.firstdate.value - int64(k));
         end
 
         % ---------- percent change ----------
 
         function r = pct(x, shiftValue, varargin)
             if nargin < 2, shiftValue = -1; end
-            p = inputParser; addParameter(p, 'islog', false);
-            parse(p, varargin{:});
-            if p.Results.islog
-                a = x; a.values = exp(x.values);
-            else
-                a = x;
+            islog = false;
+            if ~isempty(varargin)
+                p = inputParser; addParameter(p, 'islog', false);
+                parse(p, varargin{:});
+                islog = p.Results.islog;
             end
-            b = shift(a, shiftValue);
-            r = times(minus(a, b), rdivide(1, b)) * 100;
+            v = x.values;
+            if islog, v = exp(v); end
+            n = size(v, 1);
+            F = x.frequency;
+            fdv = x.firstdate.value;
+            if shiftValue < 0
+                k = -shiftValue;
+                if k >= n
+                    r = tse.MVTSeries(tse.MIT(F, fdv + int64(k)), x.colnames, ...
+                        zeros(0, size(v, 2), class(v)));
+                    return
+                end
+                a = v(k+1:end, :);
+                b = v(1:end-k, :);
+                fd = tse.MIT(F, fdv + int64(k));
+            else
+                k = shiftValue;
+                if k >= n
+                    r = tse.MVTSeries(tse.MIT(F, fdv), x.colnames, ...
+                        zeros(0, size(v, 2), class(v)));
+                    return
+                end
+                a = v(1:end-k, :);
+                b = v(k+1:end, :);
+                fd = tse.MIT(F, fdv);
+            end
+            r = tse.MVTSeries(fd, x.colnames, (a - b) ./ b * 100);
         end
 
         function r = apct(x, islog)
             if nargin < 2, islog = false; end
             F = x.frequency;
-            if ~isa(F, 'tse.YPFrequency')
-                error('tseries:noMatch', 'apct for frequency %s not implemented.', class(F));
+            if F < 32
+                error('tseries:noMatch', 'apct for frequency %s not implemented.', class(tse.int2freq(F)));
             end
-            N = double(F.PeriodsPerYear);
-            if islog, a = x; a.values = exp(x.values); else, a = x; end
-            b = shift(a, -1);
-            r = (power(rdivide(a, b), N) - 1) * 100;
+            N = periodsPerYear(F);
+            v = x.values;
+            if islog, v = exp(v); end
+            n = size(v, 1);
+            if n < 2
+                r = tse.MVTSeries(tse.MIT(F, x.firstdate.value + 1), x.colnames, ...
+                    zeros(0, size(v, 2), class(v)));
+                return
+            end
+            a = v(2:end, :);
+            b = v(1:end-1, :);
+            out = ((a ./ b) .^ N - 1) * 100;
+            r = tse.MVTSeries(tse.MIT(F, x.firstdate.value + 1), x.colnames, out);
         end
 
         function r = ytypct(x)
             F = x.frequency;
-            if ~isa(F, 'tse.YPFrequency')
-                error('tseries:noMatch', 'ytypct for frequency %s not implemented.', class(F));
+            if F < 32
+                error('tseries:noMatch', 'ytypct for frequency %s not implemented.', class(tse.int2freq(F)));
             end
-            N = double(F.PeriodsPerYear);
-            r = (rdivide(x, shift(x, -N)) - 1) * 100;
+            N = periodsPerYear(F);
+            v = x.values;
+            n = size(v, 1);
+            if N >= n
+                r = tse.MVTSeries(tse.MIT(F, x.firstdate.value + int64(N)), x.colnames, ...
+                    zeros(0, size(v, 2), class(v)));
+                return
+            end
+            a = v(N+1:end, :);
+            b = v(1:end-N, :);
+            out = (a ./ b - 1) * 100;
+            r = tse.MVTSeries(tse.MIT(F, x.firstdate.value + int64(N)), x.colnames, out);
         end
 
         % ---------- moving ----------
@@ -1288,46 +1347,73 @@ end
 function r = mvBinaryOp(a, b, op)
 % Align two operands (numeric / TSeries / MVTSeries / scalar) and apply
 % op element-wise, returning an MVTSeries when at least one operand is.
+%
+% Performance: operates on int64 row bounds, skips MITRange materialisation,
+% and short-circuits when ranges + column lists are identical.
 
     if isa(a, 'tse.MVTSeries') && isa(b, 'tse.MVTSeries')
-        if ~eq(a.frequency, b.frequency)
+        if a.frequency ~= b.frequency
             mixed_freq_error(a.frequency, b.frequency);
         end
-        rngA = rangeof(a); rngB = rangeof(b);
-        rng = intersect(rngA, rngB);
-        common = intersectColnames(a.colnames, b.colnames);
-        if isempty(common) || isempty(rng)
-            r = tse.MVTSeries(rng.startMIT, common, ...
-                zeros(length(rng), numel(common), class(a.values)));
+        fa = a.firstdate.value;
+        fb = b.firstdate.value;
+        na = size(a.values, 1);
+        nb = size(b.values, 1);
+        % --- fast path: identical ranges and column lists --------------
+        if fa == fb && na == nb && isequal(a.colnames, b.colnames)
+            r = a;
+            r.values = op(a.values, b.values);
             return
         end
-        kA = double(rng.startMIT.value - a.firstdate.value) + 1;
-        nL = length(rng);
-        kB = double(rng.startMIT.value - b.firstdate.value) + 1;
+        % --- general path ---------------------------------------------
+        F = a.frequency;
+        common = intersectColnames(a.colnames, b.colnames);
+        lo = max(fa, fb);
+        hi = min(fa + int64(na) - 1, fb + int64(nb) - 1);
+        if isempty(common) || hi < lo
+            nrows = double(max(int64(0), hi - lo + 1));
+            r = tse.MVTSeries(tse.MIT(F, lo), common, ...
+                zeros(nrows, numel(common), class(a.values)));
+            return
+        end
+        kA = double(lo - fa) + 1;
+        kB = double(lo - fb) + 1;
+        nL = double(hi - lo + 1);
         ksA = colIndicesOf(a, common);
         ksB = colIndicesOf(b, common);
         va = a.values(kA : kA + nL - 1, ksA);
         vb = b.values(kB : kB + nL - 1, ksB);
-        r = tse.MVTSeries(rng.startMIT, common, op(va, vb));
+        r = tse.MVTSeries(tse.MIT(F, lo), common, op(va, vb));
         return
     end
 
     if isa(a, 'tse.MVTSeries') && isa(b, 'tse.TSeries')
-        if ~eq(a.frequency, b.frequency)
+        if a.frequency ~= b.frequency
             mixed_freq_error(a.frequency, b.frequency);
         end
-        rng = intersect(rangeof(a), tse.rangeof(b));
-        if isempty(rng)
-            r = tse.MVTSeries(rng.startMIT, a.colnames, ...
+        fa = a.firstdate.value;
+        fb = b.firstdate.value;
+        na = size(a.values, 1);
+        nb = numel(b.values);
+        F  = a.frequency;
+        if fa == fb && na == nb
+            r = a;
+            r.values = op(a.values, b.values);
+            return
+        end
+        lo = max(fa, fb);
+        hi = min(fa + int64(na) - 1, fb + int64(nb) - 1);
+        if hi < lo
+            r = tse.MVTSeries(tse.MIT(F, lo), a.colnames, ...
                 zeros(0, numel(a.colnames), class(a.values)));
             return
         end
-        kA = double(rng.startMIT.value - a.firstdate.value) + 1;
-        nL = length(rng);
-        kB = double(rng.startMIT.value - b.firstdate.value) + 1;
+        kA = double(lo - fa) + 1;
+        kB = double(lo - fb) + 1;
+        nL = double(hi - lo + 1);
         va = a.values(kA : kA + nL - 1, :);
         vb = b.values(kB : kB + nL - 1);
-        r = tse.MVTSeries(rng.startMIT, a.colnames, op(va, vb));
+        r = tse.MVTSeries(tse.MIT(F, lo), a.colnames, op(va, vb));
         return
     end
 
@@ -1377,22 +1463,28 @@ end
 % ---------- reductions ----------
 
 function r = mvReduce(x, op, varargin)
-    p = inputParser;
-    addParameter(p, 'dims', []);
-    pos = {};
-    kw  = {};
-    for k = 1:numel(varargin)
-        if (ischar(varargin{k}) || isstring(varargin{k})) && strcmpi(varargin{k}, 'dims')
-            kw = varargin(k:end); break
+% Hoist x.values once and split args by 'dims' position (skip inputParser).
+    v = x.values;
+    pos  = {};
+    dims = [];
+    k = 1;
+    nv = numel(varargin);
+    while k <= nv
+        a = varargin{k};
+        if (ischar(a) || isstring(a)) && strcmpi(a, 'dims')
+            if k + 1 > nv
+                error('tseries:noMatch', "'dims' requires a value.");
+            end
+            dims = varargin{k + 1};
+            k = k + 2;
         else
-            pos{end+1} = varargin{k}; %#ok<AGROW>
+            pos{end+1} = a; %#ok<AGROW>
+            k = k + 1;
         end
     end
-    parse(p, kw{:});
-    dims = p.Results.dims;
 
     if isempty(dims)
-        r = op(x.values, pos{:});
+        r = op(v, pos{:});
         if isnumeric(r) && ~isscalar(r)
             r = op(r(:), pos{:});
         end
@@ -1400,16 +1492,16 @@ function r = mvReduce(x, op, varargin)
     end
 
     if dims == 1
-        r = op(x.values, pos{:}, 1);
+        r = op(v, pos{:}, 1);
         return
     end
     if dims == 2
-        rv = op(x.values, pos{:}, 2);
+        rv = op(v, pos{:}, 2);
         r = tse.TSeries(x.firstdate, rv(:));
         return
     end
     if dims >= 3
-        r = x.values;
+        r = v;
         return
     end
     error('tseries:noMatch', 'Unsupported dims value: %s', num2str(dims));

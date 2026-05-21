@@ -47,8 +47,9 @@ classdef TSeries
 
         function obj = TSeries(varargin)
             if nargin == 0
-                obj.firstdate = tse.MIT(tse.Unit(), 1);
-                obj.frequency = obj.firstdate.frequency;
+                % Skip the tse.Unit() materialisation -- Unit's int code is 11.
+                obj.firstdate = tse.MIT(int32(11), int64(1));
+                obj.frequency = int32(11);
                 obj.values = zeros(0, 1);
                 return
             end
@@ -68,8 +69,8 @@ classdef TSeries
                 if nargin > 1
                     error('tseries:noMatch', 'TSeries(n) takes no initializer.');
                 end
-                obj.firstdate = tse.MIT(tse.Unit(), 1);
-                obj.frequency = obj.firstdate.frequency;
+                obj.firstdate = tse.MIT(int32(11), int64(1));
+                obj.frequency = int32(11);
                 obj.values = nan(double(first), 1);
                 return
             end
@@ -105,8 +106,9 @@ classdef TSeries
             if isnumeric(first) && ~isscalar(first)
                 % Integer range like 1:5 -> Unit-frequency MITRange
                 if nargin == 1
-                    rng = tse.MITRange(tse.MIT(tse.Unit(),first(1)), ...
-                                            tse.MIT(tse.Unit(),first(end)));
+                    rng = tse.MITRange( ...
+                        tse.MIT(int32(11), int64(first(1))), ...
+                        tse.MIT(int32(11), int64(first(end))));
                     obj = tse.TSeries(rng);
                     return
                 end
@@ -307,20 +309,38 @@ classdef TSeries
                 varargout = {t};
                 return
             end
-            if strcmp(S(1).type, '()')
+            type1 = S(1).type;
+            if type1(1) == '('
                 subs = S(1).subs;
                 if numel(subs) ~= 1
                     error('tseries:bounds', ...
                         'TSeries supports 1-D indexing only.');
                 end
                 idx = subs{1};
+                % --- inline fast path: scalar MIT lookup ----------------
+                if isa(idx, 'tse.MIT') && isscalar(idx)
+                    if idx.frequency ~= t.frequency
+                        mixed_freq_error(idx.frequency, t.frequency);
+                    end
+                    k = idx.value - t.firstdate.value + 1;
+                    if k < 1 || k > numel(t.values)
+                        error('tseries:bounds', 'MIT %s is out of range.', char(idx));
+                    end
+                    out = t.values(k);
+                    if numel(S) > 1
+                        out = subsref(out, S(2:end));
+                    end
+                    varargout = {out};
+                    return
+                end
+                % --- general dispatcher --------------------------------
                 out = tse.TSeries.doGet(t, idx);
                 if numel(S) > 1
                     out = subsref(out, S(2:end));
                 end
                 varargout = {out};
                 return
-            elseif strcmp(S(1).type, '.')
+            elseif type1(1) == '.'
                 varargout = {builtin('subsref', t, S)};
                 return
             else
@@ -546,46 +566,20 @@ classdef TSeries
         end
 
         % ---------- reductions ----------
+        % Hoist t.values into a local so the property read only goes
+        % through subsref once.  (For overridden subsref classes, every
+        % `t.values` access costs ~µs.)
 
-        function r = sum(t, varargin)
-            r = sum(t.values, varargin{:});
-        end
-
-        function r = prod(t, varargin)
-            r = prod(t.values, varargin{:});
-        end
-
-        function r = mean(t, varargin)
-            r = mean(t.values, varargin{:});
-        end
-
-        function r = median(t, varargin)
-            r = median(t.values, varargin{:});
-        end
-
-        function r = std(t, varargin)
-            r = std(t.values, varargin{:});
-        end
-
-        function r = var(t, varargin)
-            r = var(t.values, varargin{:});
-        end
-
-        function r = min(t, varargin)
-            r = min(t.values, varargin{:});
-        end
-
-        function r = max(t, varargin)
-            r = max(t.values, varargin{:});
-        end
-
-        function r = any(t, varargin)
-            r = any(t.values, varargin{:});
-        end
-
-        function r = all(t, varargin)
-            r = all(t.values, varargin{:});
-        end
+        function r = sum(t, varargin),    v = t.values; r = sum(v, varargin{:});    end
+        function r = prod(t, varargin),   v = t.values; r = prod(v, varargin{:});   end
+        function r = mean(t, varargin),   v = t.values; r = mean(v, varargin{:});   end
+        function r = median(t, varargin), v = t.values; r = median(v, varargin{:}); end
+        function r = std(t, varargin),    v = t.values; r = std(v, varargin{:});    end
+        function r = var(t, varargin),    v = t.values; r = var(v, varargin{:});    end
+        function r = min(t, varargin),    v = t.values; r = min(v, varargin{:});    end
+        function r = max(t, varargin),    v = t.values; r = max(v, varargin{:});    end
+        function r = any(t, varargin),    v = t.values; r = any(v, varargin{:});    end
+        function r = all(t, varargin),    v = t.values; r = all(v, varargin{:});    end
 
         % ---------- cumulative / difference ----------
 
@@ -603,43 +597,93 @@ classdef TSeries
         % sign convention from MATLAB's.  Use tse.diff_ts() or the
         % diff_ts method below.
         function r = diff_ts(t, k)
+            % Direct-formula implementation that skips the intermediate
+            % `t - lag(t, -k)` binary-op chain.
             if nargin < 2, k = -1; end
-            r = t - lag(t, -k);
+            v = t.values;
+            n = numel(v);
+            F = t.frequency;
+            fdv = t.firstdate.value;
+            if k < 0
+                absk = -k;
+                if absk >= n
+                    r = tse.TSeries(tse.MIT(F, fdv + int64(absk)));
+                    return
+                end
+                out = v(absk+1:end) - v(1:end-absk);
+                fd  = tse.MIT(F, fdv + int64(absk));
+            else
+                if k >= n
+                    r = tse.TSeries(tse.MIT(F, fdv));
+                    return
+                end
+                out = v(1:end-k) - v(k+1:end);
+                fd  = tse.MIT(F, fdv);
+            end
+            r = tse.TSeries(fd, out);
         end
 
         % ---------- shift / lag / lead ----------
 
         function r = shift(t, k)
             % Shift dates by k (negative = lag, positive = lead).
+            % Fast path: bypass MIT.minus (which allocates a new MIT via
+            % the public constructor with arg dispatch).
             r = t;
-            r.firstdate = t.firstdate - k;
+            r.firstdate = tse.MIT(t.frequency, t.firstdate.value - int64(k));
         end
 
         function r = lag(t, k)
             if nargin < 2, k = 1; end
-            r = shift(t, -k);
+            r = t;
+            r.firstdate = tse.MIT(t.frequency, t.firstdate.value + int64(k));
         end
 
         function r = lead(t, k)
             if nargin < 2, k = 1; end
-            r = shift(t, k);
+            r = t;
+            r.firstdate = tse.MIT(t.frequency, t.firstdate.value - int64(k));
         end
 
         % ---------- percent change ----------
 
         function r = pct(t, shiftValue, varargin)
             % pct(t, shift_value=-1, 'islog', false)
+            %
+            % Direct numeric implementation: avoids the four binary-op
+            % chain (shift -> minus -> rdivide -> times -> mtimes).
             if nargin < 2, shiftValue = -1; end
-            p = inputParser; addParameter(p, 'islog', false);
-            parse(p, varargin{:});
-            if p.Results.islog
-                a = t;  a.values = exp(t.values);
-                b = shift(a, shiftValue);
-            else
-                a = t;
-                b = shift(t, shiftValue);
+            islog = false;
+            if ~isempty(varargin)
+                p = inputParser; addParameter(p, 'islog', false);
+                parse(p, varargin{:});
+                islog = p.Results.islog;
             end
-            r = times(minus(a, b), rdivide(1, b)) * 100;
+            v = t.values;
+            if islog, v = exp(v); end
+            n = numel(v);
+            F = t.frequency;
+            fdv = t.firstdate.value;
+            if shiftValue < 0
+                k = -shiftValue;
+                if k >= n
+                    r = tse.TSeries(tse.MIT(F, fdv + int64(k)));
+                    return
+                end
+                a = v(k+1:end);
+                b = v(1:end-k);
+                fd = tse.MIT(F, fdv + int64(k));
+            else
+                k = shiftValue;
+                if k >= n
+                    r = tse.TSeries(tse.MIT(F, fdv));
+                    return
+                end
+                a = v(1:end-k);
+                b = v(k+1:end);
+                fd = tse.MIT(F, fdv);
+            end
+            r = tse.TSeries(fd, (a - b) ./ b * 100);
         end
 
         function r = apct(t, islog)
@@ -649,13 +693,17 @@ classdef TSeries
                 error('tseries:noMatch', 'apct for frequency %s not implemented.', class(tse.int2freq(F)));
             end
             N = periodsPerYear(F);
-            if islog
-                a = t;  a.values = exp(t.values);
-            else
-                a = t;
+            v = t.values;
+            if islog, v = exp(v); end
+            n = numel(v);
+            if n < 2
+                r = tse.TSeries(tse.MIT(F, t.firstdate.value + 1));
+                return
             end
-            b = shift(a, -1);
-            r = (power(rdivide(a, b), N) - 1) * 100;
+            a = v(2:end);
+            b = v(1:end-1);
+            out = ((a ./ b) .^ N - 1) * 100;
+            r = tse.TSeries(tse.MIT(F, t.firstdate.value + 1), out);
         end
 
         function r = ytypct(t)
@@ -664,7 +712,16 @@ classdef TSeries
                 error('tseries:noMatch', 'ytypct for frequency %s not implemented.', class(tse.int2freq(F)));
             end
             N = periodsPerYear(F);
-            r = (rdivide(t, shift(t, -N)) - 1) * 100;
+            v = t.values;
+            n = numel(v);
+            if N >= n
+                r = tse.TSeries(tse.MIT(F, t.firstdate.value + int64(N)));
+                return
+            end
+            a = v(N+1:end);
+            b = v(1:end-N);
+            out = (a ./ b - 1) * 100;
+            r = tse.TSeries(tse.MIT(F, t.firstdate.value + int64(N)), out);
         end
 
         % ---------- moving ----------
@@ -1041,32 +1098,54 @@ end
 function r = binaryOp(a, b, op)
 % Apply op element-wise on numeric storage, returning a TSeries when at
 % least one input is a TSeries.  Mixed frequencies error.
-    if isa(a, 'tse.TSeries') && isa(b, 'tse.TSeries')
-        if ~eq(a.frequency, b.frequency)
+%
+% Performance: this is the hottest path in the package.  It avoids
+% materialising MITRange objects, works in int64 bounds throughout, and
+% short-circuits when ranges are identical to a single vector op.
+
+    aIsTS = isa(a, 'tse.TSeries');
+    bIsTS = isa(b, 'tse.TSeries');
+
+    if aIsTS && bIsTS
+        if a.frequency ~= b.frequency
             mixed_freq_error(a.frequency, b.frequency);
         end
-        rngA = rangeof(a);
-        rngB = rangeof(b);
-        rng = intersect(rngA, rngB);
-        if isempty(rng)
-            r = tse.TSeries(rng.startMIT);  % empty
+        fa = a.firstdate.value;
+        fb = b.firstdate.value;
+        na = numel(a.values);
+        nb = numel(b.values);
+        % --- fast path: identical ranges ------------------------------
+        if fa == fb && na == nb
+            r = a;
+            r.values = op(a.values, b.values);
             return
         end
-        kA = double(rng.startMIT.value - a.firstdate.value) + 1;
-        nL = length(rng);
-        kB = double(rng.startMIT.value - b.firstdate.value) + 1;
+        % --- general path: intersect on int64 -------------------------
+        lo = max(fa, fb);
+        hi = min(fa + int64(na) - 1, fb + int64(nb) - 1);
+        F  = a.frequency;
+        if hi < lo
+            r = tse.TSeries(tse.MIT(F, lo));
+            return
+        end
+        kA = double(lo - fa) + 1;
+        kB = double(lo - fb) + 1;
+        nL = double(hi - lo + 1);
         va = a.values(kA : kA + nL - 1);
         vb = b.values(kB : kB + nL - 1);
-        r = tse.TSeries(rng.startMIT, op(va, vb));
+        r = tse.TSeries(tse.MIT(F, lo), op(va, vb));
         return
     end
-    if isa(a, 'tse.TSeries')
+
+    if aIsTS
         va = a.values;
         if isnumeric(b) || islogical(b)
             if isscalar(b)
-                r = tse.TSeries(a.firstdate, op(va, b));
+                r = a;
+                r.values = op(va, b);
             elseif numel(b) == numel(va)
-                r = tse.TSeries(a.firstdate, op(va, b(:)));
+                r = a;
+                r.values = op(va, b(:));
             else
                 error('tseries:dimMismatch', ...
                     'Vector length %d does not match TSeries length %d.', ...
@@ -1075,13 +1154,15 @@ function r = binaryOp(a, b, op)
             return
         end
     end
-    if isa(b, 'tse.TSeries')
+    if bIsTS
         vb = b.values;
         if isnumeric(a) || islogical(a)
             if isscalar(a)
-                r = tse.TSeries(b.firstdate, op(a, vb));
+                r = b;
+                r.values = op(a, vb);
             elseif numel(a) == numel(vb)
-                r = tse.TSeries(b.firstdate, op(a(:), vb));
+                r = b;
+                r.values = op(a(:), vb);
             else
                 error('tseries:dimMismatch', ...
                     'Vector length %d does not match TSeries length %d.', ...

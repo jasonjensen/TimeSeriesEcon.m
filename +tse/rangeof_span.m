@@ -4,7 +4,9 @@ function rng = rangeof_span(varargin)
 %   All arguments must share a single frequency (or be empty).
 
     if isempty(varargin)
-        rng = tse.MITRange(tse.MIT(tse.Unit(),1), tse.MIT(tse.Unit(),0));
+        rng = tse.MITRange( ...
+            tse.MIT(int32(11), int64(1)), ...
+            tse.MIT(int32(11), int64(0)));
         return
     end
     haveRange = false;
@@ -27,7 +29,9 @@ function rng = rangeof_span(varargin)
         end
     end
     if ~haveRange
-        rng = tse.MITRange(tse.MIT(tse.Unit(),1), tse.MIT(tse.Unit(),0));
+        rng = tse.MITRange( ...
+            tse.MIT(int32(11), int64(1)), ...
+            tse.MIT(int32(11), int64(0)));
     end
 end
 

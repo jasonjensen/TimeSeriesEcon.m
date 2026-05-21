@@ -64,30 +64,41 @@ function r = overlay(varargin)
     out = cast(out, cls);
     filled = false(n, 1);
     rngFirst = rng.startMIT.value;
+    isFloat = strcmp(cls, 'double') || strcmp(cls, 'single');
 
     for k = 1:numel(tseries_args)
         ts = tseries_args{k};
-        if ~eq(ts.frequency, F)
+        if ts.frequency ~= F
             mixed_freq_error(F, ts.frequency);
         end
+        v = ts.values;
+        nts = numel(v);
+        if nts == 0, continue, end
         tsFirst = ts.firstdate.value;
-        nts = length(ts.values);
-        for j = 1:nts
-            mitVal = tsFirst + (j - 1);
-            pos = double(mitVal - rngFirst) + 1;
-            if pos < 1 || pos > n
-                continue
-            end
-            if filled(pos)
-                continue
-            end
-            v = ts.values(j);
-            if tse.istypenan(v)
-                continue
-            end
-            out(pos) = v;
-            filled(pos) = true;
+
+        % Vectorised mask of target positions for this series.
+        positions = (1:nts) + double(tsFirst - rngFirst);   % 1..N -> rng-pos
+        inRange   = positions >= 1 & positions <= n;
+        if isFloat
+            valid = inRange & ~isnan(v(:)).';
+        elseif strcmp(cls, 'logical')
+            valid = inRange;
+        else
+            sentinel = tse.typenan(cls);
+            valid = inRange & (v(:) ~= sentinel).';
         end
+        if ~any(valid), continue, end
+
+        pos = positions(valid);
+        srcIdx = find(valid);
+        % Drop positions already filled by an earlier argument.
+        unfilled = ~filled(pos);
+        if ~any(unfilled), continue, end
+        pos    = pos(unfilled);
+        srcIdx = srcIdx(unfilled);
+
+        out(pos) = v(srcIdx);
+        filled(pos) = true;
         if all(filled)
             break
         end

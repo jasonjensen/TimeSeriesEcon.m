@@ -1,23 +1,21 @@
 function t = rec(rng, t, fn)
 %REC  Recursive evaluation over an MIT range.
 %
-%   t = tse.rec(range, t, @(t, idx) ...)
+%   t = tse.rec(range, t, fn)
 %
-%   This is the MATLAB replacement for Julia's @rec macro.  The third
-%   argument is a function handle that receives the current TSeries `t`
-%   and the current MIT `idx`, and returns the new value to be stored
-%   at `t(idx)`.
+%   Two function-handle signatures are supported:
 %
-%   Example: Fibonacci.
-%       t = tse.TSeries(tse.MIT(tse.Unit(),1));
-%       t(tse.MIT(tse.Unit(),1)) = 1;
-%       t(tse.MIT(tse.Unit(),2)) = 1;
-%       t = tse.rec(tse.MIT(tse.Unit(),3):tse.MIT(tse.Unit(),10), ...
-%                       t, @(s,k) s(k-1) + s(k-2));
+%     fn(s, mit)        -- legacy form.  Receives the current TSeries
+%                          and the current MIT.  Uses subsref/subsasgn
+%                          for indexing, so it pays object-dispatch
+%                          overhead at every step.
+%     fn(v, i)          -- fast form (nargin(fn) == 2 but second arg is
+%                          a plain integer).  Receives the raw values
+%                          vector and an integer index.  No subsref.
 %
-%   For each MIT in `range`, the body is evaluated and the result is
-%   stored at that date.  Growth-on-assign rules apply, so writing past
-%   the current last date extends the series.
+%   The library auto-selects the fast form when possible.  If you need
+%   to call methods that mutate the TSeries (e.g. growth on assign),
+%   use the legacy form by writing `s(k-1)` instead of `v(i-1)`.
 
     if ~isa(rng, 'tse.MITRange')
         error('tseries:noMatch', 'rec requires an MITRange as first argument.');
@@ -28,8 +26,35 @@ function t = rec(rng, t, fn)
     if ~isa(fn, 'function_handle')
         error('tseries:noMatch', 'rec requires a function handle as third argument.');
     end
-    for k = 1:length(rng)
-        idx = rng(k);
+
+    fdv = t.firstdate.value;
+    step = double(rng.stepSize);
+    iStart = double(rng.startMIT.value - fdv) + 1;
+    iEnd   = double(rng.stopMIT.value  - fdv) + 1;
+
+    % --- fast path: in-range writes, the user-supplied lambda accepts
+    %     a values vector and an integer index.  Sidesteps subsref /
+    %     subsasgn entirely.
+    if iStart >= 1 && iEnd <= numel(t.values) && step ~= 0
+        v = t.values;
+        try
+            for i = iStart:step:iEnd
+                v(i) = fn(v, i);
+            end
+            t.values = v;
+            return
+        catch ME %#ok<NASGU>
+            % Fall through to the slow path (e.g. fn expects (s, mit)).
+        end
+    end
+
+    % --- legacy / slow path: pass (TSeries, MIT) to fn.  Used when
+    %     - the body writes outside the current range (growth-on-assign), OR
+    %     - fn expects the (s, mit) signature.
+    F = t.frequency;
+    ivals = rng.startMIT.value : rng.stepSize : rng.stopMIT.value;
+    for k = 1:numel(ivals)
+        idx = tse.MIT(F, ivals(k));
         t(idx) = fn(t, idx);
     end
 end

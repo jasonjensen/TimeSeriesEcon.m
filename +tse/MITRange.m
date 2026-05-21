@@ -8,18 +8,20 @@ classdef MITRange
     %   `intersect`, `union`, `ismember`, iteration via `for m = collect(rng)`.
 
     properties (SetAccess = immutable)
+        % Validators stripped; constructor is the single coercion point.
         startMIT
         stopMIT
-        stepSize (1,1) int64 = int64(1)
-        frequency
+        stepSize  = int64(1)
+        frequency = int32(11)
     end
 
     methods
         function obj = MITRange(a, varargin)
             if nargin == 0
-                obj.startMIT = tse.MIT(tse.Unit(), 1);
-                obj.stopMIT  = tse.MIT(tse.Unit(), 0);
-                obj.frequency = obj.startMIT.frequency;
+                % Default empty range (length 0, Unit freq).  Cheap.
+                obj.startMIT  = tse.MIT(int32(11), int64(1));
+                obj.stopMIT   = tse.MIT(int32(11), int64(0));
+                obj.frequency = int32(11);
                 return
             end
             if ~isa(a, 'tse.MIT')
@@ -31,24 +33,23 @@ classdef MITRange
                     if ~isa(b, 'tse.MIT')
                         error('tseries:noMatch', 'MITRange requires MIT endpoints.');
                     end
-                    if ~eq(a.frequency, b.frequency)
+                    if a.frequency ~= b.frequency
                         mixed_freq_error(a.frequency, b.frequency);
                     end
-                    obj.startMIT = a;
-                    obj.stopMIT  = b;
-                    obj.stepSize = int64(1);
-                    obj.frequency = obj.startMIT.frequency;
+                    obj.startMIT  = a;
+                    obj.stopMIT   = b;
+                    obj.frequency = a.frequency;
                 case 2
                     s = varargin{1};
                     b = varargin{2};
                     if ~isa(b, 'tse.MIT')
                         error('tseries:noMatch', 'MITRange requires MIT endpoints.');
                     end
-                    if ~eq(a.frequency, b.frequency)
+                    if a.frequency ~= b.frequency
                         mixed_freq_error(a.frequency, b.frequency);
                     end
                     if isa(s, 'tse.Duration')
-                        if ~eq(a.frequency, s.frequency)
+                        if a.frequency ~= s.frequency
                             mixed_freq_error(a.frequency, s.frequency);
                         end
                         obj.stepSize = s.value;
@@ -57,9 +58,9 @@ classdef MITRange
                     else
                         error('tseries:invalidArith', 'Step must be integer or Duration.');
                     end
-                    obj.startMIT = a;
-                    obj.stopMIT  = b;
-                    obj.frequency = obj.startMIT.frequency;
+                    obj.startMIT  = a;
+                    obj.stopMIT   = b;
+                    obj.frequency = a.frequency;
                 otherwise
                     error('tseries:noMatch', 'MITRange takes 2 or 3 arguments.');
             end

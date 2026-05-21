@@ -12,8 +12,10 @@ classdef MIT
     %             tse.MITRange.
 
     properties (SetAccess = immutable)
-        value (1,1) int64       = int64(0)
-        frequency (1,1) int32   = int32(11)   % integer code; see freq2int / int2freq
+        % Validators stripped on the hot path -- the constructor coerces
+        % types so the property write is a plain int assignment.
+        value      = int64(0)
+        frequency  = int32(11)   % integer code; see freq2int / int2freq
     end
 
     methods
@@ -21,13 +23,21 @@ classdef MIT
             if nargin == 0
                 return  % default-constructed MIT, used internally
             end
-            % Accept either a tse.Frequency object or an int32 frequency code.
+            % --- fast path: MIT(int_freq_code, int_value) ----------------
+            % Most callers (qq/mm/yy, arithmetic, shift/lag, binaryOp,
+            % subsref) hit this branch.  Skip all validation.
+            if nargin == 2 && isnumeric(F)
+                obj.frequency = int32(F);
+                obj.value     = int64(varargin{1});
+                return
+            end
+            % --- general path -------------------------------------------
             if isa(F, 'tse.Frequency')
                 obj.frequency = freq2int(F);
-                fObj = F;          % keep original for yp2value (case 2)
+                fObj = F;
             elseif isnumeric(F) && isscalar(F)
                 obj.frequency = int32(F);
-                fObj = [];         % will reconstruct only if needed
+                fObj = [];
             else
                 error('tseries:noMatch', ...
                     'MIT(F, ...) requires a tse.Frequency or integer frequency code.');

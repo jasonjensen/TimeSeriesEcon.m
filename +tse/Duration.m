@@ -4,8 +4,8 @@ classdef Duration
     %   See also: tse.MIT.
 
     properties (SetAccess = immutable)
-        value (1,1) int64       = int64(0)
-        frequency (1,1) int32   = int32(11)   % integer code; see freq2int / int2freq
+        value      = int64(0)
+        frequency  = int32(11)
     end
 
     methods
@@ -13,11 +13,14 @@ classdef Duration
             if nargin == 0
                 return
             end
-            % Accept either a tse.Frequency object or an int32 frequency code.
+            % Fast path: integer freq code + already-int64 value.
+            if nargin == 2 && isnumeric(F)
+                obj.frequency = int32(F);
+                obj.value     = int64(value);
+                return
+            end
             if isa(F, 'tse.Frequency')
                 obj.frequency = freq2int(F);
-            elseif isnumeric(F) && isscalar(F)
-                obj.frequency = int32(F);
             else
                 error('tseries:noMatch', ...
                     'Duration(F, n) requires a tse.Frequency or integer frequency code.');
