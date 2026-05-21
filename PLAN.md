@@ -58,7 +58,7 @@ TimeSeriesEcon.m/
 ├── LICENSE                          ← MIT/BSD-style, matching Julia source
 ├── startup_tseries.m                ← adds +tseries and tests to the path
 │
-├── +tseries/                        ← main package (`tseries.MIT`, etc.)
+├── +tseries/                        ← main package (`tse.MIT`, etc.)
 │   ├── Contents.m                   ← short package overview
 │   │
 │   ├── Frequency.m                  ← abstract base
@@ -145,9 +145,9 @@ TimeSeriesEcon.m/
 
 Why a `+tseries` package rather than the original `TimeSeriesEcon` name?
 MATLAB package names should be lower-case to avoid clashing with classdef
-file name expectations. Users will typically write `import tseries.*` at
+file name expectations. Users will typically write `import tse.*` at
 the top of their scripts, and `qq(2020,1)` etc. will resolve to
-`tseries.qq`.
+`tse.qq`.
 
 ---
 
@@ -185,7 +185,7 @@ Concrete subclasses (`Yearly`, `HalfYearly`, `Quarterly`, `Monthly`,
 `endPeriod`:
 
 ```matlab
-classdef Quarterly < tseries.YPFrequency
+classdef Quarterly < tse.YPFrequency
     properties (Constant)
         Name = 'Quarterly'
         PeriodsPerYear = 4
@@ -222,7 +222,7 @@ so we can interoperate with serialized Julia data byte-for-byte.
 classdef MIT
     properties (SetAccess = immutable)
         value (1,1) int64
-        frequency (1,1) tseries.Frequency
+        frequency (1,1) tse.Frequency
     end
     methods
         function obj = MIT(F, value)
@@ -268,7 +268,7 @@ yy(2020)
 ```
 
 For users porting Julia code mechanically, we additionally provide a
-parser, `tseries.mit('2020Q1')`, that accepts the Julia literal as a
+parser, `tse.mit('2020Q1')`, that accepts the Julia literal as a
 string. This is the only MIT-from-literal-string entry point.
 
 ### 3.3 TSeries
@@ -276,7 +276,7 @@ string. This is the only MIT-from-literal-string entry point.
 ```matlab
 classdef TSeries
     properties
-        firstdate (1,1) tseries.MIT
+        firstdate (1,1) tse.MIT
         values                          % numeric column vector
     end
     methods
@@ -309,7 +309,7 @@ Notes:
 ```matlab
 classdef MVTSeries
     properties
-        firstdate (1,1) tseries.MIT
+        firstdate (1,1) tse.MIT
         colnames  (1,:) string
         values                  % numeric matrix, size(values,1) = length
                                 % of range, size(values,2) = numel(colnames)
@@ -472,9 +472,9 @@ end
 
 ```matlab
 function R = plus(A, B)
-    [va, vb, frng, fcols] = tseries.private.alignBinary(A, B);
+    [va, vb, frng, fcols] = tse.private.alignBinary(A, B);
     rv = va + vb;       % implicit expansion does the work
-    R  = tseries.private.makeResult(rv, frng, fcols, A, B);
+    R  = tse.private.makeResult(rv, frng, fcols, A, B);
 end
 ```
 
@@ -684,7 +684,7 @@ We use a consistent error-ID hierarchy so tests can `verifyError`:
 A single utility function builds these:
 
 ```matlab
-function tseries.private.thrw(id, fmt, varargin)
+function tse.private.thrw(id, fmt, varargin)
     msg = sprintf(fmt, varargin{:});
     throwAsCaller(MException(['tseries:' id], msg));
 end
@@ -719,18 +719,18 @@ A representative test class:
 classdef TestMIT < matlab.unittest.TestCase
     methods (Test)
         function mit2yp_quarterly(tc)
-            import tseries.*
+            import tse.*
             tc.verifyEqual(mit2yp(MIT(Quarterly,5)), [1 2]);
             tc.verifyEqual(mit2yp(MIT(Quarterly,-1)), [-1 4]);
         end
         function mit_subtraction_returns_duration(tc)
-            import tseries.*
+            import tse.*
             d = qq(2020,1) - qq(2019,2);
-            tc.verifyClass(d, 'tseries.Duration');
+            tc.verifyClass(d, 'tse.Duration');
             tc.verifyEqual(int64(d), int64(3));
         end
         function mixed_frequency_subtraction_throws(tc)
-            tc.verifyError(@() tseries.qq(2020,1) - tseries.mm(2019,2), ...
+            tc.verifyError(@() tse.qq(2020,1) - tse.mm(2019,2), ...
                 'tseries:mixedFreq');
         end
     end
@@ -875,7 +875,7 @@ recommends if no other guidance is given.
 What we expect to support, end-to-end, by the end of Phase 5:
 
 ```matlab
-import tseries.*
+import tse.*
 
 % scalar dates and ranges
 q1 = qq(2020,1);

@@ -64,7 +64,7 @@ DataFrame-based pipelines encounter with multi-frequency data.  They require
 
 **Path to coverage:** implement a `Workspace` class (a thin wrapper around a
 MATLAB `struct` or `containers.Map`) plus `compare_ts` on workspaces.
-Note: scalar TSeries comparison already exists as `tseries.compare_ts`.
+Note: scalar TSeries comparison already exists as `tse.compare_ts`.
 
 ---
 

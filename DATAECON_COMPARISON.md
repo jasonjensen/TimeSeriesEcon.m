@@ -77,14 +77,14 @@ job (IRIS, in their case).
 
 | Aspect                | DataEcon matlab branch                          | Our TimeSeriesEcon.m plan                          |
 | --------------------- | ----------------------------------------------- | -------------------------------------------------- |
-| MIT analogue          | `DEDate` handle, `frequency:int + value:int64`  | `tseries.MIT` value class, `frequency: Frequency` + `value:int64` |
+| MIT analogue          | `DEDate` handle, `frequency:int + value:int64`  | `tse.MIT` value class, `frequency: Frequency` + `value:int64` |
 | Frequency type        | Single int from a flat enum                     | Class hierarchy with `endPeriod` property          |
 | End-of-period variant | Enum aliases (`quarterly_mar=quarterly_jun=67`) | Distinct instances (`Quarterly(2)` ≠ `Quarterly(3)`) |
-| Container (1-D)       | `DESeries` (handle) with 1 axis                 | `tseries.TSeries` (value)                          |
-| Container (2-D)       | `DESeries` (handle) with 2 axes                 | `tseries.MVTSeries` (value, planned)               |
+| Container (1-D)       | `DESeries` (handle) with 1 axis                 | `tse.TSeries` (value)                          |
+| Container (2-D)       | `DESeries` (handle) with 2 axes                 | `tse.MVTSeries` (value, planned)               |
 | N-D                   | `DESeries` with N axes                          | Not in our scope                                   |
 | Date arithmetic       | Delegated to `libdaec` via libpointer           | Pure MATLAB integer math                           |
-| Range type            | An axis with `ax_type==axis_range`              | `tseries.MITRange` first-class                     |
+| Range type            | An axis with `ax_type==axis_range`              | `tse.MITRange` first-class                     |
 | `+ - * /`             | Not defined                                     | Overloaded with mixed-frequency guards             |
 | `<, <=, ==, …`        | Not defined                                     | Overloaded                                         |
 | `t(2020Q1)` indexing  | Not defined                                     | Overloaded `subsref`                               |
@@ -155,7 +155,7 @@ The arguments *against*:
    need).
 3. **The flat frequency enum loses the type-level information we need.**
    In our code, `mixed_freq_error` triggers because
-   `isa(F, 'tseries.Quarterly')` and `isa(G, 'tseries.Yearly')` are
+   `isa(F, 'tse.Quarterly')` and `isa(G, 'tse.Yearly')` are
    distinct classes. With DataEcon, `F == 67` vs `G == 268` — fine, but
    `Quarterly{2}` vs `Quarterly{3}` *are not* distinct in the DataEcon
    enum (they share integer codes through the alias table), so the
@@ -198,7 +198,7 @@ move to (or merge with) the DataEcon design. What would that cost?
 ### 5.1 Pieces that swap cleanly
 
 - **Frequency identifiers.** A mapping table from our class instances
-  (`tseries.Quarterly(3)`) to DataEcon enum values
+  (`tse.Quarterly(3)`) to DataEcon enum values
   (`freq_quarterly_mar=67`) is ~30 lines. Bidirectional.
 - **Raw integer value.** Both representations store the same Julian-day
   / period-since-epoch integer. `MIT.value` and `DEDate.value` can be
@@ -209,7 +209,7 @@ move to (or merge with) the DataEcon design. What would that cost?
   60 lines.
 - **MVTSeries → DESeries** (forward). Same shape, two-axis case;
   another 60 lines.
-- **File I/O.** Adding `tseries.toDaec(file, struct)` is a tiny shim
+- **File I/O.** Adding `tse.toDaec(file, struct)` is a tiny shim
   that walks a struct, converts our types to DESeries, and calls into
   the existing DataEcon writer. ~100 lines once converters exist.
 
@@ -220,7 +220,7 @@ interop becomes a requirement.**
 
 ### 5.2 Pieces that don't swap, they re-port
 
-Wholesale replacement — i.e. *abandoning* our `tseries.TSeries` and
+Wholesale replacement — i.e. *abandoning* our `tse.TSeries` and
 making `DESeries` the new home — is a different story. The cost shows
 up in three places:
 
@@ -296,10 +296,10 @@ foundation.
 When (and if) `.daec` interop becomes a requirement, add a small
 companion module — say `+tseries/+daec/` — containing:
 
-- `+tseries/+daec/toDate.m` : `tseries.MIT → DEDate`
-- `+tseries/+daec/fromDate.m` : `DEDate → tseries.MIT`
-- `+tseries/+daec/toSeries.m` : `tseries.TSeries → DESeries`
-- `+tseries/+daec/fromSeries.m` : `DESeries → tseries.TSeries`
+- `+tseries/+daec/toDate.m` : `tse.MIT → DEDate`
+- `+tseries/+daec/fromDate.m` : `DEDate → tse.MIT`
+- `+tseries/+daec/toSeries.m` : `tse.TSeries → DESeries`
+- `+tseries/+daec/fromSeries.m` : `DESeries → tse.TSeries`
 - corresponding `toMV`/`fromMV` for MVTSeries
 - `+tseries/+daec/write.m` / `read.m` thin wrappers
 
