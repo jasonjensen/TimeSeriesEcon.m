@@ -24,11 +24,13 @@ function c = freq2int(F)
     elseif isa(F, 'tse.Monthly')
         c = int32(32);
     elseif isa(F, 'tse.Quarterly')
-        c = int32(64 + mod(F.endPeriod, 3));
+        c = int32(64 + F.endPeriod);
     elseif isa(F, 'tse.HalfYearly')
-        c = int32(128 + mod(F.endPeriod, 6));
+        % c = int32(128 + mod(F.endPeriod, 6));
+        c = int32(128 + F.endPeriod);
     elseif isa(F, 'tse.Yearly')
-        c = int32(256 + mod(F.endPeriod, 12));
+        % c = int32(256 + mod(F.endPeriod, 12));
+        c = int32(256 + F.endPeriod);
     else
         error('tseries:noMatch', 'Unknown frequency class: %s', class(F));
     end

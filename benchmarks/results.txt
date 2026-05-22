@@ -1,37 +1,37 @@
 Scenario                                        Median (µs)
 ------------------------------------------------------------
-construct_tseries_qq_100                             52.654
-construct_mvts_qq_100x5                              65.654
-indexing_mit_lookup_100                            3070.654
-indexing_int_lookup_100                            1507.654
-indexing_mitrange_slice                             473.654
-indexing_mvts_column                                 66.654
-arith_add_misaligned                                963.654
-arith_add_aligned                                   897.654
-arith_mul_scalar                                      9.224
-shift_quarterly_lag1                                130.654
-lead_quarterly_lag1                                 136.224
-diff_quarterly                                     1124.654
-pct_quarterly                                      2157.654
-ytypct_quarterly_100                               1109.654
-mean_quarterly_100                                   95.654
-std_quarterly_100                                   101.654
-quantile_quarterly_100                               94.654
-cor_two_tseries                                     256.654
-cov_two_tseries                                     161.654
-cor_mvts_5_columns                                  171.654
-cov_mvts_5_columns                                  100.224
-mean_mvts_axis0_5cols                                   n/a  [ERROR: Index in position 1 exceeds array bounds. Index must not exceed 1.]
-mean_mvts_axis1_100rows                                 n/a  [ERROR: Index in position 1 exceeds array bounds. Index must not exceed 1.]
-moving_average_quarterly_4                          181.654
-moving_sum_quarterly_4                              152.724
-undiff_quarterly                                        n/a  [ERROR: Mixing frequencies not allowed: Quarterly and Unit.]
-rec_ar2_100                                       49546.654
-rec_backcasting_via_lambda                        44583.654
-overlay_three_tseries                             10718.654
-reindex_tseries_100                                 324.654
-rangeof_tseries_drop1                               614.654
-linalg_matrix_tseries_100                             5.724
+construct_tseries_qq_100                             77.696
+construct_mvts_qq_100x5                              75.696
+indexing_mit_lookup_100                            4911.696
+indexing_int_lookup_100                            2018.696
+indexing_mitrange_slice                             523.696
+indexing_mvts_column                                 99.696
+arith_add_misaligned                                 80.696
+arith_add_aligned                                    43.251
+arith_mul_scalar                                     16.251
+shift_quarterly_lag1                                165.696
+lead_quarterly_lag1                                 161.696
+diff_quarterly                                      185.696
+pct_quarterly                                       165.696
+ytypct_quarterly_100                                217.696
+mean_quarterly_100                                   96.696
+std_quarterly_100                                    94.696
+quantile_quarterly_100                               96.696
+cor_two_tseries                                     250.696
+cov_two_tseries                                     158.696
+cor_mvts_5_columns                                  174.696
+cov_mvts_5_columns                                   99.751
+mean_mvts_axis0_5cols                               130.696
+mean_mvts_axis1_100rows                             184.696
+moving_average_quarterly_4                          210.696
+moving_sum_quarterly_4                              208.696
+undiff_quarterly                                    391.696
+rec_ar2_100                                         521.696
+rec_backcasting_via_lambda                          514.751
+overlay_three_tseries                              3512.696
+reindex_tseries_100                                 362.696
+rangeof_tseries_drop1                               660.696
+linalg_matrix_tseries_100                             8.779
 
 All times are median µs per call (timeit).
 
