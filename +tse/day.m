@@ -1,9 +1,11 @@
 function m = day(d, varargin) %#ok<INUSD>
-%DAILY  Construct an MIT{Daily} from a date or date string.
+%DAY  Construct a Daily MIT (or range) from a date or date string.
 %
-%   m = tse.day(datetime(2022,1,1))
-%   m = tse.day('2022-01-01')
-%   rng = tse.day('2022-01-01', '2022-01-31')   % returns MITRange
+%   m   = tse.day(datetime(2022,1,1))
+%   m   = tse.day('2022-01-01')
+%   rng = tse.day('2022-01-01', '2022-01-31')   % returns an MITRange
+%
+%   See also: tse.bday, tse.week, tse.qq, tse.mm, tse.yy.
 
     if nargin >= 2
         rng = tse.MITRange(tse.day(d), tse.day(varargin{1}));

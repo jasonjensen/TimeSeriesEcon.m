@@ -1,5 +1,8 @@
 function m = bday(d, varargin)
-%bday  Construct an MIT{BDaily} from a date or date string.
+%BDAY  Construct a business-daily (BDaily) MIT (or range) from a date.
+%
+%   Business days exclude Saturdays and Sundays.  The 'bias' option chooses
+%   what happens when the input date falls on a weekend.
 %
 %   m = tse.bday(datetime(2022,1,3))
 %   m = tse.bday('2022-01-03')

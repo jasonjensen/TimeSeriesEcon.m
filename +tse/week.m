@@ -1,8 +1,11 @@
 function m = week(d, endDay)
-%WEEKLY  Construct an MIT{Weekly{endDay}} from a date or date string.
+%WEEK  Construct a Weekly MIT from a date or date string.
 %
-%   m = tse.week('2022-01-01')          % endDay=7 (Sunday)
+%   m = tse.week('2022-01-01')          % endDay = 7 (Sunday, the default)
 %   m = tse.week('2022-01-01', 6)       % Saturday-end weeks
+%
+%   endDay (1=Mon .. 7=Sun) is the day on which each week ends.
+%   See also: tse.weekly_from_iso, tse.day, tse.bday.
 
     if nargin < 2 || isempty(endDay)
         endDay = 7;
