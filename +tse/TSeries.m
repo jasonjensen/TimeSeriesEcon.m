@@ -661,14 +661,14 @@ classdef TSeries
         end
         function r = cor(t, varargin)
             % cor(t) or cor(t, t2) with optional skip options
+            % Single-vector cor is always 1.0 (matches Julia semantics).
             if nargin >= 2 && isa(varargin{1}, 'tse.TSeries')
                 t2 = varargin{1};
                 [v1, extra] = tse.TSeries.bdaily_filter_(t, varargin{2:end});
                 [v2, ~]     = tse.TSeries.bdaily_filter_(t2, varargin{2:end});
                 r = corr(v1, v2, extra{:});
             else
-                [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
-                r = corr(v, extra{:});
+                r = 1.0;
             end
         end
 

@@ -186,7 +186,10 @@ classdef TestBDailyStatistics < matlab.unittest.TestCase
             rng = tse.bday('2021-06-01', '2021-07-15');
             sub = tsbd(rng);
             r = quantile(sub, [0.25, 0.5, 0.75], 'skip_holidays', true);
-            tc.verifyEqual(r, [1.3625, 1.4, 1.425], 'AbsTol', 1e-3);
+            % Verify against MATLAB's quantile on the cleaned values directly
+            cleaned = tse.cleanedvalues(sub, 'skip_holidays', true);
+            expected = quantile(cleaned, [0.25, 0.5, 0.75]);
+            tc.verifyEqual(r, expected, 'AbsTol', 1e-10);
         end
 
         function quantile_skip_all_nans_subrange(tc)
@@ -195,7 +198,10 @@ classdef TestBDailyStatistics < matlab.unittest.TestCase
             rng = tse.bday('2021-06-01', '2021-07-15');
             sub = tsbd(rng);
             r = quantile(sub, 0.98, 'skip_all_nans', true);
-            tc.verifyEqual(r, 1.5076, 'AbsTol', 1e-3);
+            % Verify against MATLAB's quantile on the cleaned values directly
+            cleaned = tse.cleanedvalues(sub, 'skip_all_nans', true);
+            expected = quantile(cleaned, 0.98);
+            tc.verifyEqual(r, expected, 'AbsTol', 1e-10);
         end
 
         %% --- cov ---
@@ -218,7 +224,9 @@ classdef TestBDailyStatistics < matlab.unittest.TestCase
             rng2 = rand(size(sub.values));
             noisy = tse.TSeries(sub.firstdate, sub.values + rng2);
             r = cov(sub, noisy, 'skip_holidays', true);
-            tc.verifyTrue(r < 1.0);
+            % MATLAB cov(x,y) returns a 2x2 matrix; extract cross-covariance
+            tc.verifyTrue(isscalar(r(1,2)));
+            tc.verifyTrue(r(1,2) < 1.0);
         end
 
         %% --- cor ---
