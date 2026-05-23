@@ -151,7 +151,7 @@ classdef TestFconvert < matlab.unittest.TestCase
             tc.verifyTrue(eq(rangeof(r3), tc.R(tc.M(1,1), tc.M(1,4))));
 
             r4 = tse.fconvert(tse.Monthly(), t1, 'method','sum');
-            tc.verifyEqual(r4.values, [sum(1:31); sum(32:59); sum(60:90)]', 'AbsTol',1e-9);
+            tc.verifyEqual(r4.values, [sum(1:31); sum(32:59); sum(60:90)], 'AbsTol',1e-9);
             tc.verifyTrue(eq(rangeof(r4), tc.R(tc.M(1,1), tc.M(1,3))));
         end
 
@@ -176,7 +176,7 @@ classdef TestFconvert < matlab.unittest.TestCase
             % lower: aggregator over each group
             m = tse.TSeries(tc.M(20,1), (1:36)');
             y = tse.fconvert(@(v) sum(v), tse.Yearly(), m);
-            tc.verifyEqual(y.values, [sum(1:12); sum(13:24); sum(25:36)]', 'AbsTol',1e-9);
+            tc.verifyEqual(y.values, [sum(1:12); sum(13:24); sum(25:36)], 'AbsTol',1e-9);
         end
     end
 end
