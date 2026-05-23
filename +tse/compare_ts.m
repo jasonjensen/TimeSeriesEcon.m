@@ -31,6 +31,12 @@ function tf = compare_ts(a, b, varargin)
     ignoreMissing = p.Results.ignoreMissing;
     trange       = p.Results.trange;
 
+    % Struct (workspace) comparison: field-by-field.
+    if isstruct(a) && isstruct(b)
+        tf = compareStructs(a, b, atol, rtol, nansEqual, ignoreMissing, trange, p.Results.quiet);
+        return
+    end
+
     if isa(a, 'tse.TSeries') && isa(b, 'tse.TSeries')
         if ~eq(a.frequency, b.frequency)
             tf = false; return
@@ -131,4 +137,38 @@ function tf = approxScalarOrArray(x, y, atol, rtol, nansEqual)
     diffArr = abs(x(:) - y(:));
     refArr  = max(abs(x(:)), abs(y(:)));
     tf = all(diffArr <= atol + rtol * refArr);
+end
+
+function tf = compareStructs(a, b, atol, rtol, nansEqual, ignoreMissing, trange, quiet)
+% Compare two structs field-by-field (workspace comparison).
+    fieldsA = fieldnames(a);
+    fieldsB = fieldnames(b);
+
+    if ignoreMissing
+        fields = intersect(fieldsA, fieldsB);
+    else
+        if ~isequal(sort(fieldsA), sort(fieldsB))
+            tf = false;
+            if ~quiet
+                fprintf('compare_ts: struct fields differ.\n');
+            end
+            return
+        end
+        fields = fieldsA;
+    end
+
+    tf = true;
+    for k = 1:numel(fields)
+        fname = fields{k};
+        result = tse.compare_ts(a.(fname), b.(fname), ...
+            'atol', atol, 'rtol', rtol, 'nans', nansEqual, ...
+            'ignoreMissing', ignoreMissing, 'trange', trange, 'quiet', quiet);
+        if ~result
+            tf = false;
+            if ~quiet
+                fprintf('compare_ts: field "%s" differs.\n', fname);
+            end
+            return
+        end
+    end
 end

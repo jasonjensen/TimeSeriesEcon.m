@@ -9,9 +9,18 @@ function r = overlay(varargin)
 %   argument that is not "not-a-number" (per tse.istypenan) wins.
 %
 %   Also works on bare values: overlay(NaN, 5) -> 5; overlay(1,2) -> 1.
+%
+%   When all arguments are structs (workspace-like), overlay is applied
+%   field-by-field across the union of field names.
 
     if isempty(varargin)
         error('tseries:noMatch', 'overlay requires at least one argument.');
+    end
+
+    % Struct overlay (workspace-like): all args are structs.
+    if isstruct(varargin{1})
+        r = overlayStructs(varargin{:});
+        return
     end
 
     % Multivariate overlay: every arg is an MVTSeries (with optional MITRange first).
@@ -180,5 +189,38 @@ function r = overlayMVTSeries(varargin)
         end
         ts = tse.overlay(rng, cols{:});
         r.(char(nm)) = ts;
+    end
+end
+
+function r = overlayStructs(varargin)
+% Overlay multiple structs field-by-field (like Julia Workspace overlay).
+% For fields that appear in multiple structs, overlay is applied recursively.
+    allFields = fieldnames(varargin{1});
+    for k = 2:numel(varargin)
+        if ~isstruct(varargin{k})
+            error('tseries:noMatch', 'overlay: all arguments must be structs when the first is a struct.');
+        end
+        fk = fieldnames(varargin{k});
+        for j = 1:numel(fk)
+            if ~any(strcmp(allFields, fk{j}))
+                allFields{end+1} = fk{j}; %#ok<AGROW>
+            end
+        end
+    end
+
+    r = struct();
+    for fi = 1:numel(allFields)
+        fname = allFields{fi};
+        vals = {};
+        for k = 1:numel(varargin)
+            if isfield(varargin{k}, fname)
+                vals{end+1} = varargin{k}.(fname); %#ok<AGROW>
+            end
+        end
+        if numel(vals) == 1
+            r.(fname) = vals{1};
+        else
+            r.(fname) = tse.overlay(vals{:});
+        end
     end
 end

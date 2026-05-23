@@ -231,6 +231,34 @@ classdef TSeries
             end
             error('tseries:noMatch', 'Unsupported TSeries(type, ...) signature.');
         end
+
+        function [v, extra] = bdaily_filter_(t, varargin)
+        %BDAILY_FILTER_  Extract skip_all_nans/skip_holidays/holidays_map
+        %   from varargin, apply cleanedvalues if BDaily, return values
+        %   and remaining positional args.
+            skipKeys = {'skip_all_nans', 'skip_holidays', 'holidays_map'};
+            hasSkip = false;
+            skipArgs = {};
+            extra = {};
+            k = 1;
+            while k <= numel(varargin)
+                a = varargin{k};
+                if (ischar(a) || isstring(a)) && any(strcmpi(a, skipKeys))
+                    hasSkip = true;
+                    skipArgs{end+1} = char(a); %#ok<AGROW>
+                    skipArgs{end+1} = varargin{k+1}; %#ok<AGROW>
+                    k = k + 2;
+                else
+                    extra{end+1} = a; %#ok<AGROW>
+                    k = k + 1;
+                end
+            end
+            if hasSkip && isa(tse.frequencyof(t), 'tse.BDaily')
+                v = tse.cleanedvalues(t, skipArgs{:});
+            else
+                v = t.values;
+            end
+        end
     end
 
     methods
@@ -592,13 +620,58 @@ classdef TSeries
         % Hoist t.values into a local so the property read only goes
         % through subsref once.  (For overridden subsref classes, every
         % `t.values` access costs ~µs.)
+        %
+        % For BDaily series, mean/std/var/median support:
+        %   'skip_all_nans', 'skip_holidays', 'holidays_map'
 
         function r = sum(t, varargin),    v = t.values; r = sum(v, varargin{:});    end
         function r = prod(t, varargin),   v = t.values; r = prod(v, varargin{:});   end
-        function r = mean(t, varargin),   v = t.values; r = mean(v, varargin{:});   end
-        function r = median(t, varargin), v = t.values; r = median(v, varargin{:}); end
-        function r = std(t, varargin),    v = t.values; r = std(v, varargin{:});    end
-        function r = var(t, varargin),    v = t.values; r = var(v, varargin{:});    end
+
+        function r = mean(t, varargin)
+            [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
+            r = mean(v, extra{:});
+        end
+        function r = median(t, varargin)
+            [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
+            r = median(v, extra{:});
+        end
+        function r = std(t, varargin)
+            [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
+            r = std(v, extra{:});
+        end
+        function r = var(t, varargin)
+            [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
+            r = var(v, extra{:});
+        end
+        function r = quantile(t, p, varargin)
+            [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
+            r = quantile(v, p, extra{:});
+        end
+        function r = cov(t, varargin)
+            % cov(t) or cov(t, t2) with optional skip options
+            if nargin >= 2 && isa(varargin{1}, 'tse.TSeries')
+                t2 = varargin{1};
+                [v1, extra] = tse.TSeries.bdaily_filter_(t, varargin{2:end});
+                [v2, ~]     = tse.TSeries.bdaily_filter_(t2, varargin{2:end});
+                r = cov(v1, v2, extra{:});
+            else
+                [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
+                r = cov(v, extra{:});
+            end
+        end
+        function r = cor(t, varargin)
+            % cor(t) or cor(t, t2) with optional skip options
+            if nargin >= 2 && isa(varargin{1}, 'tse.TSeries')
+                t2 = varargin{1};
+                [v1, extra] = tse.TSeries.bdaily_filter_(t, varargin{2:end});
+                [v2, ~]     = tse.TSeries.bdaily_filter_(t2, varargin{2:end});
+                r = corr(v1, v2, extra{:});
+            else
+                [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
+                r = corr(v, extra{:});
+            end
+        end
+
         function r = min(t, varargin),    v = t.values; r = min(v, varargin{:});    end
         function r = max(t, varargin),    v = t.values; r = max(v, varargin{:});    end
         function r = any(t, varargin),    v = t.values; r = any(v, varargin{:});    end
