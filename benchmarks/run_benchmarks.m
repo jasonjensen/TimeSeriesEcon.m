@@ -128,6 +128,10 @@ function [SETUP, RUN, DESCRIPTION] = buildRegistry()
     RUN.indexing_mvts_column   = @run_indexing_mvts_column;
     DESCRIPTION.indexing_mvts_column = "mvts('c') — column access";
 
+    SETUP.indexing_lookup_100_api = @setup_indexing_lookup_100_api;
+    RUN.indexing_lookup_100_api   = @run_indexing_lookup_100_api;
+    DESCRIPTION.indexing_lookup_100_api = 'lookup(t, mit_keys) — vectorised gather 100 MIT keys';
+
     % ----- Arithmetic -------------------------------------------------
 
     SETUP.arith_add_misaligned = @setup_arith_add_misaligned;
@@ -241,6 +245,60 @@ function [SETUP, RUN, DESCRIPTION] = buildRegistry()
     SETUP.rangeof_tseries_drop1 = @setup_rangeof_tseries_drop1;
     RUN.rangeof_tseries_drop1   = @run_rangeof_tseries_drop1;
     DESCRIPTION.rangeof_tseries_drop1 = "rangeof(t, 'drop', 1) — 100Q";
+
+    % ----- fconvert ---------------------------------------------------
+
+    SETUP.fconvert_qq_to_yy_mean = @setup_fconvert_qq_to_yy_mean;
+    RUN.fconvert_qq_to_yy_mean   = @run_fconvert_qq_to_yy_mean;
+    DESCRIPTION.fconvert_qq_to_yy_mean = "fconvert(Yearly, t, 'method','mean')";
+
+    SETUP.fconvert_qq_to_yy_sum = @setup_fconvert_qq_to_yy_sum;
+    RUN.fconvert_qq_to_yy_sum   = @run_fconvert_qq_to_yy_sum;
+    DESCRIPTION.fconvert_qq_to_yy_sum = "fconvert(Yearly, t, 'method','sum')";
+
+    SETUP.fconvert_yy_to_qq_const = @setup_fconvert_yy_to_qq_const;
+    RUN.fconvert_yy_to_qq_const   = @run_fconvert_yy_to_qq_const;
+    DESCRIPTION.fconvert_yy_to_qq_const = "fconvert(Quarterly, t, 'method','const') (higher)";
+
+    SETUP.fconvert_yy_to_qq_linear = @setup_fconvert_yy_to_qq_linear;
+    RUN.fconvert_yy_to_qq_linear   = @run_fconvert_yy_to_qq_linear;
+    DESCRIPTION.fconvert_yy_to_qq_linear = "fconvert(Quarterly, t, 'method','linear') (higher)";
+
+    SETUP.fconvert_yy_to_qq_even = @setup_fconvert_yy_to_qq_even;
+    RUN.fconvert_yy_to_qq_even   = @run_fconvert_yy_to_qq_even;
+    DESCRIPTION.fconvert_yy_to_qq_even = "fconvert(Quarterly, t, 'method','even') (higher)";
+
+    SETUP.fconvert_mm_to_qq_mean = @setup_fconvert_mm_to_qq_mean;
+    RUN.fconvert_mm_to_qq_mean   = @run_fconvert_mm_to_qq_mean;
+    DESCRIPTION.fconvert_mm_to_qq_mean = "fconvert(Quarterly, monthly_t, 'method','mean')";
+
+    % ----- Mixed-frequency pipelines ----------------------------------
+
+    SETUP.mixed_freq_qq_minus_mm_mean = @setup_mixed_freq_qq_minus_mm_mean;
+    RUN.mixed_freq_qq_minus_mm_mean   = @run_mixed_freq_qq_minus_mm_mean;
+    DESCRIPTION.mixed_freq_qq_minus_mm_mean = 'qq_gdp - fconvert(Q, mm_cpi, mean) — mixed freq';
+
+    SETUP.mixed_freq_pipeline_three_freq = @setup_mixed_freq_pipeline_three_freq;
+    RUN.mixed_freq_pipeline_three_freq   = @run_mixed_freq_pipeline_three_freq;
+    DESCRIPTION.mixed_freq_pipeline_three_freq = 'Y+Q+M → quarterly via fconvert — mixed freq';
+
+    % ----- Workspace (struct) scenarios --------------------------------
+
+    SETUP.workspace_merge_5_series = @setup_workspace_merge_5_series;
+    RUN.workspace_merge_5_series   = @run_workspace_merge_5_series;
+    DESCRIPTION.workspace_merge_5_series = 'struct overlay: 5+5 disjoint-field merge';
+
+    SETUP.workspace_filter_5_series = @setup_workspace_filter_5_series;
+    RUN.workspace_filter_5_series   = @run_workspace_filter_5_series;
+    DESCRIPTION.workspace_filter_5_series = 'struct filter: keep 5 of 10 fields';
+
+    SETUP.compare_workspaces_equal_5_keys = @setup_compare_workspaces_equal_5_keys;
+    RUN.compare_workspaces_equal_5_keys   = @run_compare_workspaces_equal_5_keys;
+    DESCRIPTION.compare_workspaces_equal_5_keys = 'compare_ts(w1, w2) — 5×TSeries, equal';
+
+    SETUP.compare_workspaces_differ_5_keys = @setup_compare_workspaces_differ_5_keys;
+    RUN.compare_workspaces_differ_5_keys   = @run_compare_workspaces_differ_5_keys;
+    DESCRIPTION.compare_workspaces_differ_5_keys = 'compare_ts(w1, w2) — 5×TSeries, one diff';
 
     % ----- Linear algebra ---------------------------------------------
 
@@ -676,4 +734,202 @@ function r = run_linalg_matrix_tseries_100(state)
     % MATLAB uses * for matrix multiplication.
     % TSeries.mtimes strips labels and falls through to values * values.
     r = state.A * state.t;
+end
+
+% ======================================================================
+% INDEXING — vectorised lookup
+% ======================================================================
+
+function state = setup_indexing_lookup_100_api()
+    start = tse.qq(2020, 1);
+    t     = tse.TSeries(start, (0:99)');
+    keys  = collect(tse.MITRange(start, start + 99));
+    state.t    = t;
+    state.keys = keys;
+end
+
+function r = run_indexing_lookup_100_api(state)
+    r = tse.lookup(state.t, state.keys);
+end
+
+% ======================================================================
+% FCONVERT
+% ======================================================================
+
+function state = setup_fconvert_qq_to_yy_mean()
+    state.Fto = tse.Yearly();
+    state.t   = tse.TSeries(tse.qq(2020, 1), (0:99)');
+end
+
+function r = run_fconvert_qq_to_yy_mean(state)
+    r = tse.fconvert(state.Fto, state.t, 'method', 'mean');
+end
+
+% ------
+
+function state = setup_fconvert_qq_to_yy_sum()
+    state.Fto = tse.Yearly();
+    state.t   = tse.TSeries(tse.qq(2020, 1), (0:99)');
+end
+
+function r = run_fconvert_qq_to_yy_sum(state)
+    r = tse.fconvert(state.Fto, state.t, 'method', 'sum');
+end
+
+% ------
+
+function state = setup_fconvert_yy_to_qq_const()
+    state.Fto = tse.Quarterly();
+    state.t   = tse.TSeries(tse.yy(2020), (0:24)');
+end
+
+function r = run_fconvert_yy_to_qq_const(state)
+    r = tse.fconvert(state.Fto, state.t, 'method', 'const');
+end
+
+% ------
+
+function state = setup_fconvert_yy_to_qq_linear()
+    state.Fto = tse.Quarterly();
+    state.t   = tse.TSeries(tse.yy(2020), (0:24)');
+end
+
+function r = run_fconvert_yy_to_qq_linear(state)
+    r = tse.fconvert(state.Fto, state.t, 'method', 'linear');
+end
+
+% ------
+
+function state = setup_fconvert_yy_to_qq_even()
+    state.Fto = tse.Quarterly();
+    state.t   = tse.TSeries(tse.yy(2020), (0:24)');
+end
+
+function r = run_fconvert_yy_to_qq_even(state)
+    r = tse.fconvert(state.Fto, state.t, 'method', 'even');
+end
+
+% ------
+
+function state = setup_fconvert_mm_to_qq_mean()
+    state.Fto = tse.Quarterly();
+    state.t   = tse.TSeries(tse.mm(2020, 1), (0:119)');
+end
+
+function r = run_fconvert_mm_to_qq_mean(state)
+    r = tse.fconvert(state.Fto, state.t, 'method', 'mean');
+end
+
+% ======================================================================
+% MIXED-FREQUENCY PIPELINES
+% ======================================================================
+
+function state = setup_mixed_freq_qq_minus_mm_mean()
+    state.Fto = tse.Quarterly();
+    state.gdp = tse.TSeries(tse.qq(2020, 1), (0:99)');
+    state.cpi = tse.TSeries(tse.mm(2020, 1), (0:299)');
+end
+
+function r = run_mixed_freq_qq_minus_mm_mean(state)
+    r = state.gdp - tse.fconvert(state.Fto, state.cpi, 'method', 'mean');
+end
+
+% ------
+
+function state = setup_mixed_freq_pipeline_three_freq()
+    state.Fto   = tse.Quarterly();
+    state.unemp = tse.TSeries(tse.yy(2020), (0:24)');
+    state.gdp   = tse.TSeries(tse.qq(2020, 1), (0:99)');
+    state.cpi   = tse.TSeries(tse.mm(2020, 1), (0:299)');
+end
+
+function r = run_mixed_freq_pipeline_three_freq(state)
+    r = tse.fconvert(state.Fto, state.unemp, 'method', 'const') ...
+        + state.gdp ...
+        + tse.fconvert(state.Fto, state.cpi, 'method', 'mean');
+end
+
+% ======================================================================
+% WORKSPACE (STRUCT) SCENARIOS
+% ======================================================================
+
+function state = setup_workspace_merge_5_series()
+    start = tse.qq(2020, 1);
+    arr   = (0:39)';
+    w1 = struct();
+    w2 = struct();
+    for name = {'a', 'b', 'c', 'd', 'e'}
+        w1.(name{1}) = tse.TSeries(start, arr);
+    end
+    for name = {'f', 'g', 'h', 'i', 'j'}
+        w2.(name{1}) = tse.TSeries(start, arr);
+    end
+    state.w1 = w1;
+    state.w2 = w2;
+end
+
+function r = run_workspace_merge_5_series(state)
+    % Merge = overlay of two structs with disjoint field sets.
+    r = tse.overlay(state.w1, state.w2);
+end
+
+% ------
+
+function state = setup_workspace_filter_5_series()
+    start = tse.qq(2020, 1);
+    arr   = (0:39)';
+    w = struct();
+    for name = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'}
+        w.(name{1}) = tse.TSeries(start, arr);
+    end
+    state.w    = w;
+    state.keep = {'a', 'b', 'c', 'd', 'e'};
+end
+
+function r = run_workspace_filter_5_series(state)
+    % Filter = copy only the kept fields into a new struct.
+    r = struct();
+    for k = 1:numel(state.keep)
+        r.(state.keep{k}) = state.w.(state.keep{k});
+    end
+end
+
+% ------
+
+function state = setup_compare_workspaces_equal_5_keys()
+    start = tse.qq(2020, 1);
+    arr   = (0:99)';
+    w1 = struct();
+    w2 = struct();
+    for name = {'a', 'b', 'c', 'd', 'e'}
+        w1.(name{1}) = tse.TSeries(start, arr);
+        w2.(name{1}) = tse.TSeries(start, arr);
+    end
+    state.w1 = w1;
+    state.w2 = w2;
+end
+
+function r = run_compare_workspaces_equal_5_keys(state)
+    r = tse.compare_ts(state.w1, state.w2, 'quiet', true);
+end
+
+% ------
+
+function state = setup_compare_workspaces_differ_5_keys()
+    start = tse.qq(2020, 1);
+    arr   = (0:99)';
+    w1 = struct();
+    w2 = struct();
+    for name = {'a', 'b', 'c', 'd', 'e'}
+        w1.(name{1}) = tse.TSeries(start, arr);
+        w2.(name{1}) = tse.TSeries(start, arr);
+    end
+    % Position 50 differs in 'c'.
+    w2.c(50) = -999.0;
+    state.w1 = w1;
+    state.w2 = w2;
+end
+
+function r = run_compare_workspaces_differ_5_keys(state)
+    r = tse.compare_ts(state.w1, state.w2, 'quiet', true);
 end

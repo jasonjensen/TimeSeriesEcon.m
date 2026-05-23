@@ -1,37 +1,52 @@
+lear runctions; run_benchmarks
+
 Scenario                                        Median (µs)
 ------------------------------------------------------------
-construct_tseries_qq_100                             77.696
-construct_mvts_qq_100x5                              75.696
-indexing_mit_lookup_100                            4911.696
-indexing_int_lookup_100                            2018.696
-indexing_mitrange_slice                             523.696
-indexing_mvts_column                                 99.696
-arith_add_misaligned                                 80.696
-arith_add_aligned                                    43.251
-arith_mul_scalar                                     16.251
-shift_quarterly_lag1                                165.696
-lead_quarterly_lag1                                 161.696
-diff_quarterly                                      185.696
-pct_quarterly                                       165.696
-ytypct_quarterly_100                                217.696
-mean_quarterly_100                                   96.696
-std_quarterly_100                                    94.696
-quantile_quarterly_100                               96.696
-cor_two_tseries                                     250.696
-cov_two_tseries                                     158.696
-cor_mvts_5_columns                                  174.696
-cov_mvts_5_columns                                   99.751
-mean_mvts_axis0_5cols                               130.696
-mean_mvts_axis1_100rows                             184.696
-moving_average_quarterly_4                          210.696
-moving_sum_quarterly_4                              208.696
-undiff_quarterly                                    391.696
-rec_ar2_100                                         521.696
-rec_backcasting_via_lambda                          514.751
-overlay_three_tseries                              3512.696
-reindex_tseries_100                                 362.696
-rangeof_tseries_drop1                               660.696
-linalg_matrix_tseries_100                             8.779
+construct_tseries_qq_100                             61.706
+construct_mvts_qq_100x5                              66.706
+indexing_mit_lookup_100                            2766.706
+indexing_int_lookup_100                            1478.706
+indexing_mitrange_slice                             393.706
+indexing_mvts_column                                 80.706
+indexing_lookup_100_api                            8465.706
+arith_add_misaligned                                 39.706
+arith_add_aligned                                    29.706
+arith_mul_scalar                                     16.266
+shift_quarterly_lag1                                139.705
+lead_quarterly_lag1                                 134.706
+diff_quarterly                                      132.706
+pct_quarterly                                       150.706
+ytypct_quarterly_100                                159.706
+mean_quarterly_100                                   95.706
+std_quarterly_100                                   112.705
+quantile_quarterly_100                              108.706
+cor_two_tseries                                     280.706
+cov_two_tseries                                     178.705
+cor_mvts_5_columns                                  197.705
+cov_mvts_5_columns                                  114.766
+mean_mvts_axis0_5cols                               148.706
+mean_mvts_axis1_100rows                             208.706
+moving_average_quarterly_4                          238.706
+moving_sum_quarterly_4                              316.706
+undiff_quarterly                                    362.706
+rec_ar2_100                                         728.706
+rec_backcasting_via_lambda                          788.705
+overlay_three_tseries                              2948.706
+reindex_tseries_100                                 287.706
+rangeof_tseries_drop1                               620.706
+fconvert_qq_to_yy_mean                             1133.706
+fconvert_qq_to_yy_sum                              1002.705
+fconvert_yy_to_qq_const                             480.706
+fconvert_yy_to_qq_linear                            608.705
+fconvert_yy_to_qq_even                              532.706
+fconvert_mm_to_qq_mean                             1015.705
+mixed_freq_qq_minus_mm_mean                        1167.706
+mixed_freq_pipeline_three_freq                     1582.706
+workspace_merge_5_series                            118.706
+workspace_filter_5_series                            25.046
+compare_workspaces_equal_5_keys                    9768.706
+compare_workspaces_differ_5_keys                   5488.706
+linalg_matrix_tseries_100                             5.045
 
 All times are median µs per call (timeit).
 
