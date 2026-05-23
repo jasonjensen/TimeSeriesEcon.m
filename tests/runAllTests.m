@@ -17,6 +17,6 @@ function results = runAllTests()
 
     suite  = TestSuite.fromFolder(here);
     runner = TestRunner.withTextOutput('Verbosity', 2);
-    % runner.addPlugin(StopOnFailuresPlugin);
+    runner.addPlugin(StopOnFailuresPlugin);
     results = runner.run(suite);
 end

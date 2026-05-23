@@ -100,7 +100,7 @@ classdef TestFconvert < matlab.unittest.TestCase
             tc.verifyTrue(eq(rangeof(y1), tc.R(tc.Y(2), tc.Y(4))));
             tc.verifyEqual(y1.values, [3;5;7], 'AbsTol',1e-12);
 
-            q2 = tse.TSeries(tc.Qn(2,1,2), [1;1;2;2;3;3;4;4;5;5;6;6;7;7;8;8]);
+            q2 = tse.TSeries(tc.Qn(2,2,2), [1;1;2;2;3;3;4;4;5;5;6;6;7;7;8;8]);
             y2 = tse.fconvert(tse.Yearly(), q2, 'method','mean');
             tc.verifyTrue(eq(rangeof(y2), tc.R(tc.Y(3), tc.Y(5))));
             tc.verifyEqual(y2.values, [3;5;7], 'AbsTol',1e-12);

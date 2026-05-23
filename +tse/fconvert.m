@@ -312,7 +312,12 @@ function out = range_convert(F_to, rng, opts)
     elseif (isYP(F_to) || isa(F_to, 'tse.Weekly'))
         hmap = resolve_holidays(opts, F_from);
         [fi, li, ts_, te_] = using_dates_parts(F_to, rng, trim, hmap, F_from);
-        out = tse.MITRange(fi + ts_, li - te_);
+        out_start = fi + ts_;
+        out_end   = li - te_;
+        if out_start.value > out_end.value
+            out_end = out_start - 1;  % canonical empty range: start:(start-1)
+        end
+        out = tse.MITRange(out_start, out_end);
     else
         error('tseries:noMatch', 'Conversion of MITRange from %s to %s not implemented.', ...
             class(F_from), class(F_to));

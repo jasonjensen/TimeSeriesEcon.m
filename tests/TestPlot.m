@@ -31,7 +31,9 @@ classdef TestPlot < matlab.unittest.TestCase
         function plot_tseries_mit_loc(tc)
             t = tse.TSeries(tse.qq(2020,1), (1:8)');
             hL = plot(t, 'mit_loc', 'left');
+            hold on;
             hR = plot(t, 'mit_loc', 'right');
+            hold off;
             % right offset shifts x by 1/N (=0.25 for quarterly)
             tc.verifyEqual(hR.XData(1) - hL.XData(1), 0.25, 'AbsTol', 1e-12);
         end
