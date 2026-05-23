@@ -246,12 +246,12 @@ We expose constructors via free functions:
 | `MIT{Quarterly}(2020, 2)`   | `MIT(Quarterly(), 2020, 2)` or `qq(2020,2)` |
 | `qq(2020, 2)`               | `qq(2020, 2)`                         |
 | `2020Q1` literal            | `qq(2020,1)` (no operator-on-Int hack)|
-| `MIT{Daily}("2022-01-01")`  | `daily('2022-01-01')`                 |
-| `d"2022-01-01"`             | `daily('2022-01-01')`                 |
-| `d"2022-01-01:2022-01-10"`  | `daily('2022-01-01','2022-01-10')`    |
-| `bd"2022-01-01"`            | `bdaily('2022-01-01')`                |
-| `bd"2022-01-01"n`           | `bdaily('2022-01-01','bias','next')`  |
-| `weekly("2022-01-01", 6)`   | `weekly('2022-01-01', 6)`             |
+| `MIT{Daily}("2022-01-01")`  | `day('2022-01-01')`                 |
+| `d"2022-01-01"`             | `day('2022-01-01')`                 |
+| `d"2022-01-01:2022-01-10"`  | `day('2022-01-01','2022-01-10')`    |
+| `bd"2022-01-01"`            | `bday('2022-01-01')`                |
+| `bd"2022-01-01"n`           | `bday('2022-01-01','bias','next')`  |
+| `week("2022-01-01", 6)`   | `week('2022-01-01', 6)`             |
 
 The convenience names `Q1` … `Q4`, `H1`, `H2`, `M1` … `M12`, `Y`, `U`
 become zero-argument MATLAB functions that *return a small helper value*

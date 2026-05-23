@@ -136,9 +136,9 @@ end
 function out = mit_to_bdaily(m, ref, round_to)
     switch round_to
         case 'previous'
-            out = tse.bdaily(mitToDate(m, ref), 'bias', 'previous');
+            out = tse.bday(mitToDate(m, ref), 'bias', 'previous');
         case 'next'
-            out = tse.bdaily(mitToDate(m, ref), 'bias', 'next');
+            out = tse.bday(mitToDate(m, ref), 'bias', 'next');
         case 'current'
             d = mitToDate(m);
             wd = weekday(d);   % 1=Sun .. 7=Sat
@@ -146,7 +146,7 @@ function out = mit_to_bdaily(m, ref, round_to)
                 error('tseries:noMatch', ...
                     '%s is on a weekend. Pass round_to=''previous'' or ''next''.', char(d));
             end
-            out = tse.bdaily(d);
+            out = tse.bday(d);
         otherwise
             error('tseries:noMatch', ...
                 'round_to must be ''current'', ''previous'', or ''next''. Received: %s', round_to);
@@ -160,7 +160,7 @@ function out = mit_to_daily(F_to, m, F_from, ref)
         if md == 0, md = 5; end
         out = tse.MIT(F_to, int64(floor((mv - 1) / 5) * 7 + md));
     else
-        out = tse.daily(mitToDate(m, ref));
+        out = tse.day(mitToDate(m, ref));
     end
 end
 
@@ -175,7 +175,7 @@ function idx = get_out_indices(F_to, dates)
     if isa(F_to, 'tse.Weekly')
         ed = double(F_to.endPeriod);
         for k = 1:n
-            idx(k) = tse.weekly(dates(k), ed);
+            idx(k) = tse.week(dates(k), ed);
         end
         return
     end
@@ -300,15 +300,15 @@ function out = range_convert(F_to, rng, opts)
         out = range_yp(F_to, rng, F_from, trim);
     elseif isa(F_to, 'tse.Daily')
         if isa(F_from, 'tse.BDaily')
-            out = tse.MITRange(tse.daily(mitToDate(rng.startMIT)), ...
-                               tse.daily(mitToDate(rng.stopMIT)));
+            out = tse.MITRange(tse.day(mitToDate(rng.startMIT)), ...
+                               tse.day(mitToDate(rng.stopMIT)));
         else
-            out = tse.MITRange(tse.daily(mitToDate(rng.startMIT - 1) + days(1)), ...
-                               tse.daily(mitToDate(rng.stopMIT)));
+            out = tse.MITRange(tse.day(mitToDate(rng.startMIT - 1) + days(1)), ...
+                               tse.day(mitToDate(rng.stopMIT)));
         end
     elseif isa(F_to, 'tse.BDaily')
-        out = tse.MITRange(tse.bdaily(mitToDate(rng.startMIT - 1) + days(1), 'bias', 'next'), ...
-                           tse.bdaily(mitToDate(rng.stopMIT), 'bias', 'previous'));
+        out = tse.MITRange(tse.bday(mitToDate(rng.startMIT - 1) + days(1), 'bias', 'next'), ...
+                           tse.bday(mitToDate(rng.stopMIT), 'bias', 'previous'));
     elseif (isYP(F_to) || isa(F_to, 'tse.Weekly'))
         hmap = resolve_holidays(opts, F_from);
         [fi, li, ts_, te_] = using_dates_parts(F_to, rng, trim, hmap, F_from);
@@ -637,20 +637,20 @@ function out = ts_higher_to_dailybd(F_to, t, method, ref, fn)
     mits = collect(rng);
     n = numel(mits);
     if isBD
-        fi = tse.bdaily(mitToDate(t.firstdate, 'begin'), 'bias', 'next');
-        li = tse.bdaily(mitToDate(rng.stopMIT), 'bias', 'previous');
+        fi = tse.bday(mitToDate(t.firstdate, 'begin'), 'bias', 'next');
+        li = tse.bday(mitToDate(rng.stopMIT), 'bias', 'previous');
     else
-        fi = tse.daily(mitToDate(t.firstdate, 'begin'));
-        li = tse.daily(mitToDate(rng.stopMIT));
+        fi = tse.day(mitToDate(t.firstdate, 'begin'));
+        li = tse.day(mitToDate(rng.stopMIT));
     end
     opp = zeros(n, 1);
     for i = 1:n
         if isBD
-            a = tse.bdaily(mitToDate(mits(i), 'end'),   'bias', 'previous');
-            b = tse.bdaily(mitToDate(mits(i), 'begin'), 'bias', 'next');
+            a = tse.bday(mitToDate(mits(i), 'end'),   'bias', 'previous');
+            b = tse.bday(mitToDate(mits(i), 'begin'), 'bias', 'next');
         else
-            a = tse.daily(mitToDate(mits(i), 'end'));
-            b = tse.daily(mitToDate(mits(i), 'begin'));
+            a = tse.day(mitToDate(mits(i), 'end'));
+            b = tse.day(mitToDate(mits(i), 'begin'));
         end
         opp(i) = double(a.value - b.value) + 1;
     end
@@ -732,7 +732,7 @@ function out = ts_bdaily_to_daily(F_to, t, method, ref)
     for i = 1:n
         d = mitToDate(mits(i));
         dows(i) = isodow(d);
-        outd(i) = tse.daily(d);
+        outd(i) = tse.day(d);
     end
     for i = 1:n
         ts(outd(i)) = t.values(i);

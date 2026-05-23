@@ -1,7 +1,7 @@
 function v = dateToWeeklyValue(d, endDay)
 %DATETOWEEKLYVALUE Map a datetime to MIT{Weekly{endDay}} raw integer value.
 %
-%   Mirrors Julia's weekly(d, end_day) which computes
+%   Mirrors Julia's week(d, end_day) which computes
 %       ceil(value(d) / 7) + max(0, min(1, dayofweek(d) - end_day))
 %   where value(d) = days since 0000-12-31.
 

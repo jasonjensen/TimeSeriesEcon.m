@@ -29,6 +29,6 @@ function ts = build_holidays_map(col)
     end
     bits = bitmat(:);
 
-    startMIT = tse.bdaily('1970-01-01');
+    startMIT = tse.bday('1970-01-01');
     ts = tse.TSeries(startMIT, bits);
 end

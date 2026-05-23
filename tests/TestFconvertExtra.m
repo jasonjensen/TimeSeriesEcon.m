@@ -14,7 +14,7 @@ classdef TestFconvertExtra < FconvertTestUtils
         end
 
         function ts = makeTS(F)
-            startMIT = tse.fconvert(F, tse.daily('2022-06-15'));
+            startMIT = tse.fconvert(F, tse.day('2022-06-15'));
             n = 4 * double(F.PeriodsPerYear);
             ts = tse.TSeries(startMIT, (1:n)');
         end

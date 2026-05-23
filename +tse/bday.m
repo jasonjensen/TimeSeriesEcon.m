@@ -1,21 +1,21 @@
-function m = bdaily(d, varargin)
-%BDAILY  Construct an MIT{BDaily} from a date or date string.
+function m = bday(d, varargin)
+%bday  Construct an MIT{BDaily} from a date or date string.
 %
-%   m = tse.bdaily(datetime(2022,1,3))
-%   m = tse.bdaily('2022-01-03')
-%   m = tse.bdaily('2022-01-02', 'bias', 'previous')
-%   m = tse.bdaily('2022-01-02', 'bias', 'next')
-%   m = tse.bdaily('2022-01-02', 'bias', 'nearest')
-%   m = tse.bdaily('2022-01-02', 'bias', 'strict')   % default
-%   rng = tse.bdaily('2022-01-01', '2022-01-22')     % MITRange
+%   m = tse.bday(datetime(2022,1,3))
+%   m = tse.bday('2022-01-03')
+%   m = tse.bday('2022-01-02', 'bias', 'previous')
+%   m = tse.bday('2022-01-02', 'bias', 'next')
+%   m = tse.bday('2022-01-02', 'bias', 'nearest')
+%   m = tse.bday('2022-01-02', 'bias', 'strict')   % default
+%   rng = tse.bday('2022-01-01', '2022-01-22')     % MITRange
 
     if ~isempty(varargin) && (ischar(varargin{1}) || isstring(varargin{1})) ...
             && (numel(varargin) == 1 || ~strcmpi(varargin{1}, 'bias'))
         % second positional is the end date
         endDate = varargin{1};
         rng = tse.MITRange( ...
-            tse.bdaily(d, 'bias', 'next'), ...
-            tse.bdaily(endDate, 'bias', 'previous'));
+            tse.bday(d, 'bias', 'next'), ...
+            tse.bday(endDate, 'bias', 'previous'));
         if rng.stopMIT.value < rng.startMIT.value
             error('tseries:noMatch', ...
                 'The provided range does not include any business days.');
@@ -33,7 +33,7 @@ function m = bdaily(d, varargin)
         d = datetime(string(d), 'InputFormat', 'yyyy-MM-dd');
     end
     if ~isa(d, 'datetime')
-        error('tseries:noMatch', 'bdaily(d) requires a datetime, char, or string input.');
+        error('tseries:noMatch', 'bday(d) requires a datetime, char, or string input.');
     end
 
     epoch = datetime(0, 12, 31);

@@ -13,7 +13,7 @@ function m = weekly_from_iso(y, p)
         padd = 0;
     end
     proposed = firstDay + days((p - 1 + padd) * 7);
-    m = tse.weekly(proposed);
+    m = tse.week(proposed);
     d = mitToDate(m);
     if year(d) ~= y && week(d, 'iso-weekofyear') < 52
         error('tseries:noMatch', 'The year %d does not have a week %d.', y, p);

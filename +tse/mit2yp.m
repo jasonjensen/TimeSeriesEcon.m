@@ -36,7 +36,7 @@ function yp = mit2yp(m)
             daysAdj = 0;
         end
         firstBDay = firstDayOfYear + days(daysAdj);
-        firstBDayMIT = tse.bdaily(firstBDay);
+        firstBDayMIT = tse.bday(firstBDay);
         diff = m.value - firstBDayMIT.value + 1;
         yp = [int64(y), int64(diff)];
     elseif isa(F, 'tse.Weekly')

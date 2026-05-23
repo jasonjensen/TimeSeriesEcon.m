@@ -43,7 +43,7 @@ classdef TestPlot < matlab.unittest.TestCase
         end
 
         function plot_tseries_daily(tc)
-            t = tse.TSeries(tse.daily('2021-01-01'), (1:10)');
+            t = tse.TSeries(tse.day('2021-01-01'), (1:10)');
             h = plot(t);
             tc.verifyTrue(isa(h.XData, 'datetime'));
             tc.verifyEqual(numel(h.XData), 10);

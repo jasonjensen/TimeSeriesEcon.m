@@ -15,9 +15,9 @@
 %   qq(y,p)             - Quarterly
 %   mm(y,p)             - Monthly
 %   yy(y[,p])           - Yearly
-%   daily(d)            - Daily from datetime / string
-%   bdaily(d,...)       - Business daily with optional 'bias'
-%   weekly(d[,end])     - Weekly
+%   day(d)            - Daily from datetime / string
+%   bday(d,...)       - Business daily with optional 'bias'
+%   week(d[,end])     - Weekly
 %   weekly_from_iso(y,p)- Weekly from ISO (year, week)
 %
 % Inspection
