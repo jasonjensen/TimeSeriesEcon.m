@@ -451,6 +451,29 @@ classdef TSeries
             s = summaryStr(t);
         end
 
+        % ---------- plotting ----------
+
+        function varargout = plot(t, varargin)
+            % plot(t, 'mit_loc', loc, 'trange', rng, <line opts>)
+            %
+            % Mirrors the one_tseries plot recipe from TimeSeriesEcon.jl.
+            % 'mit_loc' is 'left' (default), 'middle', or 'right'; 'trange'
+            % restricts the plotted range.  Remaining options pass through
+            % to the built-in plot.
+            [mit_loc, trange, rest] = tsPlotArgs(varargin);
+            rng = rangeof(t);
+            if ~isempty(trange)
+                rng = intersect(trange, rng);
+            end
+            [x, kind] = mit_xcoords(rng, mit_loc);
+            y = tse.lookup(t, rng);
+            h = plot(x, y, rest{:});
+            if strcmp(kind, 'yp')
+                mit_yp_ticklabels(ancestor(h(1), 'axes'), int2freq(t.frequency), mit_loc);
+            end
+            if nargout > 0, varargout = {h}; end
+        end
+
         % ---------- arithmetic ----------
 
         function r = plus(a, b)
@@ -1027,6 +1050,28 @@ end
 function tf = isTypeName(s)
     tf = ismember(s, {'double','single','logical', ...
         'int8','uint8','int16','uint16','int32','uint32','int64','uint64'});
+end
+
+function [mit_loc, trange, rest] = tsPlotArgs(args)
+% Pull 'mit_loc' and 'trange' name-value pairs out of a plot arg list,
+% leaving the rest to pass through to the built-in plot.
+    mit_loc = 'left';
+    trange  = [];
+    rest    = {};
+    k = 1;
+    while k <= numel(args)
+        a = args{k};
+        if (ischar(a) || isstring(a)) && k < numel(args) && strcmpi(a, 'mit_loc')
+            mit_loc = char(args{k+1});
+            k = k + 2;
+        elseif (ischar(a) || isstring(a)) && k < numel(args) && strcmpi(a, 'trange')
+            trange = args{k+1};
+            k = k + 2;
+        else
+            rest{end+1} = a; %#ok<AGROW>
+            k = k + 1;
+        end
+    end
 end
 
 function s = lpad(str, n)

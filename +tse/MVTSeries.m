@@ -279,6 +279,46 @@ classdef MVTSeries
             end
         end
 
+        function varargout = plot(x, varargin)
+            % plot(x, 'vars', names, 'mit_loc', loc, 'trange', rng, <opts>)
+            %
+            % Plots one line per (selected) column on a single axis with a
+            % legend, mirroring the MVTSeries plotting in TimeSeriesEcon.jl.
+            % 'vars' selects columns (default: all); 'mit_loc' and 'trange'
+            % behave as for TSeries.plot.
+            [mit_loc, trange, vars, rest] = mvPlotArgs(varargin);
+            if isempty(vars)
+                vars = x.colnames;
+            else
+                vars = string(vars);
+            end
+            rng = rangeof(x);
+            if ~isempty(trange)
+                rng = intersect(trange, rng);
+            end
+            [xc, kind] = mit_xcoords(rng, mit_loc);
+            fdv = x.firstdate.value;
+            kStart = double(rng.startMIT.value - fdv) + 1;
+            kEnd   = double(rng.stopMIT.value  - fdv) + 1;
+            washold = ishold();
+            h = gobjects(1, numel(vars));
+            for j = 1:numel(vars)
+                col = find(strcmp(string(vars(j)), x.colnames), 1);
+                if isempty(col)
+                    error('tseries:bounds', 'Unknown column: %s', char(vars(j)));
+                end
+                y = x.values(kStart:kEnd, col);
+                h(j) = plot(xc, y, rest{:});
+                if j == 1, hold('on'); end
+            end
+            if ~washold, hold('off'); end
+            legend(cellstr(vars));
+            if strcmp(kind, 'yp')
+                mit_yp_ticklabels(ancestor(h(1), 'axes'), int2freq(x.frequency), mit_loc);
+            end
+            if nargout > 0, varargout = {h}; end
+        end
+
         function n = length(x)
             n = size(x.values, 1);
         end
@@ -1563,5 +1603,33 @@ function out = builtin_mapslices(A, f, dims)
             out = zeros(outSz, class(chunk));
         end
         out(sliceIdx{:}) = chunk;
+    end
+end
+
+% ---------- plotting helpers ----------
+
+function [mit_loc, trange, vars, rest] = mvPlotArgs(args)
+% Pull 'mit_loc', 'trange', and 'vars' name-value pairs out of a plot arg
+% list, leaving the rest to pass to the built-in plot.
+    mit_loc = 'left';
+    trange  = [];
+    vars    = [];
+    rest    = {};
+    k = 1;
+    while k <= numel(args)
+        a = args{k};
+        if (ischar(a) || isstring(a)) && k < numel(args) && strcmpi(a, 'mit_loc')
+            mit_loc = char(args{k+1});
+            k = k + 2;
+        elseif (ischar(a) || isstring(a)) && k < numel(args) && strcmpi(a, 'trange')
+            trange = args{k+1};
+            k = k + 2;
+        elseif (ischar(a) || isstring(a)) && k < numel(args) && strcmpi(a, 'vars')
+            vars = args{k+1};
+            k = k + 2;
+        else
+            rest{end+1} = a; %#ok<AGROW>
+            k = k + 1;
+        end
     end
 end
