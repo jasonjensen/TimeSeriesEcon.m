@@ -26,7 +26,7 @@ the deviations that aren't obvious from reading the code.
 | 04 | Parametric frequencies | Julia's `Quarterly{3}` becomes a constructor argument, `Quarterly(3)` (the `endPeriod`). |
 | 05 | No numeric literals | MATLAB has no user-defined literals, so `2020Q1` → `qq(2020, 1)`. |
 | 06 | Indexing | Custom `subsref` / `subsasgn`; MIT keys return scalars, ranges return series, integer keys fall through to the values. Resize-on-MIT-assign matches Julia. |
-| 07 | Workspace | **No dedicated type** — use a native MATLAB `struct`. `overlay` / `compare_ts` accept structs. |
+| 07 | Workspace | **No dedicated type** — use a native MATLAB `struct`. `overlay` / `compare` accept structs. |
 | 08 | Statistics axis | Julia's `dims=` keyword becomes `'dims'` name-value (`mean(mv, 'dims', 1)`). |
 | 09 | Recurrences | Julia's `@rec` macro becomes the higher-order `rec(rng, target, fn)`; no `rec_linear`. |
 | 10 | Matrix product | `*` (and `\`, `/`, transpose) forward to the underlying numeric storage and drop labels, matching Julia. |

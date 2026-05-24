@@ -18,16 +18,16 @@ Shifts move the *labels*, not the data; the values are unchanged.
 
 | Call | Effect |
 |------|--------|
-| `diff_ts(t[, k])` | difference at lag `k` (default `k = -1`, first difference) |
+| `diff(t[, k])` | difference at lag `k` (default `k = -1`, first difference) |
 | `cumsum(t)` | running sum, same range |
-| `undiff(dvar)` | inverse of `diff_ts` from a 0 baseline (first level lost) |
+| `undiff(dvar)` | inverse of `diff` from a 0 baseline (first level lost) |
 | `undiff(dvar, value)` | anchor value at `firstdate(dvar) - 1` |
 | `undiff(dvar, mit, value)` | anchor a known `(date, value)` to recover the level exactly |
 
 ```matlab
 import tse.*
 x  = TSeries(qq(2020, 1), [1;3;6;10]);
-dx = diff_ts(x);                              % NaN, 2, 3, 4 on the dropped-first range
+dx = diff(x);                                 % 2, 3, 4 on the dropped-first range
 x2 = undiff(dx, x.firstdate, x(x.firstdate)); % recovers x
 ```
 
@@ -52,12 +52,14 @@ always includes the current observation. All of the above also operate on
 
 ## BDaily NaN / holiday skipping
 
-`shift` / `lag` / `lead` / `diff_ts` / `pct` on `BDaily` series accept
+`shift` / `lag` / `lead` / `diff` / `pct` on `BDaily` series accept
 `'skip_all_nans', true` and `'skip_holidays', true` (and an explicit
 `'holidays_map', map`) to treat NaNs / holidays as gaps. See
 [BDaily holidays](../tutorials/1_timeseriesecon.md#16-bdaily-holidays).
 
 !!! info "Julia ↔ MATLAB"
-    Julia's `diff(t)` is `diff_ts(t)` here (the built-in `diff` differs in
-    sign). The undiff anchor `firstdate(x) => first(x)` becomes the trailing
-    `undiff(dx, mit, value)`. In-place `lag!`/`lead!` → reassign the result.
+    `diff(t)` matches Julia (method dispatch overrides the built-in `diff` only
+    for `TSeries` / `MVTSeries`; the built-in `diff` on plain arrays differs in
+    sign and is unchanged). The undiff anchor `firstdate(x) => first(x)` becomes
+    the trailing `undiff(dx, mit, value)`. In-place `lag!`/`lead!` → reassign
+    the result.

@@ -12,7 +12,7 @@ classdef TestPctApct < matlab.unittest.TestCase
 
         function diff_range(tc)
             t1 = tse.TSeries(tse.yy(2000), [1;2;4;8]);
-            d = diff_ts(t1);
+            d = diff(t1);
             tc.verifyTrue(tse.rangeof(d).startMIT == tse.yy(2001));
             tc.verifyTrue(tse.rangeof(d).stopMIT  == tse.yy(2003));
         end

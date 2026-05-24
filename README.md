@@ -40,7 +40,7 @@ y = fconvert(Yearly(), t, 'method', 'mean');   % convert to annual
 - `TSeries` and `MVTSeries` with range-intersection arithmetic, resize-on-assign,
   shifts, differences, growth rates, moving windows, and reductions.
 - Frequency conversion (`fconvert`), recursive evaluation (`rec`), `overlay` /
-  `compare_ts` / `reindex`, BDaily holiday calendars, plotting, and an extensive
+  `compare` / `reindex`, BDaily holiday calendars, plotting, and an extensive
   `matlab.unittest` test suite.
 
 **Not included:** X-13ARIMA-SEATS (`x13`) and the DataEcon binary file format.

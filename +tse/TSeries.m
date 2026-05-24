@@ -283,6 +283,11 @@ classdef TSeries
             rng = tse.rangeof(t, varargin{:});
         end
 
+        function tf = compare(t, b, varargin)
+            % compare(t, b, ...) — see tse.compare.
+            tf = tse.compare(t, b, varargin{:});
+        end
+
         function n = length(t)
             n = length(t.values);
         end
@@ -689,10 +694,11 @@ classdef TSeries
             r.values = cumprod(t.values, varargin{:});
         end
 
-        % NB: not overriding `diff` because Julia's diff has a different
-        % sign convention from MATLAB's.  Use tse.diff_ts() or the
-        % diff_ts method below.
-        function r = diff_ts(t, k)
+        % `diff` overrides the built-in for TSeries via method dispatch
+        % (plain arrays still use the built-in `diff`).  NB: the sign
+        % convention follows Julia -- diff(x) = x - lag(x) -- which is the
+        % opposite of MATLAB's built-in `diff`.
+        function r = diff(t, k)
             % Direct-formula implementation that skips the intermediate
             % `t - lag(t, -k)` binary-op chain.
             if nargin < 2, k = -1; end

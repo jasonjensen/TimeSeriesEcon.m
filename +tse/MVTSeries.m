@@ -267,6 +267,11 @@ classdef MVTSeries
             rng = rangeof(x, varargin{:});
         end
 
+        function tf = compare(x, b, varargin)
+            % compare(x, b, ...) — see tse.compare.
+            tf = tse.compare(x, b, varargin{:});
+        end
+
         function v = rawdata(x)
             v = x.values;
         end
@@ -770,7 +775,7 @@ classdef MVTSeries
             r = x; r.values = cumprod(x.values, varargin{:});
         end
 
-        function r = diff_ts(x, k)
+        function r = diff(x, k)
             if nargin < 2, k = -1; end
             r = x - lag(x, -k);
         end

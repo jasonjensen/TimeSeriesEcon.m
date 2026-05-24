@@ -34,14 +34,14 @@ recurse field-by-field:
 
 - [`overlay(w1, w2, ...)`](various.md#overlay) — first-valid-wins composition
   across matching fields.
-- [`compare_ts(w1, w2, ...)`](various.md#compare) — recursive comparison under
+- [`compare(w1, w2, ...)`](various.md#compare) — recursive comparison under
   tolerance.
 
 ```matlab
 w1 = struct('x', TSeries(qq(2020,1), [1;NaN;3]), 'a', 1);
 w2 = struct('x', TSeries(qq(2020,1), [9;2;9]),   'b', 5);
-overlay(w1, w2)                 % field-by-field overlay
-compare_ts(w1, w1, 'nans', true)   % true
+overlay(w1, w2)                  % field-by-field overlay
+tse.compare(w1, w1, 'nans', true)   % true
 ```
 
 ## Converting to / from MVTSeries

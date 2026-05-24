@@ -47,7 +47,7 @@ These are methods, callable as `t.op(...)` or `op(t, ...)`:
 |-------|---------|
 | Arithmetic | `+ - .* ./ .^`, scalar `* /`, `uminus` — align on range intersection |
 | Shifts | `shift(t,k)`, `lag(t[,k])`, `lead(t[,k])` |
-| Differences | `diff_ts(t[,k])`, `cumsum(t)`, `undiff` (free function) |
+| Differences | `diff(t[,k])`, `cumsum(t)`, `undiff` (free function) |
 | Growth | `pct(t[,shift])`, `apct(t)`, `ytypct(t)` |
 | Moving | `moving_average(t,n)`, `moving_sum(t,n)`, `moving(t,n)` |
 | Reductions | `sum`, `mean`, `std`, `var`, `median`, `min`, `max`, `prod`, `any`, `all` |
@@ -64,5 +64,7 @@ t(qq(2022, 1)) = 99;         % extends the series with NaN padding
 
 !!! info "Julia ↔ MATLAB"
     Resize-on-assign and range-intersection arithmetic match Julia. Julia's
-    `begin`/`end` inside `[]` become `firstdate(t)`/`lastdate(t)`. `diff` is
-    spelled `diff_ts` (the built-in `diff` has a different sign convention).
+    `begin`/`end` inside `[]` become `firstdate(t)`/`lastdate(t)`. `diff(t)`
+    follows Julia's sign convention via method dispatch — it overrides the
+    built-in `diff` only for `TSeries`/`MVTSeries`, leaving `diff` on plain
+    arrays unchanged.

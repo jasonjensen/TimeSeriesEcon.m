@@ -21,7 +21,7 @@ only the spellings differ. Assume `import tse.*` is in scope in MATLAB and
 | Last / first | `t[t.lastdate]` / `t[t.firstdate]` | `t(lastdate(t))` / `t(firstdate(t))` |
 | Element-wise math | `np.log(x)`, `x + y` | `log(x)`, `x + y` |
 | Shifts | `lag(x)`, `lead(x)`, `shift(x,-1)` | `lag(x)`, `lead(x)`, `shift(x,-1)` |
-| Difference / undiff | `diff(x)` / `undiff(dx, anchor=(d,v))` | `diff_ts(x)` / `undiff(dx, d, v)` |
+| Difference / undiff | `diff(x)` / `undiff(dx, anchor=(d,v))` | `diff(x)` / `undiff(dx, d, v)` |
 | Moving average | `moving(t, n)` | `moving_average(t, n)` |
 | Recurrence | `rec(rng, t, lambda t: …)` | `t = rec(rng, t, @(s,t) …)` |
 | Linear recurrence | `rec_linear(t, coeffs, lags, rng)` | *not ported* — use `rec` or `undiff` |
@@ -32,7 +32,7 @@ only the spellings differ. Assume `import tse.*` is in scope in MATLAB and
 | Per-column / per-row mean | `mean(mv, axis=0)` / `axis=1` | `mean(mv, 'dims', 1)` / `'dims', 2` |
 | Workspace | `Workspace(...)` / `del w.x` | a `struct`: `struct(...)` / `rmfield(w,'x')` |
 | `overlay` | `overlay(x1, x2, rng=…)` | `overlay(x1, x2)` / `overlay(rng, x1, x2)` |
-| `compare` | `compare(v1, v2, atol=1e-5)` → `CompareResult` | `compare_ts(v1, v2, 'atol', 1e-5)` → logical |
+| `compare` | `compare(v1, v2, atol=1e-5)` → `CompareResult` | `compare(v1, v2, 'atol', 1e-5)` → logical |
 | `reindex` | `reindex(t, (old, new))` | `reindex(t, old, new)` |
 | Matrix product | `A @ t` | `A * t` |
 | Frequency conversion | `fconvert(t, Quarterly(), method='mean')`* | `fconvert(Quarterly(), t, 'method', 'mean')` |
@@ -50,7 +50,7 @@ call; check the Python signature order on your version.
 | DataFrame interop | `to_pandas` / `to_polars` | — (use `t.values` + `rangeof`) |
 | JSON I/O | yes | — |
 | `option_scope` context manager | yes | — (call `setoption` / restore manually) |
-| `CompareResult` object | yes | `compare_ts` returns a logical (`'quiet', false` prints a diff) |
+| `CompareResult` object | yes | `compare` returns a logical (`'quiet', false` prints a diff) |
 | Workspace type | `Workspace` class | native `struct` |
 | Matrix product operator | `@` (element-wise stays `*`) | `*` (element-wise is `.*`) |
 

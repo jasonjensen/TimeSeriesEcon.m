@@ -51,7 +51,7 @@ MATLAB has no user-defined numeric literals. Use the constructor functions
 
 MATLAB's native `struct` already is an ordered, attribute-accessible bag of
 heterogeneous values, so the port uses `struct` directly; `overlay` and
-`compare_ts` accept structs. See [Workspaces](reference/workspace.md).
+`compare` accept structs. See [Workspaces](reference/workspace.md).
 
 ## Where do I file a bug?
 

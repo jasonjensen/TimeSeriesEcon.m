@@ -1,5 +1,5 @@
 classdef TestShiftLagLead < matlab.unittest.TestCase
-    %TESTSHIFTLAGLEAD  Mirrors the shift/lag/lead/diff_ts tests from
+    %TESTSHIFTLAGLEAD  Mirrors the shift/lag/lead/diff tests from
     %    test_tseries.jl "Iris" and "TS.math" testsets.
 
     methods (Test)
@@ -35,16 +35,16 @@ classdef TestShiftLagLead < matlab.unittest.TestCase
 
         function diff_default(tc)
             t1 = tse.TSeries(tse.yy(2000), [1;2;4;8]);
-            d = diff_ts(t1);
+            d = diff(t1);
             tc.verifyEqual(d.values, [1;2;4]);
             tc.verifyTrue(d.firstdate == tse.yy(2001));
         end
 
         function diff_lead(tc)
-            % diff_ts(x, k) = x - lag(x, -k); for k=-1 (default) -> x - x[t-1]
+            % diff(x, k) = x - lag(x, -k); for k=-1 (default) -> x - x[t-1]
             % for k=1 -> x - x[t+1]
             x = tse.TSeries(tse.qq(2020,1), (1:5)');
-            d = diff_ts(x, 1);
+            d = diff(x, 1);
             tc.verifyEqual(d.values, -ones(4,1));
         end
     end

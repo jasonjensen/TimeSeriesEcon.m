@@ -32,8 +32,8 @@ scenarios are now registered in `run_benchmarks.m`:
 |---|---|
 | `workspace_merge_5_series` | `tse.overlay(w1, w2)` on structs with disjoint fields |
 | `workspace_filter_5_series` | field-copy loop into new struct |
-| `compare_workspaces_equal_5_keys` | `tse.compare_ts(w1, w2, 'quiet', true)` |
-| `compare_workspaces_differ_5_keys` | `tse.compare_ts(w1, w2, 'quiet', true)` |
+| `compare_workspaces_equal_5_keys` | `tse.compare(w1, w2, 'quiet', true)` |
+| `compare_workspaces_differ_5_keys` | `tse.compare(w1, w2, 'quiet', true)` |
 
 The following scenario remains `n/a` — it depends on `copyto`, a Python-specific
 in-place materialiser with no direct MATLAB equivalent:

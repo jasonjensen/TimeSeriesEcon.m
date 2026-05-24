@@ -1,11 +1,11 @@
 function r = undiff(dvar, varargin)
-%UNDIFF  Inverse of diff_ts.  Equivalent to Julia's `undiff`.
+%UNDIFF  Inverse of diff.  Equivalent to Julia's `undiff`.
 %
 %   r = tse.undiff(dvar)                        anchor = (firstdate(dvar)-1, 0)
 %   r = tse.undiff(dvar, anchorValue)           anchor at firstdate(dvar)-1
 %   r = tse.undiff(dvar, anchorMIT, anchorValue)
 %
-%   `dvar` is a TSeries (presumably the output of diff_ts(x)).  The
+%   `dvar` is a TSeries (presumably the output of diff(x)).  The
 %   anchor specifies a known (date, value) pair so we can recover the
 %   level series.  If only the value is provided, the date defaults to
 %   `firstdate(dvar) - 1`.

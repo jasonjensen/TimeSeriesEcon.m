@@ -35,9 +35,9 @@ classdef TestMisc < matlab.unittest.TestCase
         function compare_mvts_different_ranges(tc)
             X = tse.MVTSeries(tse.yy(2000), {'x','y','z'}, ones(20, 3));
             Z = tse.MVTSeries(tse.yy(2000), {'x','y','z'}, ones(15, 3));
-            tc.verifyFalse(tse.compare_ts(X.values, Z.values));
-            tc.verifyFalse(tse.compare_ts(X, Z, 'ignoreMissing', false));
-            tc.verifyTrue(tse.compare_ts(X, Z, 'ignoreMissing', true));
+            tc.verifyFalse(tse.compare(X.values, Z.values));
+            tc.verifyFalse(tse.compare(X, Z, 'ignoreMissing', false));
+            tc.verifyTrue(tse.compare(X, Z, 'ignoreMissing', true));
         end
 
         function axes1_returns_range(tc)

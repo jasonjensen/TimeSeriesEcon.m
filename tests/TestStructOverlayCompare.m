@@ -1,6 +1,6 @@
 classdef TestStructOverlayCompare < matlab.unittest.TestCase
     %TESTSTRUCTOVERLAYCOMPARE  Tests for struct (workspace-like) overlay
-    %   and compare_ts, ported from Julia test_workspace.jl.
+    %   and compare, ported from Julia test_workspace.jl.
 
     methods (Test)
 
@@ -14,7 +14,7 @@ classdef TestStructOverlayCompare < matlab.unittest.TestCase
             tc.verifyTrue(isstruct(r));
             tc.verifyTrue(isfield(r, 'A'));
             expected = tse.TSeries(tse.yy(87), [1; 2; 7; 4]);
-            tc.verifyTrue(tse.compare_ts(r.A, expected, 'nans', true));
+            tc.verifyTrue(tse.compare(r.A, expected, 'nans', true));
         end
 
         function overlay_reverse_priority(tc)
@@ -23,7 +23,7 @@ classdef TestStructOverlayCompare < matlab.unittest.TestCase
 
             r = tse.overlay(work2, work1);
             expected = tse.TSeries(tse.yy(87), [1; 6; 7; 8]);
-            tc.verifyTrue(tse.compare_ts(r.A, expected, 'nans', true));
+            tc.verifyTrue(tse.compare(r.A, expected, 'nans', true));
         end
 
         function overlay_three_structs(tc)
@@ -33,7 +33,7 @@ classdef TestStructOverlayCompare < matlab.unittest.TestCase
 
             r = tse.overlay(work3, work1, work2);
             expected = tse.TSeries(tse.yy(86), [NaN; 1; 2; 7; 4; NaN; NaN]);
-            tc.verifyTrue(tse.compare_ts(r.A, expected, 'nans', true));
+            tc.verifyTrue(tse.compare(r.A, expected, 'nans', true));
         end
 
         function overlay_idempotent(tc)
@@ -66,27 +66,27 @@ classdef TestStructOverlayCompare < matlab.unittest.TestCase
             r = tse.overlay(work1, work2);
             tc.verifyEqual(r.x, 5);
             expected_ts = tse.TSeries(tse.qq(2020, 1), [1; 20; 3; 4]);
-            tc.verifyTrue(tse.compare_ts(r.ts, expected_ts));
+            tc.verifyTrue(tse.compare(r.ts, expected_ts));
         end
 
-        %% --- compare_ts on structs ---
+        %% --- compare on structs ---
 
         function compare_equal_structs(tc)
             work1.A = tse.TSeries(tse.yy(87), ones(4, 1));
             work2.A = tse.TSeries(tse.yy(87), ones(4, 1));
-            tc.verifyTrue(tse.compare_ts(work1, work2, 'quiet', true));
+            tc.verifyTrue(tse.compare(work1, work2, 'quiet', true));
         end
 
         function compare_unequal_structs(tc)
             work1.A = tse.TSeries(tse.yy(87), ones(4, 1));
             work3.A = tse.TSeries(tse.yy(86), zeros(4, 1));
-            tc.verifyFalse(tse.compare_ts(work1, work3, 'quiet', true));
+            tc.verifyFalse(tse.compare(work1, work3, 'quiet', true));
         end
 
         function compare_large_equal_structs(tc)
             work4.A = tse.TSeries(tse.yy(86), zeros(300, 1));
             work5.A = tse.TSeries(tse.yy(86), zeros(300, 1));
-            tc.verifyTrue(tse.compare_ts(work4, work5, 'quiet', true));
+            tc.verifyTrue(tse.compare(work4, work5, 'quiet', true));
         end
 
         function compare_ignoreMissing_fields(tc)
@@ -94,7 +94,7 @@ classdef TestStructOverlayCompare < matlab.unittest.TestCase
             work1.B = tse.TSeries(tse.yy(90), [10; 20]);
             work2.A = tse.TSeries(tse.yy(87), [1; 2; 3]);
             % work2 is missing field B
-            tc.verifyTrue(tse.compare_ts(work1, work2, 'ignoreMissing', true, 'quiet', true));
+            tc.verifyTrue(tse.compare(work1, work2, 'ignoreMissing', true, 'quiet', true));
         end
 
         function compare_different_fields_fails(tc)
@@ -102,14 +102,14 @@ classdef TestStructOverlayCompare < matlab.unittest.TestCase
             work1.B = tse.TSeries(tse.yy(90), [10; 20]);
             work2.A = tse.TSeries(tse.yy(87), [1; 2; 3]);
             % Without ignoreMissing, different fields should fail
-            tc.verifyFalse(tse.compare_ts(work1, work2, 'quiet', true));
+            tc.verifyFalse(tse.compare(work1, work2, 'quiet', true));
         end
 
         function compare_with_tolerance(tc)
             work1.A = tse.TSeries(tse.yy(87), [1; 2; 3]);
             work2.A = tse.TSeries(tse.yy(87), [1.001; 2.001; 3.001]);
-            tc.verifyFalse(tse.compare_ts(work1, work2, 'atol', 0, 'quiet', true));
-            tc.verifyTrue(tse.compare_ts(work1, work2, 'atol', 0.01, 'quiet', true));
+            tc.verifyFalse(tse.compare(work1, work2, 'atol', 0, 'quiet', true));
+            tc.verifyTrue(tse.compare(work1, work2, 'atol', 0.01, 'quiet', true));
         end
 
         function compare_nested_struct(tc)
@@ -120,25 +120,25 @@ classdef TestStructOverlayCompare < matlab.unittest.TestCase
             inner2.val = 42;
             work2.x = tse.TSeries(tse.yy(2000), [1; 2; 3]);
             work2.meta = inner2;
-            tc.verifyTrue(tse.compare_ts(work1, work2, 'quiet', true));
+            tc.verifyTrue(tse.compare(work1, work2, 'quiet', true));
         end
 
         function compare_nans_option(tc)
             work1.A = tse.TSeries(tse.yy(87), [1; NaN; 3]);
             work2.A = tse.TSeries(tse.yy(87), [1; NaN; 3]);
             % Without nans=true, NaN ~= NaN
-            tc.verifyFalse(tse.compare_ts(work1, work2, 'quiet', true));
+            tc.verifyFalse(tse.compare(work1, work2, 'quiet', true));
             % With nans=true, NaN == NaN
-            tc.verifyTrue(tse.compare_ts(work1, work2, 'nans', true, 'quiet', true));
+            tc.verifyTrue(tse.compare(work1, work2, 'nans', true, 'quiet', true));
         end
 
         function compare_ignoreMissing_range(tc)
             work1.A = tse.TSeries(tse.yy(87), [1; 2; 3; 4]);
             work2.A = tse.TSeries(tse.yy(88), [2; 3; 4; 5]);
             % Different ranges without ignoreMissing -> false
-            tc.verifyFalse(tse.compare_ts(work1, work2, 'quiet', true));
+            tc.verifyFalse(tse.compare(work1, work2, 'quiet', true));
             % With ignoreMissing -> compare intersection
-            tc.verifyTrue(tse.compare_ts(work1, work2, 'ignoreMissing', true, 'quiet', true));
+            tc.verifyTrue(tse.compare(work1, work2, 'ignoreMissing', true, 'quiet', true));
         end
     end
 end

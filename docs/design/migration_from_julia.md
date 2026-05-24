@@ -23,7 +23,7 @@ the spellings, not the semantics. Assume `import tse.*` is in scope.
 | Last element | `x[end]` | `x(lastdate(x))` |
 | First element | `x[begin]` | `x(firstdate(x))` |
 | Shifts | `lag(x)` / `lag!(x)` | `lag(x)` / `x = lag(x)` |
-| Difference | `diff(x)` | `diff_ts(x)` |
+| Difference | `diff(x)` | `diff(x)` (method; Julia sign convention) |
 | Undiff with anchor | `undiff(dx, firstdate(x) => first(x))` | `undiff(dx, firstdate(x), x(firstdate(x)))` |
 | Moving average | `moving(t, n)` | `moving_average(t, n)` (alias `moving`) |
 | Macro recurrence | `@rec rng a[t] = …` | `a = rec(rng, a, @(s,t) …)` |
@@ -34,7 +34,7 @@ the spellings, not the semantics. Assume `import tse.*` is in scope.
 | Per-column / per-row mean | `mean(mvts; dims=1)` / `dims=2` | `mean(mv, 'dims', 1)` / `'dims', 2` |
 | Workspace | `Workspace()` / `delete!(w, :x)` | a `struct`: `struct()` / `rmfield(w, 'x')` |
 | `overlay` | `overlay(x1, x2)` / `overlay(rng, x1, x2)` | `overlay(x1, x2)` / `overlay(rng, x1, x2)` |
-| `compare` / `@compare` | `@compare(v1, v2, atol=1e-5)` | `compare_ts(v1, v2, 'atol', 1e-5)` |
+| `compare` / `@compare` | `@compare(v1, v2, atol=1e-5)` | `compare(v1, v2, 'atol', 1e-5)` |
 | `reindex` | `reindex(t, 2021Q1 => 1U)` | `reindex(t, qq(2021,1), MIT(Unit(),1))` |
 | Matrix product | `A * t` | `A * t` (returns a numeric vector) |
 | Frequency conversion | `fconvert(Quarterly, t; method=:mean)` | `fconvert(Quarterly(), t, 'method', 'mean')` |
@@ -55,12 +55,14 @@ the spellings, not the semantics. Assume `import tse.*` is in scope.
   classes, so assignment copies on write and in-place `!`-mutators have no
   separate spelling — reassign the result (`t = lag(t)`,
   `a = rec(rng, a, fn)`).
-- **No `Workspace` type.** Use a `struct`; `overlay` / `compare_ts` accept
+- **No `Workspace` type.** Use a `struct`; `overlay` / `compare` accept
   structs field-by-field, but `reindex` dispatches over MIT / MITRange / TSeries.
 - **No `rec_linear` / no `@rec` macro.** Use the higher-order `rec`; for
   `a[t] = a[t-1] + c`, use `undiff`.
-- **`diff` is `diff_ts`.** MATLAB's built-in `diff` has the opposite sign
-  convention, so the package uses a distinct name.
+- **`diff` follows the Julia sign convention.** `diff(t)` is a method, so it
+  overrides MATLAB's built-in `diff` only for `TSeries` / `MVTSeries`
+  (`diff(x) = x - lag(x)`); on plain arrays MATLAB's built-in `diff` is
+  unchanged.
 - **Display.** `disp(t)` reproduces the *shape* of Julia's `show` (header, range,
   truncated rows) but not the exact spacing.
 - **`x13` is not ported** — see [the x13 page](../reference/x13.md).

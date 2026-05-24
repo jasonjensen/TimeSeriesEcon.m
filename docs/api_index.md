@@ -34,19 +34,19 @@ also run `help tse` for the same overview, or `help tse.<name>` for any item.
 | Function | Page |
 |----------|------|
 | `tse.fconvert` | [Frequency conversion](reference/fconvert.md) |
-| `tse.diff_ts`, `tse.undiff` | [Math](reference/math.md) |
+| `tse.undiff` | [Math](reference/math.md) |
 | `tse.lookup` | [Indexing](reference/indexing.md) |
-| `tse.overlay`, `tse.compare_ts`, `tse.reindex` | [Misc helpers](reference/various.md) |
+| `tse.overlay`, `tse.compare`, `tse.reindex` | [Misc helpers](reference/various.md) |
 | `tse.strip_ts`, `tse.extend_series`, `tse.trim_series` | [Math](reference/math.md) / [fconvert](reference/fconvert.md) |
 | `tse.rec` | [Recursive](reference/recursive.md) |
 | `tse.cleanedvalues`, `tse.typenan` | [Statistics](reference/stats.md) |
 
 ## TSeries / MVTSeries methods
 
-`shift`, `lag`, `lead`, `cumsum`, `diff_ts`, `pct`, `apct`, `ytypct`,
+`shift`, `lag`, `lead`, `cumsum`, `diff`, `pct`, `apct`, `ytypct`,
 `moving_average`, `moving_sum`, `moving`, `sum`, `mean`, `std`, `var`, `median`,
-`min`, `max`, `prod`, `any`, `all`, `plot`, `rangeof`, `firstdate`, `lastdate`,
-`frequencyof`, `columns` (MVTSeries). See
+`min`, `max`, `prod`, `any`, `all`, `plot`, `compare`, `rangeof`, `firstdate`,
+`lastdate`, `frequencyof`, `columns` (MVTSeries). See
 [TSeries](reference/tseries.md) and [MVTSeries](reference/mvtseries.md).
 
 ## Options & holidays

@@ -158,7 +158,7 @@ function [SETUP, RUN, DESCRIPTION] = buildRegistry()
 
     SETUP.diff_quarterly = @setup_diff_quarterly;
     RUN.diff_quarterly   = @run_diff_quarterly;
-    DESCRIPTION.diff_quarterly = 'diff_ts(t)';
+    DESCRIPTION.diff_quarterly = 'diff(t)';
 
     SETUP.pct_quarterly = @setup_pct_quarterly;
     RUN.pct_quarterly   = @run_pct_quarterly;
@@ -294,11 +294,11 @@ function [SETUP, RUN, DESCRIPTION] = buildRegistry()
 
     SETUP.compare_workspaces_equal_5_keys = @setup_compare_workspaces_equal_5_keys;
     RUN.compare_workspaces_equal_5_keys   = @run_compare_workspaces_equal_5_keys;
-    DESCRIPTION.compare_workspaces_equal_5_keys = 'compare_ts(w1, w2) — 5×TSeries, equal';
+    DESCRIPTION.compare_workspaces_equal_5_keys = 'compare(w1, w2) — 5×TSeries, equal';
 
     SETUP.compare_workspaces_differ_5_keys = @setup_compare_workspaces_differ_5_keys;
     RUN.compare_workspaces_differ_5_keys   = @run_compare_workspaces_differ_5_keys;
-    DESCRIPTION.compare_workspaces_differ_5_keys = 'compare_ts(w1, w2) — 5×TSeries, one diff';
+    DESCRIPTION.compare_workspaces_differ_5_keys = 'compare(w1, w2) — 5×TSeries, one diff';
 
     % ----- Linear algebra ---------------------------------------------
 
@@ -462,7 +462,7 @@ function state = setup_diff_quarterly()
 end
 
 function r = run_diff_quarterly(state)
-    r = state.t.diff_ts();
+    r = state.t.diff();
 end
 
 % ------
@@ -910,7 +910,7 @@ function state = setup_compare_workspaces_equal_5_keys()
 end
 
 function r = run_compare_workspaces_equal_5_keys(state)
-    r = tse.compare_ts(state.w1, state.w2, 'quiet', true);
+    r = tse.compare(state.w1, state.w2, 'quiet', true);
 end
 
 % ------
@@ -931,5 +931,5 @@ function state = setup_compare_workspaces_differ_5_keys()
 end
 
 function r = run_compare_workspaces_differ_5_keys(state)
-    r = tse.compare_ts(state.w1, state.w2, 'quiet', true);
+    r = tse.compare(state.w1, state.w2, 'quiet', true);
 end

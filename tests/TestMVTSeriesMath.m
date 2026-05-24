@@ -82,7 +82,7 @@ classdef TestMVTSeriesMath < matlab.unittest.TestCase
 
         function diff_keeps_columns(tc)
             x = tse.MVTSeries(tse.MIT(tse.Unit(),1):tse.MIT(tse.Unit(),3), {'a','b'}, [1 4; 2 5; 3 6]);
-            d = diff_ts(x);
+            d = diff(x);
             tc.verifyClass(d, 'tse.MVTSeries');
             tc.verifyEqual(d.values, ones(2,2));
         end

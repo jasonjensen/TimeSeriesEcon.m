@@ -1,13 +1,21 @@
-function tf = compare_ts(a, b, varargin)
-%COMPARE_TS  Compare two TSeries (or scalar / array values) under
+function tf = compare(a, b, varargin)
+%COMPARE  Compare two TSeries / MVTSeries / structs / values under
 %isapprox-style tolerance.  Returns a scalar logical.
 %
-%   compare_ts(a, b, 'atol', val, 'rtol', val, 'nans', true|false,
-%              'ignoreMissing', true|false, 'trange', MITRange,
-%              'quiet', true|false)
+%   compare(a, b, 'atol', val, 'rtol', val, 'nans', true|false,
+%           'ignoreMissing', true|false, 'trange', MITRange,
+%           'quiet', true|false)
 %
-%   ignoreMissing=true causes ranges that exist in one operand but not
-%   the other to be ignored (intersection is compared).
+%   Works on TSeries, MVTSeries, numeric arrays/scalars, and structs
+%   (compared field-by-field, the "workspace" case).  ignoreMissing=true
+%   causes ranges (or fields) that exist in one operand but not the other
+%   to be ignored (the intersection is compared).
+%
+%   `compare` is also available as a method, so compare(t1, t2) works on a
+%   TSeries / MVTSeries without importing the package.  Mirrors the Julia
+%   `compare` / `@compare`.
+%
+%   See also: tse.overlay, tse.reindex.
 
     p = inputParser;
     addParameter(p, 'atol', 0);
@@ -150,7 +158,7 @@ function tf = compareStructs(a, b, atol, rtol, nansEqual, ignoreMissing, trange,
         if ~isequal(sort(fieldsA), sort(fieldsB))
             tf = false;
             if ~quiet
-                fprintf('compare_ts: struct fields differ.\n');
+                fprintf('compare: struct fields differ.\n');
             end
             return
         end
@@ -160,13 +168,13 @@ function tf = compareStructs(a, b, atol, rtol, nansEqual, ignoreMissing, trange,
     tf = true;
     for k = 1:numel(fields)
         fname = fields{k};
-        result = tse.compare_ts(a.(fname), b.(fname), ...
+        result = tse.compare(a.(fname), b.(fname), ...
             'atol', atol, 'rtol', rtol, 'nans', nansEqual, ...
             'ignoreMissing', ignoreMissing, 'trange', trange, 'quiet', quiet);
         if ~result
             tf = false;
             if ~quiet
-                fprintf('compare_ts: field "%s" differs.\n', fname);
+                fprintf('compare: field "%s" differs.\n', fname);
             end
             return
         end

@@ -29,11 +29,13 @@ overlay(struct('a', x1, 'k', 1), struct('a', x2, 'k', 2))   % field-by-field
 ## compare
 
 ```matlab
-tf = tse.compare_ts(a, b, 'name', value, ...)
+tf = tse.compare(a, b, 'name', value, ...)
 ```
 
 Recursive comparison of two series, arrays, scalars, or `struct`s under
-`isapprox`-style tolerance; returns a scalar logical.
+`isapprox`-style tolerance; returns a scalar logical. Also available as a
+method, so `compare(t1, t2)` works on a `TSeries` / `MVTSeries` without the
+package prefix.
 
 | Option | Default | Meaning |
 |--------|---------|---------|
@@ -45,8 +47,8 @@ Recursive comparison of two series, arrays, scalars, or `struct`s under
 | `'quiet'` | `true` | suppress the printed diff |
 
 ```matlab
-compare_ts(a, b, 'atol', 1e-5)
-compare_ts(n1, n2, 'nans', true)
+compare(a, b, 'atol', 1e-5)
+compare(n1, n2, 'nans', true)
 ```
 
 ## reindex
@@ -68,7 +70,7 @@ reindex(ts, qq(2020, 1), MIT(Unit(), 1))              % firstdate -> 5U
 
 !!! info "Julia ↔ MATLAB"
     `overlay` / `compare` take the same options as Julia (Julia's `@compare`
-    macro folds into `compare_ts`). Julia's `reindex(t, from => to)` `Pair`
+    macro folds into `compare`). Julia's `reindex(t, from => to)` `Pair`
     becomes `reindex(t, from, to)`. The `LikeWorkspace` union maps to MATLAB
     `struct` / `MVTSeries`; `reindex` itself dispatches over MIT / MITRange /
     TSeries.

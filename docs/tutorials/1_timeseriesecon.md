@@ -363,12 +363,13 @@ shift(x, -1)   % same as lag(x)
 
 ## 7. Diff and undiff { #7-diff-and-undiff }
 
-`diff_ts(x)` defaults to `k = -1` (first difference at lag 1). The result drops
-the first `|k|` observations. (`diff` is not overloaded because Julia's sign
-convention differs from MATLAB's built-in `diff`; use `diff_ts`.)
+`diff(x)` defaults to `k = -1` (first difference at lag 1). The result drops the
+first `|k|` observations. `diff` is a **method** on `TSeries`/`MVTSeries`, so it
+overrides MATLAB's built-in `diff` only for those types (following Julia's sign
+convention, `diff(x) = x - lag(x)`); `diff` on a plain array is unchanged.
 
 ```matlab
-dx = diff_ts(x);
+dx = diff(x);
 ```
 
 `undiff(dx)` is the inverse — a cumulative sum lifted onto the range. In its
@@ -566,14 +567,14 @@ w = rmfield(w, 'start');     % drop a member (Julia: delete!(w, :start))
 ```
 
 The package's workspace-style helpers — [`overlay`](#14-overlay) and
-[`compare_ts`](#15-compare) — operate on structs field-by-field, so the common
+[`compare`](#15-compare) — operate on structs field-by-field, so the common
 Workspace operations carry over.
 
 !!! info "Julia ↔ MATLAB"
     Corresponds to *Workspaces*. Julia's `Workspace` / Python's `Workspace`
     become a plain MATLAB `struct`: `w.x = ...` to set, `w.x` to read,
     `rmfield(w, 'x')` to delete, `fieldnames(w)` to enumerate. `overlay` and
-    `compare_ts` accept structs directly.
+    `compare` accept structs directly.
 
 ## 13. MVTSeries vs Workspace { #13-mvtseries-vs-workspace }
 
@@ -628,16 +629,18 @@ overlay(w1, w3)
 
 ## 15. `compare` { #15-compare }
 
-`compare_ts(a, b, ...)` compares two series (or scalars/arrays, or structs
-field-by-field) under `isapprox`-style tolerance and returns a logical.
+`compare(a, b, ...)` compares two series (or scalars/arrays, or structs
+field-by-field) under `isapprox`-style tolerance and returns a logical. It is
+both a free function (`tse.compare`, also for structs) and a method, so
+`compare(t1, t2)` works on series without the package prefix.
 
 ```matlab
 y1 = TSeries(qq(2020, 1), ones(10, 1));
 y2 = y1;
 y2(qq(2020, 3)) = y2(qq(2020, 3)) + 1e-7;
 
-compare_ts(y1, y2)                 % false (exact)
-compare_ts(y1, y2, 'atol', 1e-5)   % true (within tolerance)
+compare(y1, y2)                 % false (exact)
+compare(y1, y2, 'atol', 1e-5)   % true (within tolerance)
 ```
 
 `'nans', true` treats NaN-vs-NaN as equal (Julia's `isapprox(...; nans=true)`);
@@ -647,8 +650,8 @@ restricts the comparison window; `'quiet', false` prints a diff.
 ```matlab
 n1 = TSeries(qq(2020, 1), [1.0; NaN]);
 n2 = n1;
-compare_ts(n1, n2)                 % false
-compare_ts(n1, n2, 'nans', true)   % true
+compare(n1, n2)                 % false
+compare(n1, n2, 'nans', true)   % true
 ```
 
 !!! info "Julia ↔ MATLAB"

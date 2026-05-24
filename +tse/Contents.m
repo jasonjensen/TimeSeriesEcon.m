@@ -57,23 +57,22 @@
 %
 % Transforms and helpers (functions)
 %   fconvert            - Convert MIT/range/series to another frequency
-%   diff_ts             - Difference of a TSeries (Julia diff convention)
-%   undiff              - Inverse of diff_ts (cumulative sum)
+%   undiff              - Inverse of diff (cumulative sum)
 %   lookup              - Vectorised gather of values at MIT keys
 %   overlay             - First-valid-wins composition of series
 %   reindex             - Re-anchor a series so `from` maps to `to`
 %   strip_ts            - Drop leading/trailing NaNs
 %   rec                 - Recursive (loop) evaluation over a range
-%   compare_ts          - Compare two series / values with tolerance
+%   compare             - Compare two series / structs / values (tolerance)
 %   extend_series       - Pad to the period boundaries of another frequency
 %   trim_series         - Trim to a frequency-aligned subrange
 %   cleanedvalues       - Holiday/NaN-filtered values of a BDaily series
 %   typenan / istypenan - Type-appropriate not-a-number sentinel
 %
 % TSeries / MVTSeries methods (call as t.method(...) or method(t,...))
-%   shift, lag, lead, cumsum, diff_ts, pct, apct, ytypct,
+%   shift, lag, lead, cumsum, diff, pct, apct, ytypct,
 %   moving_average, moving_sum, mean, std, var, median, sum, min, max,
-%   plot, rangeof, firstdate, lastdate
+%   plot, compare, rangeof, firstdate, lastdate
 %
 % Options and holidays
 %   getoption / setoption          - Read / set a package option
