@@ -42,8 +42,13 @@ y = fconvert(Yearly(), t, 'method', 'mean');   % convert to annual
 - Frequency conversion (`fconvert`), recursive evaluation (`rec`), `overlay` /
   `compare` / `reindex`, BDaily holiday calendars, plotting, and an extensive
   `matlab.unittest` test suite.
+- X-13ARIMA-SEATS (`tse.x13`): build and serialise specs, run `x13as`, and read
+  the results (`x13.series`, `x13.arima`, `x13.x11`, `x13.run`,
+  `x13.deseasonalize`, …). The `x13as` binary is not bundled — set its path with
+  `tse.setoption('x13path', ...)`.
 
-**Not included:** X-13ARIMA-SEATS (`x13`) and the DataEcon binary file format.
+**Not included:** the DataEcon binary file format, and (within `x13`) the bundled
+`x13as` binary and the per-table English description text.
 
 ## Documentation
 

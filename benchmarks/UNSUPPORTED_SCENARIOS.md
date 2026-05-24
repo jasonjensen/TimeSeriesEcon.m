@@ -44,13 +44,17 @@ in-place materialiser with no direct MATLAB equivalent:
 
 ---
 
-## 4. X-13ARIMA-SEATS scenario — out of scope
+## 4. X-13ARIMA-SEATS scenario — implemented, but needs an external binary
 
-X-13 seasonal adjustment is **out of scope** for this port.
+X-13 seasonal adjustment is now ported in `+tse/+x13` (`tse.x13.deseasonalize`,
+`tse.x13.run`, …).  The scenario is still **not registered** in
+`run_benchmarks.m` because the MATLAB port does not bundle the `x13as`
+executable — it must be installed separately and located via
+`tse.setoption('x13path', ...)`.
 
 | Scenario | Description |
 |---|---|
-| `deseasonalize_quarterly_50y` | `deseasonalize(t)` — 200-quarter series via the bundled `x13as` binary |
+| `deseasonalize_quarterly_50y` | `deseasonalize(t)` — 200-quarter series; requires an installed `x13as` binary |
 
 ---
 
