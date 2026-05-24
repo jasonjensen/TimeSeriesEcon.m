@@ -19,8 +19,7 @@ function s = x13write(spec, varargin)
     end
 
     if ~test && tse.x13.isdefault(outfolder)
-        outfolder = tempname();   % no bundled mktempdir; caller may override
-        mkdir(outfolder);
+        outfolder = tse.x13.x13tempdir();   % no bundled mktempdir; caller may override
         spec.folder = outfolder;
     end
 
