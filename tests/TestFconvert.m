@@ -1,4 +1,4 @@
-classdef TestFconvert < matlab.unittest.TestCase
+    classdef TestFconvert < matlab.unittest.TestCase
     %TESTFCONVERT  Mirrors test/test_fconvert.jl (frequency conversion).
     %   Covers the general, YP->higher, YP->lower, YP->similar sections in
     %   full, plus a representative Daily->Monthly and Weekly chained case.
