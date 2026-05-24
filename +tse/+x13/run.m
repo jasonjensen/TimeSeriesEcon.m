@@ -24,8 +24,10 @@ function res = run(spec, varargin)
         fprintf(fid, '%s\n', s.string);
         fclose(fid);
         spec = s;
+        F = freq;
     else
         tse.x13.x13write(spec);
+        F = tse.frequencyof(spec.series.data);
     end
 
     p = struct('verbose', true, 'allow_errors', false, 'load', 'all');
@@ -63,7 +65,6 @@ function res = run(spec, varargin)
         end
     end
 
-    F = tse.frequencyof(spec.series.data);
     C = tse.x13.x13consts();
     files = local_listfiles(folder);
     for k = 1:numel(files)

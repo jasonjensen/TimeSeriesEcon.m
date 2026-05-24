@@ -17,7 +17,8 @@ function results = runAllTests()
 
     suite  = TestSuite.fromFolder(here);
     % suite = TestSuite.fromFile(fullfile(pwd, "tests", "TestX13Run.m"));
+    % suite = TestSuite.fromFile(fullfile(pwd, "tests", "TestX13Run.m"), 'ProcedureName', 'seats_run');
     runner = TestRunner.withTextOutput('Verbosity', 2);
-    runner.addPlugin(StopOnFailuresPlugin);
+    % runner.addPlugin(StopOnFailuresPlugin);
     results = runner.run(suite);
 end

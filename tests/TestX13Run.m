@@ -16,7 +16,6 @@ classdef TestX13Run < matlab.unittest.TestCase
 
     properties (Access = private)
         PreviousX13Path
-        
     end
 
     methods (TestClassSetup)
@@ -517,6 +516,483 @@ classdef TestX13Run < matlab.unittest.TestCase
             tc.verifySeriesKeys(res, {'a1','a18','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','rmx','tad','td','a3','fct','rrs'});
             tc.verifyTableKeys(res, {'d8b','acf','pcf','sp0','sp1','sp2','spr'});
             tc.verifyOtherKeys(res, {'est','udg'});
+        end
+
+        function seats_run(tc)
+            mvsales = tc.mvsales;
+
+            ts = tse.TSeries(tse.mm(1987,1), mvsales(101:550)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Exports of truck parts"));
+            tse.x13.transform(spec, 'func', 'auto', 'save', 'all');
+            tse.x13.regression(spec, 'aictest', 'td', 'save', 'all');
+            tse.x13.automdl(spec);
+            tse.x13.outlier(spec, 'types', {'ao','ls','tc'}, 'save', 'all');
+            tse.x13.forecast(spec, 'maxlead', 36, 'save', 'all');
+            tse.x13.seats(spec, 'save', 'all');
+            res = tc.runSpec(spec);
+            % some keys missing from specific X13 versions: tbs
+            tc.verifySeriesKeys(res, {'a3','afd','ao','cyc','dor','dsa','dtr','fct','ftr','fvr','ltt','otl','psc','psi','pss','rmx','s10','s11','s12','s13','s14','s16','s18','sfd','ssm','td','tfd','trn','yfd','a1','a18','a19','ase','b1','cse','rrs','se2','se3','sse','tse'});
+            % tc.verifySeriesKeys(res, {'tbs','a3','afd','ao','cyc','dor','dsa','dtr','fct','ftr','fvr','ltt','otl','psc','psi','pss','rmx','s10','s11','s12','s13','s14','s16','s18','sfd','ssm','td','tfd','trn','yfd','a1','a18','a19','ase','b1','cse','rrs','se2','se3','sse','tse'});
+            % some keys missing from specific X13 versions: rog
+            tc.verifyTableKeys(res, {'wkf','ac2','acf','pcf','s1s','s2s','sp0','spr','st0','str','t1s','t2s'});
+            % tc.verifyTableKeys(res, {'wkf','ac2','acf','pcf','s1s','s2s','sp0','spr','st0','str','t1s','t2s','rog'});
+            tc.verifyOtherKeys(res, {'mdc','est','udg'});
+
+            if ~ispc
+                ts = tse.fconvert(tse.Quarterly(), tse.TSeries(tse.mm(1990,1), flipud(mvsales(1:250)')));
+                spec = tse.x13.newspec(tse.x13.series(ts));
+                tse.x13.transform(spec, 'func', 'log');
+                tse.x13.regression(spec, 'aictest', 'td');
+                tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1,0,1,1));
+                tse.x13.forecast(spec, 'maxlead', 12);
+                tse.x13.seats(spec, 'finite', true);
+                tse.x13.history(spec, 'estimates', {'sadj','trend'});
+                res = tc.runSpec(spec);
+                % some keys missing from specific X13 versions: tbs
+                tc.verifySeriesKeys(res, {'a3','afd','dor','dsa','dtr','fct','ftr','s10','s11','s12','s13','s16','s18','sae','sfd','ssm','tfd','tre','a1','ase','b1','se2','se3','sse','tse'});
+                % tc.verifySeriesKeys(res, {'tbs','a3','afd','dor','dsa','dtr','fct','ftr','s10','s11','s12','s13','s16','s18','sae','sfd','ssm','tfd','tre','a1','ase','b1','se2','se3','sse','tse'});
+                % some keys missing from specific X13 versions: rog
+                tc.verifyTableKeys(res, {'fac','faf','ftc','ftf','gac','gaf','gtc','gtf','tac','ttc','ac2','acf','pcf'});
+                % tc.verifyTableKeys(res, {'fac','faf','ftc','ftf','gac','gaf','gtc','gtf','tac','ttc','ac2','acf','pcf','rog'});
+                tc.verifyOtherKeys(res, {'est','udg'});
+            end
+
+            ts = tse.TSeries(tse.mm(1995,1), mvsales(50:150)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Model based adjustment of Bimonthly exports"));
+            tse.x13.transform(spec, 'func', 'log', 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1,0,1,1));
+            tse.x13.outlier(spec, 'types', {'ao','ls','tc'}, 'save', 'all');
+            tse.x13.forecast(spec, 'maxlead', 18, 'save', 'all');
+            tse.x13.seats(spec, 'save', 'all');
+            res = tc.runSpec(spec);
+            % some keys missing from specific X13 versions: tbs, cyc, ltt
+            tc.verifySeriesKeys(res, {'a3','afd','dor','dsa','dtr','fct','ftr','fts','psi','pss','s10','s11','s12','s13','s16','s18','sfd','ssm','tfd','trn','a1','ase','b1','se2','se3','sse','tse'});
+            % tc.verifySeriesKeys(res, {'tbs','a3','afd','cyc','dor','dsa','dtr','fct','ftr','fts','ltt','psi','pss','s10','s11','s12','s13','s16','s18','sfd','ssm','tfd','trn','a1','ase','b1','se2','se3','sse','tse'});
+            % some keys missing from specific X13 versions: rog, ac2
+            tc.verifyTableKeys(res, {'oit','wkf','acf','pcf'});
+            % tc.verifyTableKeys(res, {'oit','wkf','ac2','acf','pcf','rog'});
+            tc.verifyOtherKeys(res, {'mdc','est','udg'});
+
+            ts = tse.TSeries(tse.qq(1990,1), mvsales(100:150)');
+            spec = tse.x13.newspec(tse.x13.series(ts));
+            tse.x13.transform(spec, 'func', 'log', 'save', 'all');
+            tse.x13.regression(spec, 'aictest', 'td', 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1,0,1,1));
+            tse.x13.forecast(spec, 'maxlead', 12, 'save', 'all');
+            tse.x13.seats(spec, 'tabtables', {'xo','n','s','p'}, 'printphtrf', false, 'save', 'all');
+            res = tc.runSpec(spec);
+            % some keys missing from specific X13 versions: tbs, cyc, ltt
+            tc.verifySeriesKeys(res, {'a3','afd','dor','dsa','dtr','fct','ftr','psi','pss','rmx','s10','s11','s12','s13','s16','s18','sfd','ssm','tfd','trn','a1','ase','b1','se2','se3','sse','tse'});
+            % tc.verifySeriesKeys(res, {'tbs','a3','afd','cyc','dor','dsa','dtr','fct','ftr','ltt','psi','pss','rmx','s10','s11','s12','s13','s16','s18','sfd','ssm','tfd','trn','a1','ase','b1','se2','se3','sse','tse'});
+            % some keys missing from specific X13 versions: rog, ac2
+            tc.verifyTableKeys(res, {'wkf','acf','pcf'});
+            % tc.verifyTableKeys(res, {'wkf','ac2','acf','pcf','rog'});
+            tc.verifyOtherKeys(res, {'mdc','est','udg'});
+        end
+
+        function slidingspans_run(tc)
+            mvsales = tc.mvsales;
+
+            ts = tse.TSeries(tse.mm(1976,1), mvsales(1:50)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Tourist"));
+            tse.x13.x11(spec, 'seasonalma', 's3x9', 'save', 'all');
+            tse.x13.slidingspans(spec, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad'});
+            tc.verifyTableKeys(res, {'d8b','sp0','sp1','sp2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.fconvert(tse.Quarterly(), tse.TSeries(tse.mm(1967,1), flipud(mvsales(1:250)')));
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Quarterly stock prices on NASDAQ"));
+            tse.x13.x11(spec, 'seasonalma', {'s3x9','s3x9','s3x5','s3x5'}, 'trendma', 7, 'mode', 'logadd');
+            tse.x13.slidingspans(spec, 'cutseas', 5.0, 'cutchng', 5.0);
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','c17','c20','chs','d10','d11','d12','d13','d16','d8','d9','e1','e18','e2','e3','sfs','ycs'});
+            tc.verifyTableKeys(res, {'d8b'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1980,1), mvsales(301:500)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Number of employed machinists - X-11"));
+            tse.x13.regression(spec, 'variables', {'const','td',tse.x13.rp(tse.mm(1982,5), tse.mm(1982,10))}, 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,2,0,1,1));
+            tse.x13.outlier(spec, 'save', 'all');
+            tse.x13.estimate(spec, 'save', 'all');
+            tse.x13.check(spec, 'save', 'all');
+            tse.x13.forecast(spec, 'save', 'all');
+            tse.x13.x11(spec, 'mode', 'add', 'save', 'all');
+            tse.x13.slidingspans(spec, 'outlier', 'keep', 'length', 144, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a18','a19','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','chs','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','fct','ftr','fts','fvr','ls','otl','paf','pe5','pe6','pe7','pe8','pir','psf','ref','rmx','rrs','rsd','sfs','tad','tal','td','ycs','a3'});
+            tc.verifyTableKeys(res, {'ac2','acf','acm','d8b','itr','oit','pcf','rcm','rts','sp0','sp1','sp2','spr','st0','st1','st2','str'});
+            tc.verifyOtherKeys(res, {'est','lks','mdl','udg'});
+
+            ts = tse.TSeries(tse.mm(1980,1), mvsales(151:450)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Number of employed machinists - Seats"));
+            tse.x13.regression(spec, 'variables', {'const','td',tse.x13.rp(tse.mm(1982,5), tse.mm(1982,10))}, 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,2,0,1,1));
+            tse.x13.outlier(spec, 'save', 'all');
+            tse.x13.estimate(spec, 'save', 'all');
+            tse.x13.check(spec, 'save', 'all');
+            tse.x13.forecast(spec, 'save', 'all');
+            tse.x13.seats(spec, 'save', 'all');
+            tse.x13.slidingspans(spec, 'outlier', 'keep', 'length', 144, 'save', 'all');
+            res = tc.runSpec(spec);
+            % some keys missing from specific X13 versions: tbs
+            tc.verifySeriesKeys(res, {'a1','a18','a19','ao','b1','chs','fct','ftr','fts','fvr','ls','otl','ref','rmx','rrs','rsd','sfs','td','ycs','a3','afd','ase','cse','dor','dsa','dtr','s10','s11','s12','s13','s14','s16','s18','se2','se3','sfd','sse','ssm','tfd','tse','yfd'});
+            % tc.verifySeriesKeys(res, {'tbs','a1','a18','a19','ao','b1','chs','fct','ftr','fts','fvr','ls','otl','ref','rmx','rrs','rsd','sfs','td','ycs','a3','afd','ase','cse','dor','dsa','dtr','s10','s11','s12','s13','s14','s16','s18','se2','se3','sfd','sse','ssm','tfd','tse','yfd'});
+            tc.verifyTableKeys(res, {'ac2','acf','acm','itr','oit','pcf','rcm','rts','s1s','s2s','sp0','spr','st0','str','t1s','t2s'});
+            tc.verifyOtherKeys(res, {'est','lks','mdl','udg'});
+
+            ts = tse.TSeries(tse.mm(1975,1), mvsales(51:300)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Cheese sales in Wisconsin"));
+            tse.x13.transform(spec, 'func', 'log', 'save', 'all');
+            tse.x13.regression(spec, 'variables', {'const','seasonal','tdnolpyear'}, 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaModel(3,1,0));
+            tse.x13.forecast(spec, 'maxlead', 60, 'save', 'all');
+            tse.x13.x11(spec, 'appendfcst', true, 'save', 'all');
+            tse.x13.slidingspans(spec, 'fixmdl', false, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a18','a3','ads','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','chs','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','fct','ftr','fvr','paf','pe5','pe6','pe7','pe8','pir','psf','rmx','sfs','tad','td','tds','trn','ycs','rrs'});
+            tc.verifyTableKeys(res, {'d8b','ac2','acf','pcf','sp0','sp1','sp2','spr','st0','st1','st2','str'});
+            tc.verifyOtherKeys(res, {'est','udg'});
+
+            ts = tse.fconvert(tse.Quarterly(), tse.TSeries(tse.mm(1967,1), flipud(mvsales(1:250)')));
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Quarterly stock prices on NASDAQ sp6"));
+            tse.x13.x11(spec, 'seasonalma', 's3x9');
+            tse.x13.slidingspans(spec, 'length', 40, 'numspans', 3);
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','c17','c20','chs','d10','d11','d12','d13','d16','d8','d9','e1','e18','e2','e3','sfs','ycs'});
+            tc.verifyTableKeys(res, {'d8b'});
+            tc.verifyOtherKeys(res, {'udg'});
+        end
+
+        function spectrum_run(tc)
+            mvsales = tc.mvsales;
+
+            ts = tse.TSeries(tse.mm(1976,1), mvsales(1:50)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Klaatu"));
+            tse.x13.x11(spec, 'seasonalma', 's3x9', 'trendma', 23, 'save', 'all');
+            tse.x13.spectrum(spec, 'logqs', true, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad'});
+            tc.verifyTableKeys(res, {'d8b','sp0','sp1','sp2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1967,1), mvsales(51:450)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Spectrum analysis of Building Permits Series"));
+            tse.x13.transform(spec, 'func', 'log', 'save', 'all');
+            tse.x13.spectrum(spec, 'start', tse.mm(1987,1), 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1'});
+            tc.verifyTableKeys(res, {'sp0','st0'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1967,1), mvsales(101:250)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "TOTAL ONE-FAMILY Housing Starts"));
+            tse.x13.x11(spec, 'seasonalma', {'s3x9'}, 'title', "Composite adj. of 1-Family housing starts", 'save', 'all');
+            tse.x13.spectrum(spec, 'type', 'periodogram', 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad'});
+            tc.verifyTableKeys(res, {'d8b','sp0','sp1','sp2','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1988,1), mvsales(201:350)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Total U.S. Retail Sales"));
+            tse.x13.transform(spec, 'func', 'log', 'save', 'all');
+            tse.x13.regression(spec, 'variables', {'td',tse.x13.easter(8),tse.x13.labor(8)}, 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1,0,1,1));
+            tse.x13.forecast(spec, 'maxlead', 60, 'save', 'all');
+            tse.x13.spectrum(spec, 'logqs', true, 'qcheck', true, 'save', 'all');
+            tse.x13.x11(spec, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a18','a2','a3','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','chl','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','fct','ftr','fvr','hol','paf','pe5','pe6','pe7','pe8','pir','psf','rmx','tad','td','trn','rrs'});
+            tc.verifyTableKeys(res, {'d8b','sp0','sp1','sp2','spr','str','ac2','acf','pcf','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'est','udg'});
+        end
+
+        function transform_run(tc)
+            mvsales = tc.mvsales;
+            rand1 = tc.rand1;
+
+            ts = tse.TSeries(tse.mm(1967,1), mvsales(51:200)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Transform example"));
+            tse.x13.transform(spec, 'data', tse.TSeries(tse.mm(1967,1), rand1(1:150)'.^2), 'mode', 'ratio', 'adjust', 'lom', 'func', 'log', 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a18','a2','a2p','b1'});
+            tc.verifyTableKeys(res, {'sp0','st0'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.qq(1997,1), mvsales(101:300)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Transform example"));
+            tse.x13.transform(spec, 'constant', 45.0, 'func', 'auto', 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a1c','b1'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1980,1), mvsales(301:400)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Total U.S. Retail Sales --- Current Dollars"));
+            tse.x13.transform(spec, 'func', 'log', 'data', tse.TSeries(tse.mm(1970,1), (0.1:0.1:23.0)'), 'title', "Consumer Price Index", 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a2','a2p','b1'});
+            tc.verifyTableKeys(res, {'sp0','st0'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Total U.S. Retail Sales --- Current Dollars"));
+            tse.x13.transform(spec, 'func', 'log', 'data', tse.TSeries(tse.mm(1970,1), (0.1:0.1:23.0)'), 'title', "Consumer Price Index", 'type', 'temporary', 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a2','a2t','b1'});
+            tc.verifyTableKeys(res, {'sp0','st0'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            if ~ispc
+                ts = tse.TSeries(tse.qq(1901,1), mvsales(1:50)');
+                spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Annual Rainfall"));
+                tse.x13.transform(spec, 'power', 0.3333);
+                res = tc.runSpec(spec);
+                tc.verifySeriesKeys(res, {'a1','b1'});
+                tc.verifyOtherKeys(res, {'udg'});
+            end
+
+            ts = tse.TSeries(tse.mm(1978,1), mvsales(401:550)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Total U.K. Retail Sales"));
+            tse.x13.transform(spec, 'func', 'auto', 'aicdiff', 0.0, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1'});
+            tc.verifyTableKeys(res, {'sp0','st0'});
+            tc.verifyOtherKeys(res, {'udg'});
+        end
+
+        function x11_run(tc)
+            mvsales = tc.mvsales;
+            rand1 = tc.rand1;
+            rand2 = tc.rand2;
+
+            ts = tse.TSeries(tse.mm(1976,1), mvsales(1:250)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Klaatu"));
+            tse.x13.x11(spec, 'save', 'all');
+            tse.x13.spectrum(spec, 'logqs', true, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad'});
+            tc.verifyTableKeys(res, {'d8b','sp0','sp1','sp2','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1976,1), mvsales(201:450)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Klaatu"));
+            tse.x13.x11(spec, 'seasonalma', 's3x9', 'trendma', 23, 'save', 'all');
+            tse.x13.x11regression(spec, 'variables', 'td', 'aictest', 'td', 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b14','b16','b17','b19','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c14','c16','c17','c19','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad','xrm'});
+            tc.verifyTableKeys(res, {'d8b','rcm','sp0','sp1','sp2','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            if ~ispc
+                ts = tse.TSeries(tse.qq(1967,1), mvsales(250:500)');
+                spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Quarterly housing starts"));
+                tse.x13.x11(spec, 'seasonalma', {'s3x3','s3x3','s3x5','s3x5'}, 'trendma', 7, 'save', 'all');
+                res = tc.runSpec(spec);
+                tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad'});
+                tc.verifyTableKeys(res, {'d8b'});
+                tc.verifyOtherKeys(res, {'udg'});
+            end
+
+            ts = tse.TSeries(tse.mm(1969,7), mvsales(301:550)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Exports of leather goods"));
+            tse.x13.regression(spec, 'variables', {'const','td',tse.x13.ls(tse.mm(1972,5)),tse.x13.ls(tse.mm(1976,10))}, 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,2,1,1,0));
+            tse.x13.estimate(spec, 'save', 'all');
+            tse.x13.forecast(spec, 'maxlead', 0, 'save', 'all');
+            tse.x13.x11(spec, 'mode', 'add', 'sigmalim', [2.0 3.5], 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a18','a19','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','ls','otl','paf','pe5','pe6','pe7','pe8','pir','psf','ref','rmx','rrs','rsd','tad','tal','td','a3'});
+            tc.verifyTableKeys(res, {'acm','d8b','itr','rcm','rts','ac2','acf','pcf','sp0','sp1','sp2','spr','st0','st1','st2','str'});
+            tc.verifyOtherKeys(res, {'est','lks','mdl','udg'});
+
+            ts = tse.TSeries(tse.mm(1985,1), mvsales(201:450)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Unit Auto Sales"));
+            tse.x13.transform(spec, 'func', 'log', 'save', 'all');
+            nobs = numel(ts.values) + 24;
+            sale88 = zeros(nobs, 1); sale90 = zeros(nobs, 1);
+            i88 = tse.TSeries(tse.mm(1984,1), sale88); i90 = tse.TSeries(tse.mm(1984,1), sale90);
+            i88(tse.mm(1988,3):tse.mm(1988,11)) = 1.0;
+            i90(tse.mm(1990,2):tse.mm(1990,7)) = 1.0;
+            mv = tse.MVTSeries(tse.mm(1984,1), ["sale88","sale90"], [i88.values, i90.values]);
+            tse.x13.regression(spec, 'variables', {'const','td'}, 'data', mv, 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaSpec(3,1,0), tse.x13.ArimaSpec(0,1,1,12));
+            tse.x13.forecast(spec, 'maxlead', 12, 'maxback', 12, 'save', 'all');
+            tse.x13.x11(spec, 'title', ["Unit Auto Sales"; "Adjusted for special sales in 1988, 1990"], 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a18','a2','a3','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','bct','btr','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','fct','ftr','fvr','paf','pe5','pe6','pe7','pe8','pir','psf','rmx','tad','td','trn','usr','rrs'});
+            tc.verifyTableKeys(res, {'d8b','ac2','acf','pcf','sp0','sp1','sp2','spr','st0','st1','st2','str'});
+            tc.verifyOtherKeys(res, {'est','udg'});
+
+            ts = tse.TSeries(tse.mm(1976,1), mvsales(201:350)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "NORTHEAST ONE FAMILY Housing Starts"));
+            tse.x13.transform(spec, 'func', 'log', 'save', 'all');
+            tse.x13.regression(spec, 'variables', {tse.x13.ao(tse.mm(1976,2)),tse.x13.ao(tse.mm(1978,2)),tse.x13.ls(tse.mm(1980,2)),tse.x13.ls(tse.mm(1982,11)),tse.x13.ao(tse.mm(1984,2))}, 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,2,0,1,1));
+            tse.x13.forecast(spec, 'maxlead', 60, 'save', 'all');
+            tse.x13.x11(spec, 'seasonalma', 's3x9', 'title', "Adjustment of 1 family housing starts", 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a19','a3','ao','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','fct','ftr','fvr','ira','ls','otl','paf','pe5','pe6','pe7','pe8','pir','psf','rmx','tad','tal','trn','rrs'});
+            tc.verifyTableKeys(res, {'d8b','ac2','acf','pcf','sp0','sp1','sp2','spr','st0','st1','st2','str'});
+            tc.verifyOtherKeys(res, {'est','udg'});
+
+            ts = tse.TSeries(tse.mm(1976,1), mvsales(51:200)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Trend for NORTHEAST ONE FAMILY Housing Starts"));
+            tse.x13.transform(spec, 'func', 'auto', 'save', 'all');
+            tse.x13.regression(spec, 'variables', {tse.x13.ls(tse.mm(1980,2)),tse.x13.ls(tse.mm(1982,11))}, 'save', 'all');
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1));
+            tse.x13.forecast(spec, 'save', 'all');
+            tse.x13.x11(spec, 'type', 'trend', 'trendma', 13, 'sigmalim', [0.7 1.0], 'title', "Updated Dagum (1996) trend of 1 family housing starts", 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a19','a3','b1','b11','b13','b17','b2','b20','b3','b6','b7','b8','c1','c11','c13','c17','c2','c20','c4','c6','c7','d1','d10','d11','d12','d13','d16','d2','d4','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e7','e8','f1','fct','ftr','fvr','ls','otl','paf','pe5','pe7','pe8','pir','psf','rmx','tad','tal','trn','rrs'});
+            tc.verifyTableKeys(res, {'d8b','ac2','acf','pcf','sp0','spr','st0','str'});
+            tc.verifyOtherKeys(res, {'est','udg'});
+
+            ts = tse.TSeries(tse.mm(1978,1), rand2(:));
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Total U.K. Retail Sales"));
+            tse.x13.transform(spec, 'func', 'auto', 'aicdiff', 0.0, 'save', 'all');
+            tse.x13.x11(spec, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad'});
+            tc.verifyTableKeys(res, {'d8b','sp0','sp1','sp2','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1978,1), rand1(:));
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Total U.K. Retail Sales"));
+            tse.x13.transform(spec, 'func', 'auto', 'aicdiff', 0.0, 'save', 'all');
+            tse.x13.x11(spec, 'calendarsigma', 'select', 'sigmavec', [tse.x13.M(1), tse.x13.M(2), tse.x13.M(12)], 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b17','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c17','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad'});
+            tc.verifyTableKeys(res, {'d8b','sp0','sp1','sp2','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1976,1), mvsales(1:250)');
+            spec = tse.x13.newspec(ts);
+            tse.x13.x11(spec, 'save', {'fsd','fad'}, 'mode', 'pseudoadd');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'fsd','fad'});
+        end
+
+        function x11regression_run(tc)
+            mvsales = tc.mvsales;
+
+            ts = tse.TSeries(tse.mm(1976,1), mvsales(151:300)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Westus"));
+            tse.x13.x11(spec, 'save', 'all');
+            tse.x13.x11regression(spec, 'variables', 'td', 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b14','b16','b17','b19','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c14','c16','c17','c19','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad','xrm'});
+            tc.verifyTableKeys(res, {'d8b','rcm','sp0','sp1','sp2','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1976,1), mvsales(51:250)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Westus"));
+            tse.x13.x11(spec, 'save', 'all');
+            tse.x13.x11regression(spec, 'variables', 'td', 'aictest', {'td','easter'}, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b16','b17','b19','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c16','c17','c19','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad','xrm'});
+            tc.verifyTableKeys(res, {'d8b','rcm','xoi','sp0','sp1','sp2','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1985,1), mvsales(101:150)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Ukclothes"));
+            tse.x13.x11(spec, 'save', 'all');
+            mv = tse.MVTSeries(tse.mm(1980,1), ["easter1","easter2"], [(0.1:0.1:12.2)', (12.2:-0.1:0.1)']);
+            tse.x13.x11regression(spec, 'variables', 'td', 'usertype', 'holiday', 'critical', 4.0, 'data', mv, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b16','b17','b19','b2','b20','b3','b5','b6','b7','b8','bxh','c1','c10','c11','c13','c16','c17','c19','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad','xhl','xrm'});
+            tc.verifyTableKeys(res, {'d8b','rcm','xoi','sp0','sp1','sp2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            ts = tse.TSeries(tse.mm(1980,1), mvsales(251:350)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "nzstarts"));
+            tse.x13.x11(spec, 'save', 'all');
+            tse.x13.x11regression(spec, 'variables', 'td', 'tdprior', [1.4 1.4 1.4 1.4 1.4 0.0 0.0], 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a4','b1','b10','b11','b13','b14','b16','b17','b19','b2','b20','b3','b5','b6','b7','b8','c1','c10','c11','c13','c14','c16','c17','c18','c19','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad','xrm'});
+            tc.verifyTableKeys(res, {'d8b','sp0','sp1','sp2','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'udg'});
+
+            if ~ispc
+                ts = tse.TSeries(tse.qq(1964,1), mvsales(151:300)');
+                spec = tse.x13.newspec(tse.x13.series(ts, 'title', "MIDWEST ONE FAMILY Housing Starts", 'span', tse.qq(1964,1):tse.qq(1989,3)));
+                tse.x13.x11(spec);
+                tse.x13.x11regression(spec, 'variables', {'td', tse.x13.easter(8)}, 'b', [0.4453 0.8550 -0.3012 0.2717 -0.1705 0.0983 -0.0082], 'fixb', [true true true true true true false]);
+                res = tc.runSpec(spec);
+                tc.verifySeriesKeys(res, {'a1','b1','c16','c17','c20','d10','d11','d12','d13','d16','d18','d8','d9','e1','e18','e2','e3','xhl'});
+                tc.verifyTableKeys(res, {'d8b'});
+                tc.verifyOtherKeys(res, {'udg'});
+            end
+
+            ts = tse.TSeries(tse.mm(1967,1), mvsales(101:400)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Motor Home Sales", 'span', tse.x13.Span(tse.mm(1972,1))));
+            tse.x13.x11(spec, 'seasonalma', 'x11default', 'sigmalim', [1.8 2.8], 'appendfcst', true, 'save', 'all');
+            tse.x13.x11regression(spec, 'variables', {tse.x13.td(tse.mm(1990,1)), tse.x13.easter(8), tse.x13.labor(10), tse.x13.thank(10)}, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','b1','b10','b11','b13','b16','b17','b19','b2','b20','b3','b5','b6','b7','b8','bxh','c1','c10','c11','c13','c16','c17','c19','c2','c20','c4','c5','c6','c7','d1','d10','d11','d12','d13','d16','d18','d2','d4','d5','d6','d7','d8','d9','e1','e11','e18','e2','e3','e5','e6','e7','e8','f1','paf','pe5','pe6','pe7','pe8','pir','psf','tad','xhl','xrm'});
+            tc.verifyTableKeys(res, {'d8b','rcm','xoi','sp0','sp1','sp2','st0','st1','st2'});
+            tc.verifyOtherKeys(res, {'udg'});
+        end
+
+        function failed_run(tc)
+            mvsales = tc.mvsales;
+
+            % For some reason this works with some versions of X13
+            % ts = tse.TSeries(tse.mm(1976,1), mvsales(51:200)');
+            % spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Westus"));
+            % tse.x13.x11(spec, 'save', 'all');
+            % tse.x13.x11regression(spec, 'variables', 'td', 'aictest', {'td','easter'});
+            % tc.verifyError(@() tse.x13.run(spec, 'verbose', false), 'tseries:noMatch');
+
+            ts = tse.TSeries(tse.qq(1967,1), mvsales(1:350)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Quarterly stock prices on NASDAQ"));
+            tse.x13.x11(spec, 'seasonalma', 's3x9');
+            tse.x13.slidingspans(spec, 'length', 40, 'numspans', 3);
+            tc.verifyError(@() tse.x13.run(spec, 'verbose', false, 'load', 'all'), 'tseries:noMatch');
+        end
+
+        function string_run(tc)
+            mvsales = tc.mvsales;
+
+            ts = tse.TSeries(tse.qq(1950,1), mvsales(1:150)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Quarterly Grape Harvest"));
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1));
+            tse.x13.estimate(spec, 'save', 'all');
+            tse.x13.x13write(spec);
+            res = tse.x13.run(spec.string, tse.Quarterly(), 'verbose', false, 'load', 'all');
+            tc.verifyClass(res, 'tse.x13.X13result');
+            tc.verifySeriesKeys(res, {'a1','a3','b1','ref','rrs','rsd'});
+            tc.verifyTableKeys(res, {'itr','ac2','acf','pcf'});
+        end
+
+        function missing_values_run(tc)
+            mvsales = tc.mvsales;
+
+            missingTs = tse.TSeries(tse.qq(1990,1), double(mvsales(1:150)'));
+            missingTs(tse.qq(1994,1):tse.qq(1994,4)) = NaN;
+            tc.verifyError(@() tse.x13.series(missingTs, 'title', "Quarterly Grape Harvest"), 'tseries:noMatch');
+
+            tc.assumeFalse(ispc, 'Missing-value X13 run example is skipped on Windows, matching the Julia suite.');
+            xts = tse.x13.series(missingTs, 'title', "Quarterly Grape Harvest", 'missingcode', -99999.0);
+            spec = tse.x13.newspec(xts);
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1));
+            tse.x13.estimate(spec, 'save', 'all');
+            res = tc.runSpec(spec);
+            tc.verifySeriesKeys(res, {'a1','a3','b1'});
+        end
+
+        function deseasonalize_run(tc)
+            mvsales = tc.mvsales;
+
+            ts = tse.TSeries(tse.mm(1967,1), double(mvsales(101:400)'));
+            out = tse.x13.deseasonalize(ts);
+            tc.verifyClass(out, 'tse.TSeries');
+            tc.verifyEqual(tse.rangeof(out), tse.rangeof(ts));
+
+            spec = tse.x13.newspec(ts, 'x11', tse.x13.x11('save', 'd11'));
+            res = tc.runSpec(spec);
+            tc.verifyEqual(out.values, res.series.d11.values, 'AbsTol', 1e-10);
         end
     end
 end
