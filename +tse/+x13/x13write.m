@@ -179,6 +179,11 @@ function out = local_fieldval(cls, key, v)
         out = local_stringval(v);
         return
     end
+    if strcmp(cls, 'X13identify') && any(strcmp(key, {'diff','sdiff'})) && isnumeric(v)
+        parts = arrayfun(@(x) local_num(x, false), v(:).', 'UniformOutput', false);
+        out = ['(' strjoin(parts, ', ') ')'];
+        return
+    end
     out = local_val(v, any(strcmp(key, local_floatfields(cls))));
 end
 
@@ -189,7 +194,12 @@ function out = local_val(v, isFloat)
     elseif isa(v, 'tse.x13.ArimaSpec')
         if isscalar(v), out = v.x13str(); else, out = local_arimaspecs(v); end
     elseif isa(v, 'tse.x13.FPConst')
-        out = v.bare();
+        if isscalar(v)
+            out = v.bare();
+        else
+            parts = arrayfun(@(e) e.bare(), v, 'UniformOutput', false);
+            out = ['(' strjoin(parts, ', ') ')'];
+        end
     elseif isa(v, 'tse.MIT')
         out = tse.x13.mitstr(v);
     elseif isa(v, 'tse.MITRange')

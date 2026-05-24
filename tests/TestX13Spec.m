@@ -548,7 +548,7 @@ classdef TestX13Spec < matlab.unittest.TestCase
             spec = tse.x13.newspec(xts);
             tse.x13.transform(spec, 'func', 'log');
             tse.x13.regression(spec, 'variables', {'td', tse.x13.easter(14)});
-            tse.x13.identify(spec, 'diff', 1, 'sdiff', 1);
+            tse.x13.identify(spec, 'diff', [1], 'sdiff', [1]);
             s = tse.x13.x13write(spec, 'test', true);
             tc.verifyContains(s, sprintf('identify {\n        diff = (1)\n        sdiff = (1)\n}'));
 
@@ -588,7 +588,7 @@ classdef TestX13Spec < matlab.unittest.TestCase
             ts = tse.TSeries(tse.mm(1964,1), (1:150)');
             xts = tse.x13.series(ts, 'title', "Monthly Retail Sales");
             spec = tse.x13.newspec(xts);
-            tse.x13.regression(spec, 'variables', {'td', tse.x13.ao(tse.mm(1967,6)), tse.x13.ls(tse.mm(1971,6)), tse.x13.easter(8))});
+            tse.x13.regression(spec, 'variables', {'td', tse.x13.ao(tse.mm(1967,6)), tse.x13.ls(tse.mm(1971,6)), tse.x13.easter(8)});
             tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1,0,1,1));
             tse.x13.check(spec);
             tse.x13.metadata(spec, {'analyst', 'John J. J. Smith'; 'spec.updated', 'October 31, 2006'});
@@ -604,7 +604,7 @@ classdef TestX13Spec < matlab.unittest.TestCase
             });
 
             spec = tse.x13.newspec(xts);
-            tse.x13.regression(spec, 'variables', {'td', tse.x13.ao(tse.mm(1967,6)), tse.x13.ls(tse.mm(1971,6)), tse.x13.easter(15))});
+            tse.x13.regression(spec, 'variables', {'td', tse.x13.ao(tse.mm(1967,6)), tse.x13.ls(tse.mm(1971,6)), tse.x13.easter(15)});
             tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1,0,1,1));
             tse.x13.check(spec);
             tse.x13.x11(spec);
@@ -880,7 +880,7 @@ classdef TestX13Spec < matlab.unittest.TestCase
                 sprintf('history {\n        estimates = (sadj trend)\n}') ...
             });
 
-            ts = tse.TSeries(tse.MIT(tse.YPFrequency(6), 1995*6), (1:50)');
+            ts = tse.TSeries(tse.mm(1995,1), (1:50)');
             xts = tse.x13.series(ts, 'title', "Model based adjustment of Bimonthly exports");
             spec = tse.x13.newspec(xts);
             tse.x13.transform(spec, 'func', 'log');
@@ -894,7 +894,7 @@ classdef TestX13Spec < matlab.unittest.TestCase
 
             tc.verifyError(@() tse.x13.seats('epsiv', -0.1), 'tseries:noMatch');
             tc.verifyWarnContains(@() tse.x13.seats('hpcycle', false, 'hplan', 2), 'Hodrick-Prescott filters will be used');
-            tc.verifyWarnContains(@() tse.x13.seats('print', 'all'), 'print=:all option is not available');
+            tc.verifyWarnContains(@() tse.x13.seats('print', 'all'), 'The print=all option is not available for the seats spec.');
         end
 
         function series_writing(tc)

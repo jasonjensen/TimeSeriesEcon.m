@@ -20,7 +20,8 @@ classdef FPConst
         end
         function s = bare(obj)
             %BARE  Period string: a month name for monthly, else the number.
-            if strcmp(obj.kind, 'monthly')
+            kind = char(obj.kind);
+            if strcmp(kind, 'monthly')
                 months = {'jan','feb','mar','apr','may','jun', ...
                           'jul','aug','sep','oct','nov','dec'};
                 s = months{obj.n};

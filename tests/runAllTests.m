@@ -16,6 +16,7 @@ function results = runAllTests()
     import matlab.unittest.plugins.StopOnFailuresPlugin
 
     suite  = TestSuite.fromFolder(here);
+    % suite = TestSuite.fromFile(fullfile(pwd, "tests", "TestX13Run.m"));
     runner = TestRunner.withTextOutput('Verbosity', 2);
     runner.addPlugin(StopOnFailuresPlugin);
     results = runner.run(suite);
