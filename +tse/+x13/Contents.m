@@ -35,5 +35,4 @@
 % Symbol vs string convention: pass Julia "symbols" as char (e.g. 'mult') and
 % Julia "strings" (name/title/file/format) as double-quoted strings ("My GDP").
 %
-% Not ported: the per-table English description text (_output_descriptions) and
-% the X13as binary itself (set its path via tse.setoption('x13path', ...)).
+% Not ported: the X13as binary itself (set its path via tse.setoption('x13path', ...)).

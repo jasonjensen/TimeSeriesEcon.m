@@ -161,6 +161,31 @@ classdef TestX13Run < matlab.unittest.TestCase
             tc.verifyOtherKeys(res, {'est','lks','mdl','udg'});
         end
 
+        function descriptions_run(tc)
+            sales = tc.mvsales;
+
+            ts = tse.TSeries(tse.mm(1964,1), sales(150:300)');
+            spec = tse.x13.newspec(tse.x13.series(ts, 'title', "Monthly Retail Sales"));
+            tse.x13.arima(spec, tse.x13.ArimaModel(0,1,1,0,1,1));
+            tse.x13.check(spec, 'save', 'all');
+            tse.x13.x11(spec, 'save', {'d11'});
+
+            res = tc.runSpec(spec);
+            desc = res.descriptions();
+
+            tc.verifyTrue(isfield(desc, 'series'));
+            tc.verifyTrue(isfield(desc.series, 'd11'));
+            tc.verifyEqual(desc.series.d11, 'X11: final seasonally adjusted series');
+
+            tc.verifyTrue(isfield(desc, 'tables'));
+            tc.verifyTrue(isfield(desc.tables, 'acf'));
+            tc.verifyEqual(desc.tables.acf, ...
+                'CHECK: autocorrelation function of residuals with standard errors, and Ljung-Box Q-statistics computed through each lag');
+
+            helperDesc = tse.x13.descriptions(res);
+            tc.verifyEqual(helperDesc, desc);
+        end
+
         function automdl_run(tc)
             mvsales = tc.mvsales;
 

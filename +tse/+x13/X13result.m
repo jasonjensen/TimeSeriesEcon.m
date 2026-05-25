@@ -35,7 +35,54 @@ classdef X13result
             end
         end
         function d = descriptions(obj)
-            d = tse.x13.descriptions(obj);
+            C = tse.x13.x13consts();
+
+            d = struct();
+            d.series = local_collect_workspace_descriptions(fieldnames(obj.series), obj.spec, C.output_descriptions);
+            d.tables = local_collect_workspace_descriptions(fieldnames(obj.tables), obj.spec, C.output_descriptions);
+
+            if isfield(obj.other, 'udg') && isstruct(obj.other.udg)
+                udg = local_collect_udg_descriptions(fieldnames(obj.other.udg), C.output_udg_description);
+                if ~isempty(fieldnames(udg))
+                    d.other = struct('udg', udg);
+                end
+            end
         end
+    end
+end
+
+function out = local_collect_workspace_descriptions(keys, spec, outputDescriptions)
+    out = struct();
+    specNames = fieldnames(outputDescriptions);
+    for i = 1:numel(keys)
+        key = keys{i};
+        code = matlab.lang.makeValidName(local_result_code(key));
+        for j = 1:numel(specNames)
+            specName = specNames{j};
+            if ~isprop(spec, specName) || tse.x13.isdefault(spec.(specName))
+                continue
+            end
+            specDescriptions = outputDescriptions.(specName);
+            if isfield(specDescriptions, code)
+                out.(key) = sprintf('%s: %s', upper(specName), specDescriptions.(code));
+            end
+        end
+    end
+end
+
+function out = local_collect_udg_descriptions(keys, udgDescriptions)
+    out = struct();
+    for i = 1:numel(keys)
+        key = keys{i};
+        if isfield(udgDescriptions, key)
+            out.(key) = udgDescriptions.(key);
+        end
+    end
+end
+
+function code = local_result_code(key)
+    code = key;
+    if startsWith(code, 'x') && all(isstrprop(code(2:end), 'digit'))
+        code = code(2:end);
     end
 end
