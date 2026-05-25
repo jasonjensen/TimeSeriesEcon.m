@@ -52,15 +52,14 @@ y = fconvert(Yearly(), t, 'method', 'mean');   % convert to annual
 
 ## Documentation
 
-User-facing documentation lives in [`docs/`](./docs), mirroring the structure of
-the [Python documentation](https://nic2020.github.io/TimeSeriesEconPy/):
+User-facing documentation can be found on the [Documentation site](https://jasonjensen.github.io/TimeSeriesEcon.m/), as well as in the [`docs/`](./docs) folder.
 
-- [Home](./docs/index.md) and the [Tutorial](./docs/tutorials/1_timeseriesecon.md)
-- [Reference](./docs/reference/frequencies.md) (one page per topic)
+- [Home]((https://jasonjensen.github.io/TimeSeriesEcon.m/)) and the [Tutorial](https://jasonjensen.github.io/TimeSeriesEcon.m/tutorials/1_timeseriesecon/)
+- [Reference](https://jasonjensen.github.io/TimeSeriesEcon.m/reference/frequencies/) (one page per topic)
 - Design notes, including migration guides
-  [from Julia](./docs/design/migration_from_julia.md) and
-  [from Python](./docs/design/migration_from_python.md)
-- [FAQ](./docs/faq.md) and [API index](./docs/api_index.md)
+  [from Julia](https://jasonjensen.github.io/TimeSeriesEcon.m/design/migration_from_julia/) and
+  [from Python](https://jasonjensen.github.io/TimeSeriesEcon.m/design/migration_from_python/)
+- [FAQ](https://jasonjensen.github.io/TimeSeriesEcon.m/faq/) and [API index](https://jasonjensen.github.io/TimeSeriesEcon.m/api_index/)
 
 The pages are plain Markdown (readable on GitHub). They can also be built into a
 site with `mkdocs` using [`mkdocs.yml`](./mkdocs.yml) (`mkdocs serve`). Inside MATLAB,
@@ -76,7 +75,6 @@ results = runAllTests;   % from the tests/ folder
 
 ## Project history
 
-See [PLAN.md](./PLAN.md) and [PLAN_EXTENSIONS.md](./PLAN_EXTENSIONS.md) for the
-original implementation plan and the extension plan, and
-[TEST_PARITY_REPORT.md](./TEST_PARITY_REPORT.md) for test-coverage parity with
+See the [lore](.lore) folder for some design documents, including an older
+[TEST_PARITY_REPORT.md](./lore/TEST_PARITY_REPORT.md) for test-coverage parity with
 the Julia upstream.
