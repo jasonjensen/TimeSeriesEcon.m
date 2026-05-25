@@ -230,6 +230,15 @@ t = TSeries(qq(2020, 1), [0.1; 0.2; 0.3; 0.4; 0.5]);
 disp(t)
 ```
 
+By default, TSeries displays are truncated. Use `showall(t)` or `dispall(t)` to show
+the full range.
+
+```matlab
+t = TSeries(qq(2020, 1):qq(2080,4), @rand);
+disp(t)
+dispall(t)
+```
+
 You can also construct from a range. Without a value argument the storage is
 NaN-filled; pass a scalar, a vector, or an initialiser function:
 
@@ -484,6 +493,9 @@ disp(mv)
 MVTSeries(MITRange(qq(2020, 1), qq(2021, 3)), {'one','too','tree'}, @zeros)
 ```
 
+By default, MVTSeries displays are truncated. Use `showall(mv)` or `dispall(mv)` to show
+the full range.
+
 ### Access
 
 ```matlab
@@ -493,6 +505,7 @@ mv('a')                                    % one column as a TSeries
 mv.a                                       % same, attribute-style
 mv({'a', 'b'})                             % sub-MVTSeries with those columns
 mv(MITRange(qq(2020, 1), qq(2020, 4)))     % sub-MVTSeries (all columns, rows sliced)
+mv.a(qq(2020, 1):qq(2020, 4))              % one  column, rows sliced 
 ```
 
 ### Iterating columns

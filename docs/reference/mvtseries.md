@@ -36,6 +36,9 @@ underlying matrix (growing it if needed).
 `firstdate`, `lastdate(x)`, `rangeof(x)`, `frequencyof(x)`, `x.colnames`,
 `x.values` (the 2-D buffer), `columns(x)` (a struct mapping name → `TSeries`).
 
+By default, MVTSeries displays are truncated. Use `showall(t)` or `dispall(t)` to show
+the full range.
+
 ```matlab
 import tse.*
 mv = MVTSeries(qq(2020, 1), {'a','b','c'}, rand(8, 3));

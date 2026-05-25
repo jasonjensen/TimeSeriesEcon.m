@@ -39,6 +39,9 @@ A `TSeries` is a univariate time series: a column of values plus an
 `firstdate`, `lastdate(t)`, `rangeof(t[, 'drop', k])`, `frequencyof(t)`,
 `length(t)`, `numel(t)`, `t.values` (raw column).
 
+By default, TSeries displays are truncated. Use `showall(t)` or `dispall(t)` to show
+the full range.
+
 ## Arithmetic, transforms, reductions (methods)
 
 These are methods, callable as `t.op(...)` or `op(t, ...)`:
