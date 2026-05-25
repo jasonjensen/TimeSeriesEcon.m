@@ -564,6 +564,11 @@ classdef TSeries
             r = t;
         end
 
+        function r = log(t)
+            r = t;
+            r.values = log(r.values);
+        end
+
         function r = mtimes(a, b)
             % Scalar * TSeries / TSeries * scalar => element-wise.
             % Anything else defers to numeric mtimes (will usually error

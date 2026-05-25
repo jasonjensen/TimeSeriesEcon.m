@@ -733,9 +733,14 @@ classdef MVTSeries
         function r = rdivide(a, b), r = mvBinaryOp(a, b, @rdivide); end
         function r = ldivide(a, b), r = mvBinaryOp(a, b, @ldivide); end
         function r = power(a, b),   r = mvBinaryOp(a, b, @power);   end
-
+            
         function r = uminus(x), r = x; r.values = -x.values; end
         function r = uplus(x),  r = x; end
+
+        function r = log(mv)
+            r = mv;
+            r.values = log(r.values);
+        end
 
         function r = mtimes(a, b)
             if isa(a, 'tse.MVTSeries') && isnumeric(b) && isscalar(b)
