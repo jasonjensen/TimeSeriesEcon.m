@@ -86,55 +86,6 @@ classdef TestX13Run < matlab.unittest.TestCase
             res = tse.x13.run(spec, 'verbose', false, 'load', 'all');
             tc.verifyClass(res, 'tse.x13.X13result');
         end
-
-        function values = fixtureArray(~, name)
-            persistent cached
-            if isempty(cached)
-                cached = struct();
-            end
-            field = matlab.lang.makeValidName(name);
-            if isfield(cached, field)
-                values = cached.(field);
-                return
-            end
-            content = TestX13Run.juliaRunFileContent();
-            pattern = sprintf('(?ms)^%s\s*=\s*\[(.*?)\]', regexptranslate('escape', name));
-            token = regexp(content, pattern, 'tokens', 'once');
-            assert(~isempty(token), 'Fixture %s not found in Julia test file.', name);
-            values = str2double(regexp(token{1}, '[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?', 'match'));
-            cached.(field) = values;
-        end
-
-        function ts = inventoriesFixture(~)
-            persistent inventories
-            if ~isempty(inventories)
-                ts = inventories;
-                return
-            end
-            content = TestX13Run.juliaRunFileContent();
-            token = regexp(content, '(?ms)^inventories\s*=\s*TSeries\(1991M1,\s*\[(.*?)\]\)', 'tokens', 'once');
-            assert(~isempty(token), 'inventories fixture not found in Julia test file.');
-            values = str2double(regexp(token{1}, '[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?', 'match'));
-            inventories = tse.TSeries(tse.mm(1991,1), values(:));
-            ts = inventories;
-        end
-
-        function path = juliaDataFile(tc, fileName)
-            root = fileparts(fileparts(mfilename('fullpath')));
-            path = fullfile(root, 'TimeSeriesEcon.jl', 'data', fileName);
-            tc.assumeTrue(isfile(path), sprintf('Required Julia data file is missing: %s', path));
-        end
-    end
-
-    methods (Static, Access = private)
-        function content = juliaRunFileContent()
-            persistent cached
-            if isempty(cached)
-                root = fileparts(fileparts(mfilename('fullpath')));
-                cached = fileread(fullfile(root, 'TimeSeriesEcon.jl', 'test', 'test_x13run.jl'));
-            end
-            content = cached;
-        end
     end
 
     methods (Test)
@@ -291,7 +242,7 @@ classdef TestX13Run < matlab.unittest.TestCase
             tc.verifyTableKeys(res, {'acm','itr','rcm','rts','ac2','acf','pcf','sp0','spr','st0','str'});
             tc.verifyOtherKeys(res, {'est','lks','mdl','udg'});
 
-            spec = tse.x13.newspec(tse.x13.series(tc.inventoriesFixture(), 'title', "Monthly Inventory"));
+            spec = tse.x13.newspec(tse.x13.series(tc.inventories, 'title', "Monthly Inventory"));
             tse.x13.transform(spec, 'func', 'log', 'save', 'all');
             tse.x13.estimate(spec, 'file', fullfile(pwd, 'fixtures', 'reg1.mdl'), 'save', 'all', 'fix', 'all');
             res = tc.runSpec(spec);
