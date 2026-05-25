@@ -24,6 +24,18 @@ classdef TestDates < matlab.unittest.TestCase
             tc.verifyEqual(datetime(2022,1,20), tse.toDate(rng.stopMIT));
         end
 
+        function collect_range_returns_displayable_mit_array(tc)
+            rng = tse.qq(2022,1):tse.qq(2022,4);
+            mits = collect(rng);
+
+            tc.verifySize(mits, [1, 4]);
+            tc.verifyEqual(string(mits), ["2022Q1", "2022Q2", "2022Q3", "2022Q4"]);
+
+            shown = evalc('disp(mits);');
+            tc.verifyTrue(contains(shown, '2022Q1'));
+            tc.verifyTrue(contains(shown, '2022Q4'));
+        end
+
         function mit2yp_daily(tc)
             tc.verifyEqual(double(tse.mit2yp(tse.day('2022-01-01'))), [2022, 1]);
             tc.verifyEqual(double(tse.mit2yp(tse.day('2022-01-03'))), [2022, 3]);

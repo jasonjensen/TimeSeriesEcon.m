@@ -336,11 +336,36 @@ classdef MIT
         end
 
         function s = string(m)
-            s = string(char(m));
+            if isscalar(m)
+                s = string(char(m));
+            else
+                s = arrayfun(@(x) string(char(x)), m);
+            end
         end
 
         function disp(m)
-            fprintf('%s\n', char(m));
+            if isscalar(m)
+                fprintf('%s\n', char(m));
+            else
+                if numel(m) < 10
+                    arrayfun(@(x) fprintf('%s\n', char(x)), m);
+                else
+                    arrayfun(@(x) fprintf('%s\n', char(x)), m(1:3));
+                    fprintf('...\n');
+                    arrayfun(@(x) fprintf('%s\n', char(x)), m(numel(m)-2:end));
+                end
+            end
+        end
+
+        function showall(m)
+            if isscalar(m)
+                fprintf('%s\n', char(m));
+            else
+                arrayfun(@(x) fprintf('%s\n', char(x)), m);
+            end
+        end
+        function dispall(m)
+            showall(m)
         end
     end
 

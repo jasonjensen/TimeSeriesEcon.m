@@ -686,6 +686,45 @@ classdef MVTSeries
             end
         end
 
+        function showall(x)
+            cls = class(x.values);
+            et = '';
+            if ~strcmp(cls, 'double'), et = sprintf(',%s', cls); end
+            Fname = char(int2freq(x.frequency));
+            n = size(x.values, 1);
+            N = size(x.values, 2);
+            fprintf('%dx%d MVTSeries{%s%s} with range %s', n, N, Fname, et, char(rangeof(x)));
+            if N == 0
+                fprintf(' and no variables\n');
+            elseif N <= 5
+                fprintf(' and variables (%s)\n', strjoin(cellstr(x.colnames), ', '));
+            else
+                fprintf(' and variables (%s, ...)\n', strjoin(cellstr(x.colnames(1:3)), ', '));
+            end
+            if N == 0 || n == 0, return; end
+
+            mits = collect(rangeof(x));
+            maxLabel = 0;
+            for k = 1:n
+                s = char(mits(k));
+                if numel(s) > maxLabel, maxLabel = numel(s); end
+            end
+            header = repmat(' ', 1, maxLabel + 3);
+            for k = 1:N
+                s = char(x.colnames(k));
+                if numel(s) > 10, s = s(1:10); end
+                header = [header sprintf('%-12s', s)];  %#ok<AGROW>
+            end
+            fprintf('%s\n', header);
+            
+            rows = 1:n;
+            printRows(x, mits, rows, maxLabel);
+        end
+
+        function dispall(x)
+            showall(x);
+        end
+
         % ---------- arithmetic ----------
 
         function r = plus(a, b),    r = mvBinaryOp(a, b, @plus);    end

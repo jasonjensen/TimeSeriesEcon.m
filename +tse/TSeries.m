@@ -480,6 +480,28 @@ classdef TSeries
             end
         end
 
+        function showall(t)
+            summary_(t);
+            if isempty(t.values), return; end
+            fprintf(':\n');
+            nval = length(t.values);
+            rng = rangeof(t);
+            maxLabel = 0;
+            allMits = collect(rng);
+            for k = 1:nval
+                s = char(allMits(k));
+                if numel(s) > maxLabel, maxLabel = numel(s); end
+            end
+            for k = 1:nval
+                fprintf('    %s : %g\n', lpad(char(allMits(k)), maxLabel), ...
+                    double(t.values(k)));
+            end
+        end
+
+        function dispall(t)
+            showall(t);
+        end
+
         function s = summary(t)
             s = summaryStr(t);
         end
