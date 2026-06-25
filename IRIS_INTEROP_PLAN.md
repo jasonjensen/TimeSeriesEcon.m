@@ -227,7 +227,136 @@ The interop doc should show three concrete patterns:
 
 ---
 
-## Test coverage
+## 3. Implicit acceptance of IRIS dates
+
+For people transitioning, the most common slip is to build a `tse.TSeries`
+but reach for an IRIS helper for the start date — `tse.TSeries(qq(2020,1), v)`
+where `qq` resolves to IRIS and returns a `double`, not a `tse.MIT`. We can
+accept that quietly **with no cost on the existing MIT path**.
+
+### Pattern: fast-path-first coercion
+
+A small helper `tse.MIT.coerce(x)` (or a free `+tse/+iris/coerce.m` so it has
+no impact when IRIS isn't loaded):
+
+```matlab
+function m = coerce(x)
+    if isa(x, 'tse.MIT')           % <-- the hot path; a single isa check
+        m = x; return
+    end
+    if isnumeric(x) && isscalar(x) && tse.iris.isavailable()
+        m = tse.iris.from_date(x); % decodes via IRIS dat2ypf and builds tse.MIT
+        return
+    end
+    error('tseries:noMatch', 'Expected a tse.MIT or an IRIS date.');
+end
+```
+
+`isa(x,'tse.MIT')` is a C-level type-tag check (tens of nanoseconds). When the
+caller passes a real `tse.MIT`, that's the only added work — the function
+returns immediately, no IRIS reachability check, no path lookup. The
+fallback only runs in the misuse case, which is exactly when we *want* a
+slower path that does something helpful.
+
+`tse.iris.isavailable()` caches its result in a `persistent`, with an
+`invalidate` entry point for code that adds IRIS to the path mid-session.
+After the first call it's also tens of nanoseconds. (And it never runs at
+all on the MIT path.)
+
+### Where to plumb it
+
+Only entry points that today demand a `tse.MIT` need the coerce call:
+
+- **`tse.TSeries` constructor** — the two-argument form `TSeries(start, vec)`.
+  The one-argument numeric form `TSeries(100)` (length, builds a Unit-freq
+  series) stays integer-only by design.
+- **`tse.MITRange` constructor** — `MITRange(a, b)` and `MITRange(a, step, b)`.
+  Both endpoints get coerced.
+- **`tse.TSeries.subsref` / `tse.MVTSeries.subsref`** — indexing `t(x)` /
+  `t(x:y)` / `t(x) = v`. See the ambiguity note below.
+- **`tse.MIT`'s own colon (`a:b`)** — colon would also pick up coerced
+  endpoints via the MITRange constructor.
+
+Free-function entry points (`tse.fconvert`, `tse.rec`, `tse.overlay`,
+`tse.compare`, `tse.lookup`, `tse.reindex`) already take TSeries/MIT objects
+that themselves came through one of the above — no extra plumbing needed.
+
+### Indexing: handling the plain-integer ambiguity
+
+`t(4)` today means "the 4th observation" (positional). An IRIS yearly date is
+also `yy(2020) = 2020` — a plain integer. We must not silently re-interpret
+positional indices as yearly dates.
+
+Resolution:
+
+- The fast path **stays exactly as today** for `integer` inputs: positional.
+- We attempt IRIS-date coercion only when the input is a *non-integer* finite
+  double (so quarterly `qq(2020,1)`, monthly `mm(2020,1)`, weekly `ww`, daily
+  `dd`, etc. all work transparently — they encode the period and frequency in
+  the fractional part).
+- Yearly IRIS dates are integers and remain ambiguous; for those, the user
+  must write `t(tse.iris.from_date(yy(2020)))` explicitly. The error message
+  on a bare `t(2020)` against a yearly series already says "out of range" if
+  position 2020 doesn't exist, which is enough of a hint.
+
+In numbers, the indexing dispatch becomes:
+
+```matlab
+% in TSeries.subsref / paren-reference
+if isa(idx, 'tse.MIT'),       use idx directly                        % fast
+elseif isa(idx, 'tse.MITRange'), slice                                % fast
+elseif isnumeric(idx) && all(idx == floor(idx)), positional indexing  % fast
+elseif isnumeric(idx),        coerce each element via tse.iris.coerce % fallback
+elseif islogical(idx),        mask                                    % fast
+else                          ... existing error ...
+end
+```
+
+The new branch only runs when the input contains a non-integer double — the
+existing positional and MIT paths are untouched.
+
+### Frequency consistency check
+
+`from_date(d)` decodes `(y, p, freq)`. The TSeries constructor and indexer
+already check frequency compatibility between the input MIT and the series'
+frequency, so an IRIS-date input that decodes to the wrong frequency surfaces
+through the same existing error path with no extra logic.
+
+### Opt-out
+
+A boolean option for callers who want the old, strict behaviour:
+
+```matlab
+tse.setoption('accept_iris_dates', false);   % default: true when IRIS loaded
+```
+
+Backed by the existing `options_db.m`. When `false`, `coerce` skips the
+fallback branch and errors immediately on a non-`tse.MIT` input — useful in
+CI where surprises should fail loudly.
+
+### Performance assertion
+
+This needs to be a measured commitment, not a hope. Add to
+`benchmarks/run_benchmarks.m`:
+
+- `construct_tseries_qq_100_with_coerce` — identical to the existing
+  `construct_tseries_qq_100`, just exercising the post-coerce constructor.
+- `indexing_mit_lookup_100_with_coerce` — same loop, hot path.
+
+The median µs should match the pre-coerce baseline within noise (single-digit
+ns difference). If it doesn't, the patch isn't shipped.
+
+### Where this slots into the phasing
+
+Inserts as **phase 2.5**, after the series converters land (they provide
+`from_date` / `to_date`, which `coerce` calls) and before the conflict
+tooling — so by the time someone runs `tse.iris.check_conflicts()`, the
+transparent acceptance is already in place and the warnings can mention it as
+the safety net.
+
+---
+
+
 
 A new `tests/TestIrisInterop.m` that:
 
