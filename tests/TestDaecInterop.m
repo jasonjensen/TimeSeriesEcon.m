@@ -97,5 +97,57 @@ classdef TestDaecInterop < matlab.unittest.TestCase
             tc.verifyError(@() tse.daec.to_series(42), 'tseries:noMatch');
         end
 
+        % ---- databases (in-memory struct conversion; no native library) ----
+
+        function db_roundtrip(tc)
+            d.gdp  = tse.TSeries(tse.qq(2020, 1), (1:10)');
+            d.cpi  = tse.TSeries(tse.qq(2020, 1), (11:20)');
+            d.mv   = tse.MVTSeries(tse.mm(2010, 1), {'a','b'}, reshape(1:24, 12, 2));
+            d.note = 'a non-series field';
+
+            daec_db = tse.daec.to_db(d);
+            tc.verifyClass(daec_db.gdp, 'DESeries');
+            tc.verifyClass(daec_db.mv, 'DESeries');
+            tc.verifyEqual(daec_db.note, 'a non-series field');
+
+            d2 = tse.daec.from_db(daec_db);
+            tc.verifyClass(d2.gdp, 'tse.TSeries');
+            tc.verifyClass(d2.mv, 'tse.MVTSeries');
+            tc.verifyEqual(d2.gdp.values, d.gdp.values);
+            tc.verifyEqual(d2.cpi.values, d.cpi.values);
+            tc.verifyEqual(d2.mv.values, d.mv.values);
+            tc.verifyEqual(cellstr(d2.mv.colnames), cellstr(d.mv.colnames));
+            tc.verifyEqual(d2.note, 'a non-series field');
+        end
+
+        % ---- file round-trip (requires a loaded libdaec) ----
+
+        function file_db_roundtrip(tc)
+            if exist('DAEC', 'class') ~= 8 || ~DAEC.isloaded()
+                tc.assumeFail('libdaec is not loaded; skipping .daec file round-trip.');
+            end
+            d = struct();
+            d.gdp = tse.TSeries(tse.qq(2000, 1), (1:24)');
+            d.mv  = tse.MVTSeries(tse.mm(2010, 1), {'a','b'}, reshape(1:24, 12, 2));
+
+            f = [tempname '.daec'];
+            cleaner = onCleanup(@() cleanupFile(f)); %#ok<NASGU>
+
+            tse.daec.write(f, d);
+            d2 = tse.daec.read(f);
+
+            tc.verifyEqual(d2.gdp.values, d.gdp.values);
+            tc.verifyTrue(d.gdp.firstdate == d2.gdp.firstdate);
+            tc.verifyEqual(d2.mv.values, d.mv.values);
+            tc.verifyTrue(d.mv.firstdate == d2.mv.firstdate);
+            tc.verifyEqual(cellstr(d2.mv.colnames), cellstr(d.mv.colnames));
+        end
+
+    end
+end
+
+function cleanupFile(f)
+    if exist(f, 'file')
+        delete(f);
     end
 end

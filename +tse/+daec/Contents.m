@@ -24,5 +24,10 @@
 %   to_series      - tse.TSeries / tse.MVTSeries -> DataEcon DESeries
 %   from_series    - DataEcon DESeries -> tse.TSeries / tse.MVTSeries
 %
-% File I/O and database helpers (read / write, to_db / from_db) are added in
-% the next step of the integration; those wrap DEFile and require libdaec.
+% Databases (in-memory struct conversion; no native library)
+%   to_db          - struct of tse.* series -> struct of DESeries
+%   from_db        - struct of DESeries -> struct of tse.* series
+%
+% Files (these require a loaded libdaec; call tse.daec.startup first)
+%   write          - write a struct of tse.* series to a .daec file
+%   read           - read a .daec file into a struct of tse.* series
