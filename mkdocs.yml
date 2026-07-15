@@ -72,5 +72,7 @@ nav:
       - Frequency model: design/frequency_model.md
       - Migration from Julia: design/migration_from_julia.md
       - Migration from Python: design/migration_from_python.md
+      - IRIS interop: design/iris_interop.md
+      - Dynare interop: design/dynare_interop.md
   - API index: api_index.md
   - FAQ: faq.md
