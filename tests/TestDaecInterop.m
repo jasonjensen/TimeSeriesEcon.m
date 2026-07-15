@@ -41,6 +41,30 @@ classdef TestDaecInterop < matlab.unittest.TestCase
             end
         end
 
+        function date_endperiod_roundtrips(tc)
+            % Non-default end periods are encoded in the frequency int, so
+            % they must survive the identity mapping (and the DataEcon enum
+            % aliasing of end-of-period variants).
+            fs = { tse.Quarterly(1), 65; ...
+                   tse.Quarterly(2), 66; ...
+                   tse.HalfYearly(3), 131; ...
+                   tse.Yearly(6),    262; ...
+                   tse.Yearly(3),    259; ...
+                   tse.Weekly(1),     17; ...
+                   tse.Weekly(3),     19};
+            for i = 1:size(fs, 1)
+                F    = fs{i, 1};
+                code = fs{i, 2};
+                m    = tse.MIT(F, 2020, 2);
+                tc.verifyEqual(double(m.frequency), double(code));
+                d = tse.daec.to_date(m);
+                tc.verifyEqual(double(d.frequency), double(code));
+                m2 = tse.daec.from_date(d);
+                tc.verifyTrue(m == m2);
+                tc.verifyEqual(tse.frequencyof(m2).endPeriod, F.endPeriod);
+            end
+        end
+
         function to_date_rejects_non_mit(tc)
             tc.verifyError(@() tse.daec.to_date(42), 'tseries:noMatch');
         end
@@ -93,8 +117,37 @@ classdef TestDaecInterop < matlab.unittest.TestCase
             tc.verifyTrue(t.firstdate == t2.firstdate);
         end
 
+        function series_endperiod_roundtrip(tc)
+            % A non-default end-period frequency must survive object
+            % conversion (firstdate carries the encoded end period).
+            t  = tse.TSeries(tse.MIT(tse.Quarterly(1), 2000, 1), (1:8)');
+            t2 = tse.daec.from_series(tse.daec.to_series(t));
+            tc.verifyClass(t2, 'tse.TSeries');
+            tc.verifyTrue(t.firstdate == t2.firstdate);
+            tc.verifyEqual(double(t2.firstdate.frequency), 65);
+            tc.verifyEqual(t2.values, t.values);
+        end
+
         function to_series_rejects_other(tc)
             tc.verifyError(@() tse.daec.to_series(42), 'tseries:noMatch');
+        end
+
+        function from_series_rejects_non_deseries(tc)
+            tc.verifyError(@() tse.daec.from_series(42), 'tseries:noMatch');
+        end
+
+        function to_range_rejects_non_range(tc)
+            tc.verifyError(@() tse.daec.to_range(42), 'tseries:noMatch');
+        end
+
+        function from_range_rejects_names_axis(tc)
+            ax = DEAxis({'a','b','c'});   % a names axis, not a range axis
+            tc.verifyError(@() tse.daec.from_range(ax), 'tseries:noMatch');
+        end
+
+        function db_helpers_reject_non_struct(tc)
+            tc.verifyError(@() tse.daec.to_db(42),   'tseries:noMatch');
+            tc.verifyError(@() tse.daec.from_db(42), 'tseries:noMatch');
         end
 
         % ---- databases (in-memory struct conversion; no native library) ----
