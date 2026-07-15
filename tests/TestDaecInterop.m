@@ -49,5 +49,53 @@ classdef TestDaecInterop < matlab.unittest.TestCase
             tc.verifyError(@() tse.daec.from_date(42), 'tseries:noMatch');
         end
 
+        % ---- ranges (object conversion; no native library needed) ----
+
+        function range_roundtrip(tc)
+            r  = tse.qq(2020, 1):tse.qq(2024, 4);
+            ax = tse.daec.to_range(r);
+            tc.verifyClass(ax, 'DEAxis');
+            tc.verifyEqual(double(ax.length), double(length(r)));
+            r2 = tse.daec.from_range(ax);
+            tc.verifyClass(r2, 'tse.MITRange');
+            tc.verifyTrue(first(r) == first(r2));
+            tc.verifyTrue(last(r) == last(r2));
+        end
+
+        % ---- series (object conversion; no native library needed) ----
+
+        function tseries_roundtrip_quarterly(tc)
+            t  = tse.TSeries(tse.qq(2020, 1), (1:40)');
+            s  = tse.daec.to_series(t);
+            tc.verifyClass(s, 'DESeries');
+            t2 = tse.daec.from_series(s);
+            tc.verifyClass(t2, 'tse.TSeries');
+            tc.verifyEqual(t2.values, t.values);
+            tc.verifyTrue(t.firstdate == t2.firstdate);
+        end
+
+        function tseries_roundtrip_monthly(tc)
+            t  = tse.TSeries(tse.mm(2010, 6), (1:60)');
+            t2 = tse.daec.from_series(tse.daec.to_series(t));
+            tc.verifyEqual(t2.values, t.values);
+            tc.verifyTrue(t.firstdate == t2.firstdate);
+        end
+
+        function mvtseries_roundtrip(tc)
+            t  = tse.MVTSeries(tse.qq(2020, 1), {'gdp','cpi','rate'}, ...
+                               reshape(1:60, 20, 3));
+            s  = tse.daec.to_series(t);
+            tc.verifyClass(s, 'DESeries');
+            t2 = tse.daec.from_series(s);
+            tc.verifyClass(t2, 'tse.MVTSeries');
+            tc.verifyEqual(t2.values, t.values);
+            tc.verifyEqual(cellstr(t2.colnames), cellstr(t.colnames));
+            tc.verifyTrue(t.firstdate == t2.firstdate);
+        end
+
+        function to_series_rejects_other(tc)
+            tc.verifyError(@() tse.daec.to_series(42), 'tseries:noMatch');
+        end
+
     end
 end
