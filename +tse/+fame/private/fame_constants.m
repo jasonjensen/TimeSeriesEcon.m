@@ -43,12 +43,19 @@ function c = fame_constants()
         k.HOBHIG = 7;
         k.HOBLOW = 8;
 
-        % --- missing-value translation option for cfmrrng/cfmwrng ---
-        k.HNTMIS = 0;    % (confirmed) no translation (raw FAME missing codes)
-        k.HTMIS  = 1;    % (confirmed) translate missing <-> the misval[3] we pass
-
         % --- status ---
         k.HSUCC  = 0;    % success
+
+        % --- missing-value sentinels (extern globals in the CHLI; MATLAB
+        %     cannot read them, so they are recorded here from their exact bit
+        %     patterns).  All are finite, so equality comparison is exact.
+        %     NaN maps to NC on write; any of NC/NA/ND maps to NaN on read.
+        k.FPRCNC = typecast(uint64(5179139575771037696), 'double');   % precision NC
+        k.FNUMNC = typecast(uint32(2130706440),          'single');   % numeric   NC
+        % NA / ND values still to be supplied; add them to these arrays to
+        % also catch FAME-authored NA/ND on read.
+        k.precision_missing = k.FPRCNC;
+        k.numeric_missing   = k.FNUMNC;
     end
     c = k;
 end

@@ -203,33 +203,33 @@ classdef CHLI < handle
         end
 
         function data = unmissing(data, cls)
-            % Replace FAME missing values (NC/NA/ND) with NaN by asking the
-            % library per value (cfmispm for double, cfmisnm for single).
-            % HNMVAL (0) == normal; anything else is one of the missing types.
+            % Map FAME missing sentinels to NaN.  The sentinels are finite, so
+            % an exact vectorized equality test is reliable (no per-value CHLI
+            % call needed).
+            K = fame_constants();
             if strcmp(cls, 'single')
-                fn = 'cfmisnm';  castfun = @single;
+                sentinels = K.numeric_missing;
             else
-                fn = 'cfmispm';  castfun = @double;
+                sentinels = K.precision_missing;
             end
-            mp = libpointer('int32Ptr', int32(0));
-            for i = 1:numel(data)
-                if isnan(data(i))
-                    continue   % already missing on our side
-                end
-                tse.fame.CHLI.raw_call(fn, castfun(data(i)), mp);
-                if mp.Value ~= 0
-                    data(i) = NaN;
-                end
+            for s = sentinels(:)'
+                data(data == s) = NaN;
             end
         end
 
         function write_precisions(dbkey, name, r, data)
-            dp = libpointer('doublePtr', double(data(:)));
+            K = fame_constants();
+            d = double(data(:));
+            d(isnan(d)) = K.FPRCNC;                 % NaN -> FAME NC
+            dp = libpointer('doublePtr', d);
             tse.fame.CHLI.fame_call('fame_write_precisions', int32(dbkey), char(name), r, dp);
         end
 
         function write_numerics(dbkey, name, r, data)
-            dp = libpointer('singlePtr', single(data(:)));
+            K = fame_constants();
+            d = single(data(:));
+            d(isnan(d)) = K.FNUMNC;                 % NaN -> FAME NC
+            dp = libpointer('singlePtr', d);
             tse.fame.CHLI.fame_call('fame_write_numerics', int32(dbkey), char(name), r, dp);
         end
     end
