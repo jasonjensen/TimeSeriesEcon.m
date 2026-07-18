@@ -58,6 +58,21 @@ classdef TestFameSeries < matlab.unittest.TestCase
             tc.verifyTrue(d.y.firstdate == d2.y.firstdate);
         end
 
+        function read_whole_db_by_enumeration(tc)
+            f = [tempname '.db'];
+            cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
+
+            d.gdp = tse.TSeries(tse.qq(2000, 1), (1:24)');
+            d.cpi = tse.TSeries(tse.mm(2010, 1), (1:60)');
+            tse.fame.write(f, d);
+
+            d2 = tse.fame.read(f);                 % no names -> enumerate all
+            tc.verifyTrue(isfield(d2, 'gdp'));
+            tc.verifyTrue(isfield(d2, 'cpi'));
+            tc.verifyEqual(d2.gdp.values, d.gdp.values);
+            tc.verifyEqual(d2.cpi.values, d.cpi.values);
+        end
+
     end
 end
 

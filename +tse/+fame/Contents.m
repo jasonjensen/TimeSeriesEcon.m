@@ -25,15 +25,17 @@
 %   from_range      - FAME range descriptor -> tse.MITRange
 %
 % Series read/write (require the CHLI) -- IMPLEMENTED (precision + numeric)
-%   read            - open a FAME db and read named series into a struct
+%   read            - read a FAME db into a struct: named objects, or the
+%                     whole database by enumeration when no names are given
 %   write           - write a struct of tse.TSeries into a FAME db (posts it)
 %   read_object     - read one named series from an open db  -> tse.TSeries
 %   write_object    - write a tse.TSeries into an open db
 %
+% Missing values: NaN <-> FAME NC on write; NC/NA/ND -> NaN on read.
+%
 % Planned in later steps (each grounded in FAME.jl + the CHLI reference):
-%   - MVTSeries read/write (columns as related FAME series)
 %   - boolean / string / date series, and scalar / namelist objects
-%   - database-wide enumeration (read every object without naming them)
+%   (MVTSeries has no FAME equivalent, so it is out of scope.)
 %
 % FAME frequencies with no TimeSeriesEcon.m analogue (tenday, twicemonthly,
 % bimonthly, biweekly, sub-daily, ppy/ypp, weekly_pattern) are rejected with

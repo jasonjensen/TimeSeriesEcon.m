@@ -232,6 +232,69 @@ classdef CHLI < handle
             dp = libpointer('singlePtr', d);
             tse.fame.CHLI.fame_call('fame_write_numerics', int32(dbkey), char(name), r, dp);
         end
+
+        % --- object enumeration (modern fame_*_wildcard) ---
+
+        function objs = list_objects(dbkey)
+            % Enumerate every object in the database.  Returns a struct array
+            % with fields name, class, type, freq, first, last.  Pattern '?'
+            % matches any name (as FAME.jl's listdb does).
+            wildkey = tse.fame.CHLI.init_wildcard(dbkey, '?');
+            cleanup = onCleanup(@() tse.fame.CHLI.free_wildcard(wildkey)); %#ok<NASGU>
+            objs = struct('name', {}, 'class', {}, 'type', {}, ...
+                          'freq', {}, 'first', {}, 'last', {});
+            while true
+                [status, name, oclass, type, freq, first, last] = ...
+                    tse.fame.CHLI.next_wildcard(wildkey);
+                if status == 13          % HNOOBJ: iteration exhausted
+                    break
+                elseif status ~= 0
+                    tse.fame.CHLI.check(status);
+                end
+                objs(end+1) = struct('name', name, 'class', oclass, ...
+                    'type', type, 'freq', freq, 'first', first, 'last', last); %#ok<AGROW>
+            end
+        end
+
+        function wildkey = init_wildcard(dbkey, pattern)
+            if nargin < 2 || isempty(pattern)
+                pattern = '?';
+            end
+            wk = libpointer('int32Ptr', int32(0));
+            % wildonly = 0, wildstart = '' (from the beginning)
+            tse.fame.CHLI.fame_call('fame_init_wildcard', ...
+                int32(dbkey), wk, char(pattern), int32(0), '');
+            wildkey = double(wk.Value);
+        end
+
+        function [status, name, oclass, type, freq, first, last] = next_wildcard(wildkey)
+            % Fetch the next matching object.  Returns status without raising,
+            % so the caller can stop on HNOOBJ.  The name buffer is null-padded.
+            inst = tse.fame.CHLI.instance();
+            tse.fame.CHLI.ensure_loaded();
+            oc = libpointer('int32Ptr', int32(0));  ty = libpointer('int32Ptr', int32(0));
+            fr = libpointer('int32Ptr', int32(0));
+            st = libpointer('int64Ptr', int64(0));  en = libpointer('int64Ptr', int64(0));
+            ol = libpointer('int32Ptr', int32(0));
+            buf = repmat(' ', 1, 256);
+            [status, nameOut] = calllib(inst.libname, 'fame_get_next_wildcard', ...
+                int32(wildkey), buf, oc, ty, fr, st, en, int32(numel(buf) - 1), ol);
+            name = '';  oclass = 0;  type = 0;  freq = 0;  first = 0;  last = 0;
+            if status == 0
+                name = nameOut;
+                z = find(name == char(0), 1);   % strip at the null terminator
+                if ~isempty(z)
+                    name = name(1:z-1);
+                end
+                name   = strtrim(name);
+                oclass = double(oc.Value);  type = double(ty.Value);  freq = double(fr.Value);
+                first  = double(st.Value);  last = double(en.Value);
+            end
+        end
+
+        function free_wildcard(wildkey)
+            tse.fame.CHLI.fame_call('fame_free_wildcard', int32(wildkey));
+        end
     end
 
     methods (Static, Access = private)
