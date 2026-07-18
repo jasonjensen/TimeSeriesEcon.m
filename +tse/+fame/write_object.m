@@ -20,9 +20,11 @@ function write_object(dbkey, name, t)
     else
         type = K.HPRECN;
     end
-    % basis / observed are undefined-friendly defaults; refine when we carry
-    % that metadata on the tse side (VALIDATE against your FAME conventions).
-    tse.fame.CHLI.newobj(dbkey, name, K.HSERIE, freq, type, K.HBSDAY, K.HOBUND);
+    % Match FAME.jl's create-object defaults: basis = daily, observed =
+    % summed for a floating-point series (FAME rejects observed=undefined
+    % here, status HBOBSV/27).  observed is metadata only and does not affect
+    % the stored values.
+    tse.fame.CHLI.newobj(dbkey, name, K.HSERIE, freq, type, K.HBSDAY, K.HOBSUM);
 
     first = t.firstdate;
     last  = first + (numel(t.values) - 1);
