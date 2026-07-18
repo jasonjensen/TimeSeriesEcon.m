@@ -193,13 +193,34 @@ classdef CHLI < handle
         function data = get_precisions(dbkey, name, r, nobs)
             dp = libpointer('doublePtr', zeros(nobs, 1));
             tse.fame.CHLI.fame_call('fame_get_precisions', int32(dbkey), char(name), r, dp);
-            data = dp.Value;
+            data = tse.fame.CHLI.unmissing(dp.Value, 'double');
         end
 
         function data = get_numerics(dbkey, name, r, nobs)
             dp = libpointer('singlePtr', zeros(nobs, 1, 'single'));
             tse.fame.CHLI.fame_call('fame_get_numerics', int32(dbkey), char(name), r, dp);
-            data = dp.Value;
+            data = tse.fame.CHLI.unmissing(dp.Value, 'single');
+        end
+
+        function data = unmissing(data, cls)
+            % Replace FAME missing values (NC/NA/ND) with NaN by asking the
+            % library per value (cfmispm for double, cfmisnm for single).
+            % HNMVAL (0) == normal; anything else is one of the missing types.
+            if strcmp(cls, 'single')
+                fn = 'cfmisnm';  castfun = @single;
+            else
+                fn = 'cfmispm';  castfun = @double;
+            end
+            mp = libpointer('int32Ptr', int32(0));
+            for i = 1:numel(data)
+                if isnan(data(i))
+                    continue   % already missing on our side
+                end
+                tse.fame.CHLI.raw_call(fn, castfun(data(i)), mp);
+                if mp.Value ~= 0
+                    data(i) = NaN;
+                end
+            end
         end
 
         function write_precisions(dbkey, name, r, data)
