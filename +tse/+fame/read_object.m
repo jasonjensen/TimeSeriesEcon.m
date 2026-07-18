@@ -3,30 +3,36 @@ function val = read_object(dbkey, name)
 %
 %   t = tse.fame.read_object(dbkey, name)
 %
-%   dbkey is an open database key (see tse.fame.CHLI.opendb).  This step
-%   supports precision (double) and numeric (single) series; other classes /
-%   types raise a clear error and are added in a later step.  Missing FAME
-%   values come back as NaN.
+%   Uses the modern FAME API (as FAME.jl does): fame_quick_info for the
+%   class/type/frequency and first/last date index, then a typed range read
+%   (fame_get_precisions / fame_get_numerics).  Supports precision (double)
+%   and numeric (single) series in this version.  Requires the CHLI loaded.
 %
 %   See also: tse.fame.read, tse.fame.write_object.
-    info = tse.fame.CHLI.whatis(dbkey, name);
+    info = tse.fame.CHLI.quick_info(dbkey, name);
     K = fame_constants();
     if info.class ~= K.HSERIE
         error('tseries:fame', ...
             'read_object supports series objects in this version (%s has class %d).', ...
             name, info.class);
     end
-    cls = tse.fame.type_from_fame(info.type);
-    if ~ismember(cls, {'double', 'single'})
-        error('tseries:fame', ...
-            'read_object supports precision/numeric series in this version (%s has type %d).', ...
-            name, info.type);
+    cls  = tse.fame.type_from_fame(info.type);
+    nobs = info.last - info.first + 1;
+    r    = tse.fame.CHLI.make_range(info.freq, info.first, info.last);
+    switch cls
+        case 'double'
+            data = tse.fame.CHLI.get_precisions(dbkey, name, r, nobs);
+        case 'single'
+            data = tse.fame.CHLI.get_numerics(dbkey, name, r, nobs);
+        otherwise
+            error('tseries:fame', ...
+                'read_object supports precision/numeric series in this version (%s has type %d).', ...
+                name, info.type);
     end
-    [range, nobs] = tse.fame.CHLI.makerange(info.freq, info.fyear, info.fprd, info.lyear, info.lprd);
-    data = tse.fame.CHLI.readrange(dbkey, name, range, nobs, cls);
-    % Rebuild the first MIT from (freq, year, period) -- the inverse of the
-    % mit2yp used on write, so the round-trip is exact.
+    % First MIT from the FAME first index, via (year, period) -- the inverse
+    % of the write-side mapping, so the round-trip is exact.
+    [year, period] = tse.fame.CHLI.index_to_yp(info.freq, info.first);
     F = tse.fame.freq_from_fame(info.freq);
-    firstMIT = tse.MIT(F, info.fyear, info.fprd);
+    firstMIT = tse.MIT(F, year, period);
     val = tse.TSeries(firstMIT, data(:));
 end

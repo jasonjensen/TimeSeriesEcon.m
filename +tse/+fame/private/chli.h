@@ -1,61 +1,50 @@
 /*
- * chli.h -- minimal MATLAB loadlibrary prototype header for the FAME CHLI.
+ * chli.h -- reference notes on the FAME CHLI signatures TimeSeriesEcon.m uses.
  *
- * Hand-authored from the Bank of Canada FAME.jl bindings and the CRAN `fame`
- * R package header (https://github.com/cran/fame/blob/master/src/fame.h).
- * Only the functions TimeSeriesEcon.m calls are declared.  The K&R DLLENTRY /
- * A(()) wrappers of the original header are resolved to plain ANSI prototypes
- * here so MATLAB's loadlibrary can parse them.
+ * NOTE: this file is documentation only.  tse.fame.CHLI.load points MATLAB's
+ * loadlibrary at the real FAME header ($FAME/hli/hli.h), so the signatures and
+ * the fame_range struct below come from there -- they are recorded here so the
+ * MATLAB wrappers can be read without the vendor header at hand.
  *
- * FAME CHLI calling convention: every function is void and reports success
- * through its FIRST argument, `int *status` (0 == HSUCC).  Object and date
- * indices are 32-bit `int` in this (classic) interface.
+ * Two calling conventions are in play:
+ *   - classic cfm* : void, status reported through the FIRST argument (int*).
+ *   - modern fame_*: int return value is the status; no status argument.
  *
- * VALIDATE against the CHLI actually installed on your machine before relying
- * on this: in particular the range read/write symbol names (this header uses
- * the classic cfmrrng / cfmwrng; the CRAN header exports cfmrrng_f / cfmwrng_f)
- * and the exact argument count of cfmwhat.
+ * The interop follows FAME.jl: classic for the database lifecycle and object
+ * creation, modern for metadata, date<->index conversion, and series data.
  */
 
-/* ---- library lifecycle ---- */
+/* ==== classic cfm* (status is the first int* argument) ==================== */
+
+/* library lifecycle + error text */
 void cfmini(int *status);
 void cfmfin(int *status);
-
-/* ---- error text ---- */
 void cfmferr(int *status, char *message);
 
-/* ---- databases ---- */
+/* databases */
 void cfmopdb(int *status, int *dbkey, char *dbname, int mode);
 void cfmopwk(int *status, int *dbkey);
 void cfmpodb(int *status, int dbkey);
 void cfmcldb(int *status, int dbkey);
 
-/* ---- objects ---- */
-void cfmdlob(int *status, int dbkey, char *objname);
+/* object creation / deletion */
 void cfmnwob(int *status, int dbkey, char *objname,
              int objclass, int freq, int type, int basis, int observed);
-void cfmwhat(int *status, int dbkey, char *objname,
-             int *objclass, int *type, int *freq, int *basis, int *observed,
-             int *fyear, int *fperiod, int *lyear, int *lperiod,
-             int *cyear, int *cmonth, int *cday, int *gyear, int *gmonth,
-             int *gday, char *desc, char *doc);
+void cfmdlob(int *status, int dbkey, char *objname);
 
-/* ---- ranges ---- */
-void cfmsrng(int *status, int freq,
-             int *syear, int *speriod, int *eyear, int *eperiod,
-             int *range, int *numobs);
+/* ==== modern fame_* (int return value is the status) ===================== */
 
-/* ---- series data ----
- * NB: exported as the _f variants (the bare cfmrrng/cfmwrng are header
- * macros, not callable symbols); confirmed at runtime against a real CHLI. */
-void cfmrrng_f(int *status, int dbkey, char *objname,
-               const int *range, void *data, int tmiss, void *misval);
-void cfmwrng_f(int *status, int dbkey, char *objname,
-               const int *range, void *data, int tmiss, void *misval);
+/* fame_index is a 64-bit index; fame_freq/fame_type are int. */
+typedef struct { int r_freq; long long r_start; long long r_end; } fame_range;
 
-/* ---- date conversion (calendar year/month/day based) ---- */
-void cfmddat(int *status, int freq, int *date, int year, int month, int day);
-void cfmdatd(int *status, int freq, int date, int *year, int *month, int *day);
+int fame_quick_info(int dbkey, const char *oname, int *oclass, int *type,
+                    int *freq, long long *findex, long long *lindex);
+int fame_year_period_to_index(int freq, long long *date, int year, int period);
+int fame_index_to_year_period(int freq, long long date, int *year, int *period);
 
-/* ---- FAME command execution ---- */
-void cfmfame(int *status, char *command);
+int fame_get_precisions (int dbkey, const char *objnam, const fame_range *range, double *valary);
+int fame_get_numerics   (int dbkey, const char *objnam, const fame_range *range, float  *valary);
+int fame_write_precisions(int dbkey, const char *objnam, const fame_range *range, const double *valary);
+int fame_write_numerics  (int dbkey, const char *objnam, const fame_range *range, const float  *valary);
+
+/* Later steps: fame_get/write_booleans/strings/dates, fame_*_wildcard. */

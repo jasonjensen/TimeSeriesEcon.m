@@ -147,90 +147,92 @@ classdef CHLI < handle
             tse.fame.CHLI.raw_call('cfmcldb', int32(dbkey));
         end
 
-        % --- objects, ranges, series data (all read outputs via .Value) ---
+        % --- object creation (classic cfmnwob, as FAME.jl does) ---
 
         function newobj(dbkey, name, objclass, freq, type, basis, observed)
             tse.fame.CHLI.raw_call('cfmnwob', int32(dbkey), char(name), ...
                 int32(objclass), int32(freq), int32(type), int32(basis), int32(observed));
         end
 
-        function info = whatis(dbkey, name)
-            % Object attributes via cfmwhat.  Returns a struct with class,
-            % type, freq, basis, observed, and the first/last (year, period).
-            c  = libpointer('int32Ptr', int32(0));  t  = libpointer('int32Ptr', int32(0));
-            f  = libpointer('int32Ptr', int32(0));  b  = libpointer('int32Ptr', int32(0));
-            o  = libpointer('int32Ptr', int32(0));
-            fy = libpointer('int32Ptr', int32(0));  fp = libpointer('int32Ptr', int32(0));
-            ly = libpointer('int32Ptr', int32(0));  lp = libpointer('int32Ptr', int32(0));
-            % six trailing int* (created / modified date parts) we do not use
-            x1 = libpointer('int32Ptr', int32(0));  x2 = libpointer('int32Ptr', int32(0));
-            x3 = libpointer('int32Ptr', int32(0));  x4 = libpointer('int32Ptr', int32(0));
-            x5 = libpointer('int32Ptr', int32(0));  x6 = libpointer('int32Ptr', int32(0));
-            desc = blanks(256);  doc = blanks(256);
-            tse.fame.CHLI.raw_call('cfmwhat', int32(dbkey), char(name), ...
-                c, t, f, b, o, fy, fp, ly, lp, x1, x2, x3, x4, x5, x6, desc, doc);
-            info = struct('class', double(c.Value), 'type', double(t.Value), ...
-                'freq', double(f.Value), 'basis', double(b.Value), ...
-                'observed', double(o.Value), 'fyear', double(fy.Value), ...
-                'fprd', double(fp.Value), 'lyear', double(ly.Value), 'lprd', double(lp.Value));
+        % --- metadata, date<->index, series data (modern fame_* API) ---
+        % These return status as their return value and take a fame_range
+        % struct {r_freq:int32, r_start:int64, r_end:int64} by pointer.
+
+        function info = quick_info(dbkey, name)
+            % fame_quick_info: class, type, freq, and first/last date index.
+            oc = libpointer('int32Ptr', int32(0));  ty = libpointer('int32Ptr', int32(0));
+            fr = libpointer('int32Ptr', int32(0));
+            fi = libpointer('int64Ptr', int64(0));  li = libpointer('int64Ptr', int64(0));
+            tse.fame.CHLI.fame_call('fame_quick_info', int32(dbkey), char(name), oc, ty, fr, fi, li);
+            info = struct('class', double(oc.Value), 'type', double(ty.Value), ...
+                'freq', double(fr.Value), 'first', double(fi.Value), 'last', double(li.Value));
         end
 
-        function [range, nobs] = makerange(freq, syear, sprd, eyear, eprd)
-            % Build the FAME range array [freq, startIndex, endIndex] and the
-            % observation count from a first/last (year, period).
-            syp = libpointer('int32Ptr', int32(syear));  spp = libpointer('int32Ptr', int32(sprd));
-            eyp = libpointer('int32Ptr', int32(eyear));  epp = libpointer('int32Ptr', int32(eprd));
-            rng = libpointer('int32Ptr', int32([0 0 0])); nob = libpointer('int32Ptr', int32(0));
-            tse.fame.CHLI.raw_call('cfmsrng', int32(freq), syp, spp, eyp, epp, rng, nob);
-            range = int32(rng.Value);
-            nobs  = double(nob.Value);
+        function idx = yp_to_index(freq, year, period)
+            dp = libpointer('int64Ptr', int64(0));
+            tse.fame.CHLI.fame_call('fame_year_period_to_index', ...
+                int32(freq), dp, int32(year), int32(period));
+            idx = double(dp.Value);
         end
 
-        function data = readrange(dbkey, name, range, nobs, cls)
-            % Read `nobs` observations of a series; missing values come back
-            % as NaN (we pass a NaN misval array with translation enabled).
-            K = fame_constants();
-            switch cls
-                case 'double'
-                    dp = libpointer('doublePtr', zeros(nobs, 1));
-                    mv = libpointer('doublePtr', [NaN; NaN; NaN]);
-                case 'single'
-                    dp = libpointer('singlePtr', zeros(nobs, 1, 'single'));
-                    mv = libpointer('singlePtr', single([NaN; NaN; NaN]));
-                otherwise
-                    error('tseries:fame', 'readrange supports double/single (got %s).', cls);
-            end
-            tse.fame.CHLI.raw_call('cfmrrng_f', int32(dbkey), char(name), ...
-                int32(range), dp, int32(K.HTMIS), mv);
+        function [year, period] = index_to_yp(freq, idx)
+            yp = libpointer('int32Ptr', int32(0));  pp = libpointer('int32Ptr', int32(0));
+            tse.fame.CHLI.fame_call('fame_index_to_year_period', ...
+                int32(freq), int64(idx), yp, pp);
+            year = double(yp.Value);  period = double(pp.Value);
+        end
+
+        function r = make_range(freq, first, last)
+            % A libstruct matching the C fame_range type (loaded from hli.h).
+            r = libstruct('fame_range');
+            r.r_freq  = int32(freq);
+            r.r_start = int64(first);
+            r.r_end   = int64(last);
+        end
+
+        function data = get_precisions(dbkey, name, r, nobs)
+            dp = libpointer('doublePtr', zeros(nobs, 1));
+            tse.fame.CHLI.fame_call('fame_get_precisions', int32(dbkey), char(name), r, dp);
             data = dp.Value;
         end
 
-        function writerange(dbkey, name, range, data)
-            % Write a series range; NaN in `data` is stored as FAME missing.
-            K = fame_constants();
-            if isa(data, 'single')
-                dp = libpointer('singlePtr', single(data(:)));
-                mv = libpointer('singlePtr', single([NaN; NaN; NaN]));
-            else
-                dp = libpointer('doublePtr', double(data(:)));
-                mv = libpointer('doublePtr', [NaN; NaN; NaN]);
-            end
-            tse.fame.CHLI.raw_call('cfmwrng_f', int32(dbkey), char(name), ...
-                int32(range), dp, int32(K.HTMIS), mv);
+        function data = get_numerics(dbkey, name, r, nobs)
+            dp = libpointer('singlePtr', zeros(nobs, 1, 'single'));
+            tse.fame.CHLI.fame_call('fame_get_numerics', int32(dbkey), char(name), r, dp);
+            data = dp.Value;
+        end
+
+        function write_precisions(dbkey, name, r, data)
+            dp = libpointer('doublePtr', double(data(:)));
+            tse.fame.CHLI.fame_call('fame_write_precisions', int32(dbkey), char(name), r, dp);
+        end
+
+        function write_numerics(dbkey, name, r, data)
+            dp = libpointer('singlePtr', single(data(:)));
+            tse.fame.CHLI.fame_call('fame_write_numerics', int32(dbkey), char(name), r, dp);
         end
     end
 
     methods (Static, Access = private)
 
         function raw_call(func, varargin)
-            % Like check_call, but for functions with multiple / array output
-            % pointers: the caller passes libpointers and reads their .Value
-            % after the call.  status is captured from calllib's first return
-            % (the status pointer) -- the mechanism validated in step 2.
+            % Classic cfm* convention: status is the function's FIRST argument
+            % (int*).  We prepend the status pointer, then the caller reads any
+            % outputs from the libpointers it passed via .Value.
             inst = tse.fame.CHLI.instance();
             tse.fame.CHLI.ensure_loaded();
             sp = libpointer('int32Ptr', int32(0));
             status = calllib(inst.libname, func, sp, varargin{:});
+            tse.fame.CHLI.check(status);
+        end
+
+        function fame_call(func, varargin)
+            % Modern fame_* convention: status is the RETURN value (no status
+            % pointer argument).  The caller reads outputs from its libpointers
+            % (and libstruct) via .Value after the call.
+            inst = tse.fame.CHLI.instance();
+            tse.fame.CHLI.ensure_loaded();
+            status = calllib(inst.libname, func, varargin{:});
             tse.fame.CHLI.check(status);
         end
 
