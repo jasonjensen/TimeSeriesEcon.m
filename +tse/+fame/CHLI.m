@@ -20,7 +20,8 @@ classdef CHLI < handle
 %   See also: tse.fame.isavailable, tse.fame.startup.
 
     properties
-        libname     = 'chli';
+        libname     = 'libchli';
+        libfile = 'libchli.so';
         headerpath  = '';
         initialized = false;
     end
@@ -44,16 +45,22 @@ classdef CHLI < handle
 
     methods (Static)  % lifecycle
 
-        function load(libname, headerpath)
+        function load(libname, libfile, headerpath)
             inst = tse.fame.CHLI.instance();
             if nargin >= 1 && ~isempty(libname)
                 inst.libname = char(libname);
             end
-            if nargin >= 2 && ~isempty(headerpath)
+             if nargin >= 2 && ~isempty(libfile)
+                inst.libfile = char(libfile);
+            end
+            if nargin >= 3 && ~isempty(headerpath)
                 inst.headerpath = char(headerpath);
             end
             if ~libisloaded(inst.libname)
-                [~, ~] = loadlibrary(inst.libname, inst.headerpath);
+                chlipath = fullfile(getenv('FAME'),'hli');
+                chlih = 'hli.h';
+                [~, ~] = loadlibrary(fullfile(chlipath,inst.libfile), ...
+                             fullfile(chlipath, chlih));
             end
             if ~inst.initialized
                 tse.fame.CHLI.init();

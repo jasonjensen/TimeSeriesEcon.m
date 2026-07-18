@@ -16,7 +16,19 @@ function startup(libname, headerpath)
         elseif nargin >= 1
             tse.fame.CHLI.load(libname);
         else
-            tse.fame.CHLI.load();
+            switch computer()
+                case 'PCWIN'
+                    tse.fame.CHLI.load('chli', 'chli.dll');
+                case 'PCWIN64'
+                    tse.fame.CHLI.load('chli', fullfile('64','chli.dll'));
+                case 'GLNX86'
+                    tse.fame.CHLI.load('libchli', 'libchli.so');
+                case 'GLNXA64'
+                    tse.fame.CHLI.load('libchli', fullfile('64','libchli.so'));
+                otherwise
+                    error('TSE.FAME:PlatformNotSupported', ...
+                        'Your platform is not supported.');
+            end
         end
     catch e
         warning('tseries:fame', 'Could not load the FAME CHLI: %s', e.message);
