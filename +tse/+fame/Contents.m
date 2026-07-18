@@ -15,11 +15,16 @@
 %   type_to_fame    - MATLAB value  -> FAME type code (numeric/precision/...)
 %   type_from_fame  - FAME type code -> MATLAB class
 %
+% CHLI loader and dates (require the CHLI; startup loads it) -- IMPLEMENTED
+%   CHLI            - singleton loader: loadlibrary/calllib, cfmini, errors
+%   isavailable     - true iff the CHLI is loaded
+%   startup         - load the chli library and initialise it
+%   to_date         - tse.MIT      -> FAME date index (constant-offset method)
+%   from_date       - FAME date index -> tse.MIT
+%   to_range        - tse.MITRange -> FAME range descriptor {freq,first,last}
+%   from_range      - FAME range descriptor -> tse.MITRange
+%
 % Planned in later steps (each grounded in FAME.jl + the CHLI reference):
-%   CHLI            - singleton loader: loadlibrary/calllib, init, error checks
-%   isavailable / startup       - gate on the CHLI being loadable
-%   to_date / from_date         - tse.MIT <-> FAME date index (via the CHLI)
-%   to_range / from_range       - tse.MITRange <-> FAME range
 %   to_series / from_series     - tse.TSeries / tse.MVTSeries <-> FAME series
 %   read / write                - open a FAME db and read/write a struct of
 %                                 tse.* series (all FAME types: precision,
