@@ -27,6 +27,7 @@ void cfmferr(int *status, char *message);
 /* ---- databases ---- */
 void cfmopdb(int *status, int *dbkey, char *dbname, int mode);
 void cfmopwk(int *status, int *dbkey);
+void cfmpodb(int *status, int dbkey);
 void cfmcldb(int *status, int dbkey);
 
 /* ---- objects ---- */
