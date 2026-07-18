@@ -257,10 +257,35 @@ classdef CHLI < handle
                 msg = strtrim(msg);
             catch
             end
+            nm = tse.fame.CHLI.status_name(status);
             if isempty(msg)
-                error('tseries:fame', 'FAME CHLI error (status %d).', double(status));
+                error('tseries:fame', 'FAME CHLI error %d (%s).', double(status), nm);
             else
-                error('tseries:fame', 'FAME CHLI error (status %d): %s', double(status), msg);
+                error('tseries:fame', 'FAME CHLI error %d (%s): %s', double(status), nm, msg);
+            end
+        end
+
+        function nm = status_name(status)
+            % Names for the FAME CHLI status codes we are most likely to hit.
+            persistent m
+            if isempty(m)
+                m = containers.Map('KeyType', 'double', 'ValueType', 'char');
+                pairs = { ...
+                    0,'HSUCC'; 1,'HINITD'; 2,'HNINIT'; 3,'HFIN'; 4,'HBFILE'; ...
+                    5,'HBMODE'; 6,'HBKEY'; 8,'HBSRNG'; 9,'HBERNG'; 10,'HBNRNG'; ...
+                    13,'HNOOBJ'; 14,'HBRNG'; 15,'HDUTAR'; 16,'HBOBJT'; 17,'HBFREQ'; ...
+                    18,'HTRUNC'; 20,'HNPOST'; 23,'HRNEXI'; 24,'HCEXI'; 25,'HNRESW'; ...
+                    26,'HBCLAS'; 27,'HBOBSV'; 28,'HBBASI'; 30,'HBMONT'; 32,'HBMISS'; ...
+                    33,'HBINDX'; 34,'HNWILD'; 46,'HBYEAR'; 47,'HBPER'; 48,'HBDAY'; ...
+                    49,'HBDATE'; 70,'HBLEN'; 71,'HNULLP'; 72,'HREADO'; 513,'HFAMER'};
+                for i = 1:size(pairs, 1)
+                    m(pairs{i, 1}) = pairs{i, 2};
+                end
+            end
+            if isKey(m, double(status))
+                nm = m(double(status));
+            else
+                nm = 'unknown';
             end
         end
     end

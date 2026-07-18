@@ -26,8 +26,13 @@ function write_object(dbkey, name, t)
     % the stored values.
     tse.fame.CHLI.newobj(dbkey, name, K.HSERIE, freq, type, K.HBSDAY, K.HOBSUM);
 
+    % Build the FAME range with cfmsrng from (year, period) -- the same path
+    % the CRAN fame package uses.  A hand-built [freq, start, end] array does
+    % not register the series range (read then fails with HBRNG/14).
     first = t.firstdate;
     last  = first + (numel(t.values) - 1);
-    range = int32([freq, tse.fame.to_date(first), tse.fame.to_date(last)]);
+    fyp   = tse.mit2yp(first);
+    lyp   = tse.mit2yp(last);
+    range = tse.fame.CHLI.makerange(freq, fyp(1), fyp(2), lyp(1), lyp(2));
     tse.fame.CHLI.writerange(dbkey, name, range, t.values);
 end

@@ -24,7 +24,9 @@ function val = read_object(dbkey, name)
     end
     [range, nobs] = tse.fame.CHLI.makerange(info.freq, info.fyear, info.fprd, info.lyear, info.lprd);
     data = tse.fame.CHLI.readrange(dbkey, name, range, nobs, cls);
-    % range = [freq, startIndex, endIndex]; rebuild the first MIT from the index.
-    firstMIT = tse.fame.from_date(info.freq, double(range(2)));
+    % Rebuild the first MIT from (freq, year, period) -- the inverse of the
+    % mit2yp used on write, so the round-trip is exact.
+    F = tse.fame.freq_from_fame(info.freq);
+    firstMIT = tse.MIT(F, info.fyear, info.fprd);
     val = tse.TSeries(firstMIT, data(:));
 end
