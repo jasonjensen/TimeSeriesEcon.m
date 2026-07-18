@@ -7,8 +7,9 @@ analysis, and push results back.
 The plan mirrors the IRIS and Dynare interop layouts (converters at the
 boundary, no hard dependency), but the shape is different: FAME is a C-only
 HLI (Host Language Interface) with a database on disk, not a MATLAB class.
-The interop is therefore a **native-code bridge** (a small MEX wrapper over
-`libhli`) plus MATLAB helpers, not an in-memory type converter.
+The interop is therefore a **shared-library bridge** driven from MATLAB via
+`loadlibrary` / `calllib`, using a committed prototype file so users never
+need a C compiler.
 
 The CRAN R `fame` header
 ([`fame.h`](https://github.com/cran/fame/blob/master/src/fame.h)) is a
@@ -24,10 +25,10 @@ workflow we need. That is enough to build against without pulling the full
 - **Faithful round-trip** for values, missing markers, frequency, start date,
   and description text.
 - **Zero hard dependency** on FAME: nothing outside `+tse/+fame/` looks for
-  it, and the subpackage checks for it (and the MEX wrapper) only at call
-  time.
-- **One-command build**: `tse.fame.build()` compiles the MEX shim against
-  `$FAME/hli` (or `$FAME/hli/64`) and links `libhli`.
+  it, and the subpackage checks at call time only.
+- **Zero build step for users.** The `loadlibrary` prototype file is
+  committed, so cloning the repo and having `libhli` on the loader path is
+  all a user needs.
 
 ## Non-goals
 
@@ -41,33 +42,52 @@ workflow we need. That is enough to build against without pulling the full
   series and use `tse.fconvert` instead.
 - Bundling `libhli` — it is proprietary. Users must have FAME installed.
 
-## Deployment story: MEX vs `loadlibrary`
+## Deployment story: `loadlibrary`, no per-user compile
 
-`loadlibrary` would technically work, but the HLI uses `int*` for every
-output (status codes, series data pointers, metadata ints), `void *valary`
-for the numeric buffer (sized float or double depending on NUMERIC vs
-PRECISION), and pre-allocated `char*` buffers for names/descriptions. That is
-uncomfortable through `calllib`.
+The Matlab-facing bridge is `loadlibrary` / `calllib`, not MEX. That is a
+deliberate choice for the "clone the repo and go" workflow: MEX ships a
+platform-specific `.mex*` file per platform and needs a C compiler +
+`$FAME` visible at the user's install time; `loadlibrary` needs neither.
 
-A tiny **MEX wrapper** — one `.c` file that turns each `cfm*` call into a
-MATLAB-friendly signature — is the pragmatic choice. It handles
+`loadlibrary` does need a **prototype file** — a MATLAB-parseable
+description of the C entry points. MATLAB can auto-generate one from
+`fame.h` (that step needs a compiler) but the generated file is plain
+MATLAB and gets committed to the repo. The user never sees the header
+again.
 
-- pointer indirection for status and output ints,
-- `void*` sizing based on the series type,
-- MATLAB `mxArray` allocation of correctly-sized value/name buffers,
-- the missing-value translation table (`void *mistt`).
+Maintainer, once:
 
-Location and build:
-
-```
-+tse/+fame/private/fame_hli.c          the wrapper (one file)
-+tse/+fame/private/fame_hli.mex*       compiled per-platform
-+tse/+fame/build.m                     invokes mex against $FAME/hli(/64)
+```matlab
+loadlibrary('hli', fullfile(getenv('FAME'), 'hli', '64', 'fame.h'), ...
+    'mfilename', '+tse/+fame/private/hli_proto', 'notempdir');
 ```
 
-`build.m` is a thin wrapper over `mex` that reads `$FAME`, picks `hli/64` on
-a 64-bit MATLAB and `hli` otherwise, adds `-I` for the header and `-L`+`-l`
-for `libhli`, and drops the mex file into `+tse/+fame/private/`.
+User, every time — no compiler, no `fame.h`, no `$FAME`:
+
+```matlab
+loadlibrary('hli', @tse.fame.private.hli_proto);
+```
+
+MATLAB picks the platform-specific library name automatically
+(`libhli.so` / `libhli.dylib` / `fame.dll`).
+
+Living with the two `loadlibrary` papercuts:
+
+- `cfmrrng` / `cfmwrng` are `#define` macros in the header that forward to
+  `cfmrrng_f` / `cfmwrng_f`; `calllib` binds against the real symbols so
+  our wrapper always talks to the `_f` names.
+- `cfmrrng`'s `void *valary` is `float*` or `double*` depending on whether
+  the series is NUMERIC or PRECISION. We resolve that from the value type
+  returned by `cfmwhat` and allocate the correct `libpointer` at the call
+  site, so the prototype file itself stays untouched.
+
+Location:
+
+```
++tse/+fame/private/hli_proto.m           the committed prototype (checked in)
++tse/+fame/regenerate_proto.m            maintainer helper (calls loadlibrary
+                                          with the generator flags)
+```
 
 ## File layout
 
@@ -76,9 +96,10 @@ Same shape as `+tse/+iris/` and `+tse/+dynare/`:
 ```
 +tse/+fame/
   Contents.m
-  isavailable.m           true iff MEX + libhli + $FAME are all in place
-  startup.m               validate $FAME, ensure MEX built, cache-invalidate
-  build.m                 compile the MEX wrapper from $FAME/hli(/64)
+  isavailable.m           libhli loadable (loads it lazily on first call)
+  startup.m               explicit load + cfmini
+  shutdown.m              cfmfin + unloadlibrary
+  regenerate_proto.m      maintainer: regenerate hli_proto from $FAME/hli
   freq_to_fame.m          tse.Frequency -> FAME freq int
   freq_from_fame.m        FAME freq int -> tse.Frequency
   from_index.m            (freq, index)          -> tse.MIT
@@ -93,7 +114,7 @@ Same shape as `+tse/+iris/` and `+tse/+dynare/`:
   info.m                  db + name              -> struct (from cfmwhat)
   check_conflicts.m       usual (mostly a no-op; nothing bare collides)
   private/
-    fame_hli.c            MEX shim
+    hli_proto.m           committed loadlibrary prototype (checked in)
     fame_status.m         status int -> friendly error string via cfmferr
     fame_missing.m        FNUMNA/NC/ND / FPRCNA/NC/ND handling
     fame_freq_table.m     the hardcoded (Annual=9, Quarterly=17, …) table
@@ -103,24 +124,24 @@ Same shape as `+tse/+iris/` and `+tse/+dynare/`:
 
 ### `$FAME` environment variable
 
-Both `build.m` and `startup.m` resolve the HLI location as:
+Only `regenerate_proto.m` (the maintainer helper) looks at `$FAME`, to
+locate the header:
 
 ```matlab
 famehome = getenv('FAME');
-hli64    = fullfile(famehome, 'hli', '64');
-hli32    = fullfile(famehome, 'hli');
+header   = fullfile(famehome, 'hli', '64', 'fame.h');   % or 'hli/fame.h'
 ```
 
-`build.m` prefers `hli/64` on 64-bit MATLAB and falls back to `hli/`.
+Users don't need `$FAME` set, don't need the header, and don't need a
+compiler.
 
-**Runtime library path is the user's responsibility.** Both `build.m` and
-`startup.m` assume `libhli` is already reachable from the process — via
-`LD_LIBRARY_PATH` on Linux / macOS, or `PATH` on Windows — the same way
-FAME's own CLI expects it. We don't try to mutate the env from inside
-MATLAB (MATLAB caches the loader state at startup, so `setenv` after the
-fact is unreliable on some platforms anyway). `isavailable` will report
-`false` if the loader can't find the DLL, with a hint pointing at
-`LD_LIBRARY_PATH`.
+**Runtime library path is the user's responsibility.** `startup.m` and
+`isavailable.m` assume `libhli` is already reachable from the process —
+via `LD_LIBRARY_PATH` on Linux / macOS, or `PATH` on Windows — the same
+way FAME's own CLI expects it. We don't mutate the env from inside MATLAB
+(MATLAB caches the loader state at startup, so `setenv` after the fact is
+unreliable on some platforms). `isavailable` returns `false` with a hint
+pointing at `LD_LIBRARY_PATH` if the loader can't find the DLL.
 
 ### Frequency mapping
 
@@ -231,9 +252,10 @@ them alongside.
 
 ## Namespace conflicts
 
-Effectively none. Every FAME function is prefixed `cfm*` and lives inside
-the mex file; every helper is namespaced under `tse.fame`. The only bare
-class name we introduce is `tse.fame.Database`, which is already namespaced.
+Effectively none. Every FAME entry point is prefixed `cfm*` and reached
+via `calllib('hli', 'cfm…', …)`; every helper is namespaced under
+`tse.fame`. The only bare class name we introduce is `tse.fame.Database`,
+which is already namespaced.
 
 `check_conflicts.m` still ships for consistency with the other two interop
 subpackages; it looks for `cfm*` and `tse.fame.*` shadowing but is expected
@@ -261,10 +283,12 @@ sample `.db`.
 
 Same commit-sized cadence as the IRIS plan:
 
-1. **Build + probe.** `build.m`, `isavailable.m`, `startup.m`, `Contents.m`,
-   the MEX shim skeleton (init/shutdown + a smoke test of `cfmfame`).
+1. **Probe + load.** `Contents.m`, `isavailable.m`, `startup.m`,
+   `shutdown.m`, the committed `hli_proto.m`, `regenerate_proto.m`. Smoke
+   path: init the HLI (`cfmini`), issue a trivial `cfmfame` command,
+   shutdown (`cfmfin`), unload.
 2. **Frequency + date primitives.** `freq_to_fame`, `freq_from_fame`,
-   `from_index`, `to_index`. Direct MEX-call unit tests for the FAME
+   `from_index`, `to_index`. Direct `calllib` unit tests for the FAME
    constants that `cfmdatd`/`cfmddat` should agree on.
 3. **Database handle + metadata.** `opendb`, `Database`, `info`, `list`,
    `del`, `rename`. Enough to open a `.db` and enumerate it.
