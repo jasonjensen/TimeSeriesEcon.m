@@ -45,11 +45,13 @@ void cfmsrng(int *status, int freq,
              int *syear, int *speriod, int *eyear, int *eperiod,
              int *range, int *numobs);
 
-/* ---- series data ---- */
-void cfmrrng(int *status, int dbkey, char *objname,
-             const int *range, void *data, int tmiss, void *misval);
-void cfmwrng(int *status, int dbkey, char *objname,
-             const int *range, void *data, int tmiss, void *misval);
+/* ---- series data ----
+ * NB: exported as the _f variants (the bare cfmrrng/cfmwrng are header
+ * macros, not callable symbols); confirmed at runtime against a real CHLI. */
+void cfmrrng_f(int *status, int dbkey, char *objname,
+               const int *range, void *data, int tmiss, void *misval);
+void cfmwrng_f(int *status, int dbkey, char *objname,
+               const int *range, void *data, int tmiss, void *misval);
 
 /* ---- date conversion (calendar year/month/day based) ---- */
 void cfmddat(int *status, int freq, int *date, int year, int month, int day);

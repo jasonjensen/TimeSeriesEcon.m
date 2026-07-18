@@ -200,7 +200,7 @@ classdef CHLI < handle
                 otherwise
                     error('tseries:fame', 'readrange supports double/single (got %s).', cls);
             end
-            tse.fame.CHLI.raw_call('cfmrrng', int32(dbkey), char(name), ...
+            tse.fame.CHLI.raw_call('cfmrrng_f', int32(dbkey), char(name), ...
                 int32(range), dp, int32(K.HTMIS), mv);
             data = dp.Value;
         end
@@ -215,7 +215,7 @@ classdef CHLI < handle
                 dp = libpointer('doublePtr', double(data(:)));
                 mv = libpointer('doublePtr', [NaN; NaN; NaN]);
             end
-            tse.fame.CHLI.raw_call('cfmwrng', int32(dbkey), char(name), ...
+            tse.fame.CHLI.raw_call('cfmwrng_f', int32(dbkey), char(name), ...
                 int32(range), dp, int32(K.HTMIS), mv);
         end
     end
