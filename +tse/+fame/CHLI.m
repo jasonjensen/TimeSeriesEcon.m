@@ -246,6 +246,37 @@ classdef CHLI < handle
             tse.fame.CHLI.fame_call('fame_write_booleans', int32(dbkey), char(name), r, dp);
         end
 
+        function data = get_strings(dbkey, name, r, nobs)
+            % Two-step, as FAME.jl does: fame_len_strings for each length,
+            % then fame_get_strings into per-string buffers (char**).
+            lp = libpointer('int32Ptr', zeros(nobs, 1, 'int32'));
+            tse.fame.CHLI.fame_call('fame_len_strings', int32(dbkey), char(name), r, lp);
+            lens = double(lp.Value);
+            bufs = cell(nobs, 1);
+            for i = 1:nobs
+                bufs{i} = blanks(lens(i) + 1);      % +1 for the null terminator
+            end
+            sp    = libpointer('stringPtrPtr', bufs);
+            inlen = libpointer('int32Ptr', int32(lens));
+            tse.fame.CHLI.fame_call('fame_get_strings', int32(dbkey), char(name), r, sp, inlen, []);
+            out  = sp.Value;
+            data = strings(nobs, 1);
+            for i = 1:nobs
+                s = char(out{i});
+                z = find(s == char(0), 1);          % trim at the null terminator
+                if ~isempty(z)
+                    s = s(1:z-1);
+                end
+                data(i) = string(s);
+            end
+        end
+
+        function write_strings(dbkey, name, r, data)
+            c  = cellstr(string(data(:)));
+            sp = libpointer('stringPtrPtr', c);
+            tse.fame.CHLI.fame_call('fame_write_strings', int32(dbkey), char(name), r, sp);
+        end
+
         % --- object enumeration (modern fame_*_wildcard) ---
 
         function objs = list_objects(dbkey)

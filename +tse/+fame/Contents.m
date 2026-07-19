@@ -24,7 +24,7 @@
 %   to_range        - tse.MITRange -> FAME range descriptor {freq,first,last}
 %   from_range      - FAME range descriptor -> tse.MITRange
 %
-% Series read/write (require the CHLI) -- precision, numeric, boolean
+% Series read/write (require the CHLI) -- precision, numeric, boolean, string
 %   read            - read a FAME db into a struct: named objects, or the
 %                     whole database by enumeration when no names are given
 %   write           - write a struct of tse.TSeries into a FAME db (posts it)
@@ -34,7 +34,7 @@
 % Missing values: NaN <-> FAME NC on write; NC/NA/ND -> NaN on read.
 %
 % Planned in later steps (each grounded in FAME.jl + the CHLI reference):
-%   - string and date-valued series, and scalar / namelist objects
+%   - date-valued series, and scalar / namelist objects
 %   - weekly series (year/period reconstruction via the ISO-week path)
 %   (MVTSeries has no FAME equivalent, so it is out of scope.)
 %

@@ -26,9 +26,11 @@ function val = read_object(dbkey, name)
             data = tse.fame.CHLI.get_numerics(dbkey, name, r, nobs);
         case 'logical'
             data = tse.fame.CHLI.get_booleans(dbkey, name, r, nobs);
+        case 'string'
+            data = tse.fame.CHLI.get_strings(dbkey, name, r, nobs);
         otherwise
             error('tseries:fame', ...
-                'read_object supports precision/numeric/boolean series in this version (%s has type %d).', ...
+                'read_object supports precision/numeric/boolean/string series in this version (%s has type %d).', ...
                 name, info.type);
     end
     % First MIT from the FAME first index, via (year, period) -- the inverse

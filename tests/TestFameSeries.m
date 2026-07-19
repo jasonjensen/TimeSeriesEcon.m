@@ -109,6 +109,16 @@ classdef TestFameSeries < matlab.unittest.TestCase
             tc.verifyEqual(d2.flag.values, d.flag.values);
         end
 
+        function string_roundtrip(tc)
+            f = [tempname '.db'];
+            cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
+
+            d.tags = tse.TSeries(tse.qq(2000, 1), ["alpha"; "beta"; "gamma"; "delta"]);
+            tse.fame.write(f, d);
+            d2 = tse.fame.read(f, {'tags'});
+            tc.verifyEqual(cellstr(d2.tags.values), cellstr(d.tags.values));
+        end
+
     end
 end
 
