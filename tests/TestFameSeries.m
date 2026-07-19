@@ -73,6 +73,42 @@ classdef TestFameSeries < matlab.unittest.TestCase
             tc.verifyEqual(d2.cpi.values, d.cpi.values);
         end
 
+        function frequency_coverage(tc)
+            % Round-trip across more frequencies, including a non-default end
+            % period (Quarterly(1)) and the calendar frequencies daily/bdaily.
+            % (Weekly is deferred -- its year/period reconstruction needs the
+            % ISO-week path, tracked separately.)
+            f = [tempname '.db'];
+            cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
+
+            d = struct();
+            d.hy = tse.TSeries(tse.MIT(tse.HalfYearly(6), 2000, 1), (1:20)');
+            d.qj = tse.TSeries(tse.MIT(tse.Quarterly(1),  2000, 1), (1:16)');
+            d.da = tse.TSeries(tse.day('2023-01-01'),               (1:30)');
+            d.bd = tse.TSeries(tse.bday('2023-01-02'),              (1:20)');
+            tse.fame.write(f, d);
+
+            d2 = tse.fame.read(f, {'hy', 'qj', 'da', 'bd'});
+            for nm = {'hy', 'qj', 'da', 'bd'}
+                key = nm{1};
+                tc.verifyEqual(d2.(key).values, d.(key).values, ...
+                    sprintf('values differ for %s', key));
+                tc.verifyTrue(d.(key).firstdate == d2.(key).firstdate, ...
+                    sprintf('firstdate differs for %s', key));
+            end
+        end
+
+        function boolean_roundtrip(tc)
+            f = [tempname '.db'];
+            cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
+
+            d.flag = tse.TSeries(tse.qq(2000, 1), logical([1 0 1 1 0 1 0 0]'));
+            tse.fame.write(f, d);
+            d2 = tse.fame.read(f, {'flag'});
+            tc.verifyClass(d2.flag.values, 'logical');
+            tc.verifyEqual(d2.flag.values, d.flag.values);
+        end
+
     end
 end
 

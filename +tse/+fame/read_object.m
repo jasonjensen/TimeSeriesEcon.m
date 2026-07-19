@@ -4,9 +4,9 @@ function val = read_object(dbkey, name)
 %   t = tse.fame.read_object(dbkey, name)
 %
 %   Uses the modern FAME API (as FAME.jl does): fame_quick_info for the
-%   class/type/frequency and first/last date index, then a typed range read
-%   (fame_get_precisions / fame_get_numerics).  Supports precision (double)
-%   and numeric (single) series in this version.  Requires the CHLI loaded.
+%   class/type/frequency and first/last date index, then a typed range read.
+%   Supports precision (double), numeric (single), and boolean (logical)
+%   series in this version.  Requires the CHLI loaded.
 %
 %   See also: tse.fame.read, tse.fame.write_object.
     info = tse.fame.CHLI.quick_info(dbkey, name);
@@ -24,9 +24,11 @@ function val = read_object(dbkey, name)
             data = tse.fame.CHLI.get_precisions(dbkey, name, r, nobs);
         case 'single'
             data = tse.fame.CHLI.get_numerics(dbkey, name, r, nobs);
+        case 'logical'
+            data = tse.fame.CHLI.get_booleans(dbkey, name, r, nobs);
         otherwise
             error('tseries:fame', ...
-                'read_object supports precision/numeric series in this version (%s has type %d).', ...
+                'read_object supports precision/numeric/boolean series in this version (%s has type %d).', ...
                 name, info.type);
     end
     % First MIT from the FAME first index, via (year, period) -- the inverse

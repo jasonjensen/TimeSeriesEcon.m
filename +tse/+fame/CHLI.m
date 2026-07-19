@@ -233,6 +233,19 @@ classdef CHLI < handle
             tse.fame.CHLI.fame_call('fame_write_numerics', int32(dbkey), char(name), r, dp);
         end
 
+        function data = get_booleans(dbkey, name, r, nobs)
+            dp = libpointer('int32Ptr', zeros(nobs, 1, 'int32'));
+            tse.fame.CHLI.fame_call('fame_get_booleans', int32(dbkey), char(name), r, dp);
+            % FAME booleans: 1 = true, 0 = false, missing = a distinct code.
+            % tse logical has no missing state, so only exactly-1 is true.
+            data = (dp.Value == 1);
+        end
+
+        function write_booleans(dbkey, name, r, data)
+            dp = libpointer('int32Ptr', int32(logical(data(:))));
+            tse.fame.CHLI.fame_call('fame_write_booleans', int32(dbkey), char(name), r, dp);
+        end
+
         % --- object enumeration (modern fame_*_wildcard) ---
 
         function objs = list_objects(dbkey)
