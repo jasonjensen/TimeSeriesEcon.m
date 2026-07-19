@@ -132,6 +132,25 @@ classdef TestFameSeries < matlab.unittest.TestCase
             tc.verifyEqual(cellstr(d2.tags), cellstr(strs));
         end
 
+        function scalar_roundtrip(tc)
+            % Scalars: plain values in the struct become FAME scalar objects.
+            f = [tempname '.db'];
+            cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
+
+            d = struct();
+            d.pival = 3.14159;                 % precision scalar
+            d.flag  = true;                    % boolean scalar
+            d.label = "hello";                 % string scalar
+            d.asof  = tse.qq(2020, 3);         % date scalar
+            tse.fame.write(f, d);
+
+            d2 = tse.fame.read(f, {'pival', 'flag', 'label', 'asof'});
+            tc.verifyEqual(d2.pival, 3.14159, 'AbsTol', 1e-10);
+            tc.verifyEqual(d2.flag, true);
+            tc.verifyEqual(char(d2.label), 'hello');
+            tc.verifyTrue(d2.asof == tse.qq(2020, 3));
+        end
+
         function date_valued_roundtrip(tc)
             % Likewise build a date-valued series at the CHLI level (value
             % frequency stored in the type field), then read it back as a

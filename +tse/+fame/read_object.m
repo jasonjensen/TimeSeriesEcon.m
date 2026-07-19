@@ -1,57 +1,65 @@
 function val = read_object(dbkey, name)
-%READ_OBJECT  Read one named series from an open FAME database.
+%READ_OBJECT  Read one named object from an open FAME database.
 %
 %   v = tse.fame.read_object(dbkey, name)
 %
-%   Uses the modern FAME API (as FAME.jl does): fame_quick_info for the
-%   class/type/frequency and first/last date index, then a typed range read.
-%   Return value depends on the FAME element type:
-%     precision/numeric/boolean -> tse.TSeries (double / single / logical)
-%     string                    -> a string array (time axis not represented,
-%                                  as tse has no string-valued series)
-%     date                      -> a tse.MIT array (likewise a bare vector)
+%   Handles both series and scalar objects (fame_quick_info reports the
+%   class).  Return value depends on the FAME element type:
+%     precision/numeric/boolean -> tse.TSeries (series) or a scalar
+%                                  double/single/logical (scalar)
+%     string                    -> a string array (series) or a scalar string
+%     date                      -> a tse.MIT array (series) or a scalar tse.MIT
 %
-%   A date-valued series encodes its value frequency in the `type` field, so
-%   `type` is a FAME frequency code rather than one of the scalar type codes.
-%   Requires the CHLI loaded.
+%   Series/date/string with no tse container are returned as bare arrays (tse
+%   has no string- or date-valued TSeries).  A date object stores its value
+%   frequency in the `type` field, so `type` is a FAME frequency code rather
+%   than a scalar type code.  Requires the CHLI loaded.
 %
 %   See also: tse.fame.read, tse.fame.write_object.
     info = tse.fame.CHLI.quick_info(dbkey, name);
     K = fame_constants();
-    if info.class ~= K.HSERIE
-        error('tseries:fame', ...
-            'read_object supports series objects in this version (%s has class %d).', ...
-            name, info.class);
+    switch info.class
+        case K.HSERIE
+            isScalar = false;
+            nobs = info.last - info.first + 1;
+            r    = tse.fame.CHLI.make_range(info.freq, info.first, info.last);
+        case K.HSCALA
+            isScalar = true;
+            nobs = 1;
+            r    = [];                      % NULL range for a scalar
+        otherwise
+            error('tseries:fame', ...
+                'read_object supports series and scalar objects (%s has class %d).', ...
+                name, info.class);
     end
-    nobs = info.last - info.first + 1;
-    r    = tse.fame.CHLI.make_range(info.freq, info.first, info.last);
 
-    % A date-valued series stores its value frequency in the type field, so
+    % A date-valued object stores its value frequency in the type field, so
     % type is a valid FAME frequency code (freq_from_fame succeeds).
-    isDateSeries = false;
+    isDate = false;
     try
         tse.fame.freq_from_fame(info.type);
-        isDateSeries = true;
+        isDate = true;
     catch
-        isDateSeries = false;
+        isDate = false;
     end
 
-    if isDateSeries
+    if isDate
         raw  = tse.fame.CHLI.get_dates(dbkey, name, r, nobs);
         Fval = tse.fame.freq_from_fame(info.type);
-        val(nobs, 1) = tse.MIT();
+        mits(nobs, 1) = tse.MIT();
         for i = 1:nobs
             [yy, pp] = tse.fame.CHLI.index_to_yp(info.type, raw(i));
-            val(i, 1) = tse.MIT(Fval, yy, pp);
+            mits(i, 1) = tse.MIT(Fval, yy, pp);
         end
+        val = local_scalarize(mits, isScalar);
         return
     end
 
     cls = tse.fame.type_from_fame(info.type);
     switch cls
         case 'string'
-            % tse has no string-valued series; return the bare string array.
-            val = tse.fame.CHLI.get_strings(dbkey, name, r, nobs);
+            s = tse.fame.CHLI.get_strings(dbkey, name, r, nobs);
+            val = local_scalarize(s, isScalar);
             return
         case 'double'
             data = tse.fame.CHLI.get_precisions(dbkey, name, r, nobs);
@@ -64,8 +72,19 @@ function val = read_object(dbkey, name)
                 'read_object: unsupported FAME type %d for %s.', info.type, name);
     end
 
-    [year, period] = tse.fame.CHLI.index_to_yp(info.freq, info.first);
-    F = tse.fame.freq_from_fame(info.freq);
-    firstMIT = tse.MIT(F, year, period);
-    val = tse.TSeries(firstMIT, data(:));
+    if isScalar
+        val = data(1);
+    else
+        [year, period] = tse.fame.CHLI.index_to_yp(info.freq, info.first);
+        F = tse.fame.freq_from_fame(info.freq);
+        val = tse.TSeries(tse.MIT(F, year, period), data(:));
+    end
+end
+
+function v = local_scalarize(arr, isScalar)
+    if isScalar
+        v = arr(1);
+    else
+        v = arr;
+    end
 end

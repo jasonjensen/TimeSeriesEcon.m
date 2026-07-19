@@ -34,9 +34,12 @@
 %   read_object     - read one named object from an open db
 %   write_object    - write a tse.TSeries into an open db
 %
-% Planned in later steps (grounded in FAME.jl + the CHLI reference):
-%   - scalar and namelist objects
-%   (MVTSeries has no FAME equivalent, so it is out of scope.)
+% Scalars: a struct field that is a plain value (double/single/logical, a
+% scalar string, or a scalar tse.MIT) is written as a FAME scalar and read
+% back as that value.
+%
+% Planned: namelist objects.  (MVTSeries has no FAME equivalent -- out of
+% scope.)
 %
 % FAME frequencies with no TimeSeriesEcon.m analogue (tenday, twicemonthly,
 % bimonthly, biweekly, sub-daily, ppy/ypp, weekly_pattern) are rejected with
