@@ -151,6 +151,20 @@ classdef TestFameSeries < matlab.unittest.TestCase
             tc.verifyTrue(d2.asof == tse.qq(2020, 3));
         end
 
+        function namelist_roundtrip(tc)
+            % A string array field is written as a FAME namelist and read back
+            % as a string array of names (FAME upper-cases and may reorder).
+            f = [tempname '.db'];
+            cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
+
+            d.mylist = ["gdp"; "cpi"; "rate"];
+            tse.fame.write(f, d);
+            d2 = tse.fame.read(f, {'mylist'});
+            got = sort(upper(cellstr(d2.mylist)));
+            exp = sort(upper({'gdp'; 'cpi'; 'rate'}));
+            tc.verifyEqual(got, exp);
+        end
+
         function date_valued_roundtrip(tc)
             % Likewise build a date-valued series at the CHLI level (value
             % frequency stored in the type field), then read it back as a

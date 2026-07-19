@@ -33,6 +33,12 @@ function val = read_object(dbkey, name)
                 name, info.class);
     end
 
+    % A namelist is a scalar of type HNAMEL, whose value is a string of names.
+    if info.type == K.HNAMEL
+        val = local_parse_namelist(tse.fame.CHLI.get_namelist(dbkey, name));
+        return
+    end
+
     % A date-valued object stores its value frequency in the type field, so
     % type is a valid FAME frequency code (freq_from_fame succeeds).
     isDate = false;
@@ -87,4 +93,14 @@ function v = local_scalarize(arr, isScalar)
     else
         v = arr;
     end
+end
+
+function names = local_parse_namelist(s)
+    % A FAME namelist value is a single string of names; split on braces,
+    % commas, and whitespace into a string array.
+    s = regexprep(char(s), '[{}]', ' ');
+    parts = regexp(strtrim(s), '[,\s]+', 'split');
+    parts = string(parts);
+    names = parts(strlength(parts) > 0);
+    names = names(:);
 end

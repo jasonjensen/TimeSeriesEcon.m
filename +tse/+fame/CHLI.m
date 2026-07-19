@@ -291,6 +291,40 @@ classdef CHLI < handle
                 int32(dbkey), char(name), r, int32(value_freq), dp);
         end
 
+        % --- namelists (classic cfm*; a namelist is a scalar of type HNAMEL,
+        %     whose value is a single string of names).
+        %     VALIDATE these signatures against hli.h -- char-buffer calls. ---
+
+        function n = namelist_len(dbkey, name)
+            % cfmnlen(int *status, int dbkey, char *name, int *len)
+            lp = libpointer('int32Ptr', int32(0));
+            tse.fame.CHLI.raw_call('cfmnlen', int32(dbkey), char(name), lp);
+            n = double(lp.Value);
+        end
+
+        function s = get_namelist(dbkey, name)
+            % cfmgtnl(int *status, int dbkey, char *name, int mode,
+            %         char *vals, int buflen, int *outlen)
+            K = fame_constants();
+            n = tse.fame.CHLI.namelist_len(dbkey, name);
+            if n <= 0
+                s = '';
+                return
+            end
+            bufp = libpointer('cstring', blanks(n + 1));
+            op   = libpointer('int32Ptr', int32(0));
+            tse.fame.CHLI.raw_call('cfmgtnl', int32(dbkey), char(name), ...
+                int32(K.HNLALL), bufp, int32(n + 1), op);
+            s = bufp.Value;
+        end
+
+        function write_namelist(dbkey, name, str)
+            % cfmwtnl(int *status, int dbkey, char *name, int mode, char *vals)
+            K = fame_constants();
+            tse.fame.CHLI.raw_call('cfmwtnl', int32(dbkey), char(name), ...
+                int32(K.HNLALL), char(str));
+        end
+
         % --- object enumeration (modern fame_*_wildcard) ---
 
         function objs = list_objects(dbkey)

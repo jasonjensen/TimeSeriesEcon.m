@@ -26,6 +26,8 @@ function write(dbname, db, mode)
         v = db.(fns{i});
         if isa(v, 'tse.TSeries')
             tse.fame.write_object(dbkey, fns{i}, v);
+        elseif (isstring(v) || iscellstr(v)) && ~isscalar(v)
+            local_write_namelist(dbkey, fns{i}, v);   % a list of names
         elseif local_is_scalar(v)
             local_write_scalar(dbkey, fns{i}, v);
         else
@@ -34,6 +36,13 @@ function write(dbname, db, mode)
         end
     end
     tse.fame.CHLI.postdb(dbkey);
+end
+
+function local_write_namelist(dbkey, name, v)
+    K = fame_constants();
+    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HUNDFT, K.HNAMEL, K.HBSDAY, K.HOBUND);
+    str = strjoin(cellstr(string(v(:))), ', ');
+    tse.fame.CHLI.write_namelist(dbkey, name, str);
 end
 
 function tf = local_is_scalar(v)

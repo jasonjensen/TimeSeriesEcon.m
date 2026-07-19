@@ -43,6 +43,9 @@ function c = fame_constants()
         k.HOBHIG = 7;
         k.HOBLOW = 8;
 
+        % --- namelist ---
+        k.HNLALL = -1;   % cfmgtnl/cfmwtnl mode: the whole namelist
+
         % --- status ---
         k.HSUCC  = 0;    % success
 

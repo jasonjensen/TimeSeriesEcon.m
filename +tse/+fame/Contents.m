@@ -38,8 +38,10 @@
 % scalar string, or a scalar tse.MIT) is written as a FAME scalar and read
 % back as that value.
 %
-% Planned: namelist objects.  (MVTSeries has no FAME equivalent -- out of
-% scope.)
+% Namelists: a non-scalar string array field is written as a FAME namelist
+% and read back as a string array of names.
+%
+% (MVTSeries has no FAME equivalent -- out of scope.)
 %
 % FAME frequencies with no TimeSeriesEcon.m analogue (tenday, twicemonthly,
 % bimonthly, biweekly, sub-daily, ppy/ypp, weekly_pattern) are rejected with
