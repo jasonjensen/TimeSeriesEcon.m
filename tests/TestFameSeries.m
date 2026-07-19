@@ -74,10 +74,10 @@ classdef TestFameSeries < matlab.unittest.TestCase
         end
 
         function frequency_coverage(tc)
-            % Round-trip across more frequencies, including a non-default end
-            % period (Quarterly(1)) and the calendar frequencies daily/bdaily.
-            % (Weekly is deferred -- its year/period reconstruction needs the
-            % ISO-week path, tracked separately.)
+            % Round-trip across more frequencies: a non-default end period
+            % (Quarterly(1)), the calendar frequencies daily/bdaily, and
+            % weekly (tse.mit2yp and FAME agree, and MIT(Weekly,y,p) rebuilds
+            % the original -- confirmed against the CHLI).
             f = [tempname '.db'];
             cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
 
@@ -86,10 +86,11 @@ classdef TestFameSeries < matlab.unittest.TestCase
             d.qj = tse.TSeries(tse.MIT(tse.Quarterly(1),  2000, 1), (1:16)');
             d.da = tse.TSeries(tse.day('2023-01-01'),               (1:30)');
             d.bd = tse.TSeries(tse.bday('2023-01-02'),              (1:20)');
+            d.wk = tse.TSeries(tse.week('2021-03-07'),              (1:15)');
             tse.fame.write(f, d);
 
-            d2 = tse.fame.read(f, {'hy', 'qj', 'da', 'bd'});
-            for nm = {'hy', 'qj', 'da', 'bd'}
+            d2 = tse.fame.read(f, {'hy', 'qj', 'da', 'bd', 'wk'});
+            for nm = {'hy', 'qj', 'da', 'bd', 'wk'}
                 key = nm{1};
                 tc.verifyEqual(d2.(key).values, d.(key).values, ...
                     sprintf('values differ for %s', key));
@@ -110,13 +111,56 @@ classdef TestFameSeries < matlab.unittest.TestCase
         end
 
         function string_roundtrip(tc)
+            % tse has no string-valued series, so build the FAME object at the
+            % CHLI level, then read it back (read_object returns a bare string
+            % array).  This exercises the char** marshaling.
             f = [tempname '.db'];
             cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
+            freq = 162;                                   % quarterly time axis
+            strs = ["alpha"; "beta"; "gamma"; "delta"];
 
-            d.tags = tse.TSeries(tse.qq(2000, 1), ["alpha"; "beta"; "gamma"; "delta"]);
-            tse.fame.write(f, d);
+            dbkey = tse.fame.CHLI.opendb(f, 3);           % HOMODE (overwrite)
+            tse.fame.CHLI.newobj(dbkey, 'tags', 1, freq, 4, 1, 0);  % HSERIE, freq, HSTRNG, HBSDAY, HOBUND
+            i0 = tse.fame.CHLI.yp_to_index(freq, 2000, 1);
+            i1 = tse.fame.CHLI.yp_to_index(freq, 2000, 4);
+            tse.fame.CHLI.write_strings(dbkey, 'tags', ...
+                tse.fame.CHLI.make_range(freq, i0, i1), strs);
+            tse.fame.CHLI.postdb(dbkey);
+            tse.fame.CHLI.closedb(dbkey);
+
             d2 = tse.fame.read(f, {'tags'});
-            tc.verifyEqual(cellstr(d2.tags.values), cellstr(d.tags.values));
+            tc.verifyEqual(cellstr(d2.tags), cellstr(strs));
+        end
+
+        function date_valued_roundtrip(tc)
+            % Likewise build a date-valued series at the CHLI level (value
+            % frequency stored in the type field), then read it back as a
+            % tse.MIT array.
+            f = [tempname '.db'];
+            cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
+            freq    = 162;                                % quarterly time axis
+            valfreq = 162;                                % quarterly-valued dates
+            dates   = [tse.qq(2020, 1); tse.qq(2020, 2); tse.qq(2020, 3); tse.qq(2020, 4)];
+
+            dbkey = tse.fame.CHLI.opendb(f, 3);
+            tse.fame.CHLI.newobj(dbkey, 'dts', 1, freq, valfreq, 1, 0);  % type = value freq
+            i0 = tse.fame.CHLI.yp_to_index(freq, 2000, 1);
+            i1 = tse.fame.CHLI.yp_to_index(freq, 2000, 4);
+            idx = zeros(4, 1, 'int64');
+            for i = 1:4
+                yp = tse.mit2yp(dates(i));
+                idx(i) = tse.fame.CHLI.yp_to_index(valfreq, yp(1), yp(2));
+            end
+            tse.fame.CHLI.write_dates(dbkey, 'dts', ...
+                tse.fame.CHLI.make_range(freq, i0, i1), valfreq, idx);
+            tse.fame.CHLI.postdb(dbkey);
+            tse.fame.CHLI.closedb(dbkey);
+
+            d2 = tse.fame.read(f, {'dts'});
+            tc.verifyEqual(numel(d2.dts), 4);
+            for i = 1:4
+                tc.verifyTrue(d2.dts(i) == dates(i));
+            end
         end
 
     end

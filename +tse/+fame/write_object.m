@@ -18,10 +18,10 @@ function write_object(dbkey, name, t)
     v    = t.values;
 
     % type + observed: observed = summed for a float series (FAME rejects
-    % undefined there), undefined otherwise -- matching FAME.jl.
-    if isstring(v) || iscellstr(v) || ischar(v)
-        type = K.HSTRNG;  observed = K.HOBUND;
-    elseif islogical(v)
+    % undefined there), undefined otherwise -- matching FAME.jl.  (A
+    % tse.TSeries only holds numeric/logical values; string- and date-valued
+    % FAME series have no tse.TSeries form and are read as bare arrays.)
+    if islogical(v)
         type = K.HBOOLN;  observed = K.HOBUND;
     elseif isa(v, 'single')
         type = K.HNUMRC;  observed = K.HOBSUM;
@@ -39,9 +39,7 @@ function write_object(dbkey, name, t)
     lindex = tse.fame.CHLI.yp_to_index(freq, lyp(1), lyp(2));
     r      = tse.fame.CHLI.make_range(freq, findex, lindex);
 
-    if isstring(v) || iscellstr(v) || ischar(v)
-        tse.fame.CHLI.write_strings(dbkey, name, r, v);
-    elseif islogical(v)
+    if islogical(v)
         tse.fame.CHLI.write_booleans(dbkey, name, r, v);
     elseif isa(v, 'single')
         tse.fame.CHLI.write_numerics(dbkey, name, r, v);

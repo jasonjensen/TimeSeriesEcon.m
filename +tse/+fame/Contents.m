@@ -24,18 +24,18 @@
 %   to_range        - tse.MITRange -> FAME range descriptor {freq,first,last}
 %   from_range      - FAME range descriptor -> tse.MITRange
 %
-% Series read/write (require the CHLI) -- precision, numeric, boolean, string
+% Series (require the CHLI).  Read+write: precision (double), numeric
+% (single), boolean (logical) as tse.TSeries.  Read-only, as bare arrays
+% (tse has no container for them): string series -> string array, date
+% series -> tse.MIT array.  Missing values: NaN <-> NC; NC/NA/ND -> NaN.
 %   read            - read a FAME db into a struct: named objects, or the
 %                     whole database by enumeration when no names are given
 %   write           - write a struct of tse.TSeries into a FAME db (posts it)
-%   read_object     - read one named series from an open db  -> tse.TSeries
+%   read_object     - read one named object from an open db
 %   write_object    - write a tse.TSeries into an open db
 %
-% Missing values: NaN <-> FAME NC on write; NC/NA/ND -> NaN on read.
-%
-% Planned in later steps (each grounded in FAME.jl + the CHLI reference):
-%   - date-valued series, and scalar / namelist objects
-%   - weekly series (year/period reconstruction via the ISO-week path)
+% Planned in later steps (grounded in FAME.jl + the CHLI reference):
+%   - scalar and namelist objects
 %   (MVTSeries has no FAME equivalent, so it is out of scope.)
 %
 % FAME frequencies with no TimeSeriesEcon.m analogue (tenday, twicemonthly,

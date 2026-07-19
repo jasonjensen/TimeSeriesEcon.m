@@ -277,6 +277,20 @@ classdef CHLI < handle
             tse.fame.CHLI.fame_call('fame_write_strings', int32(dbkey), char(name), r, sp);
         end
 
+        function data = get_dates(dbkey, name, r, nobs)
+            % Date-valued series: observations are FAME date indices (int64).
+            dp = libpointer('int64Ptr', zeros(nobs, 1, 'int64'));
+            tse.fame.CHLI.fame_call('fame_get_dates', int32(dbkey), char(name), r, dp);
+            data = dp.Value;
+        end
+
+        function write_dates(dbkey, name, r, value_freq, data)
+            % value_freq is the FAME frequency of the date values (fame_freq).
+            dp = libpointer('int64Ptr', int64(data(:)));
+            tse.fame.CHLI.fame_call('fame_write_dates', ...
+                int32(dbkey), char(name), r, int32(value_freq), dp);
+        end
+
         % --- object enumeration (modern fame_*_wildcard) ---
 
         function objs = list_objects(dbkey)
