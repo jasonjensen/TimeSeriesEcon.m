@@ -220,7 +220,7 @@ classdef CHLI < handle
         function write_precisions(dbkey, name, r, data)
             K = fame_constants();
             d = double(data(:));
-            d(isnan(d)) = K.FPRCNC;                 % NaN -> FAME NC
+            d(isnan(d)) = K.FPRCNA;                 % NaN -> FAME NA
             dp = libpointer('doublePtr', d);
             tse.fame.CHLI.fame_call('fame_write_precisions', int32(dbkey), char(name), r, dp);
         end
@@ -228,7 +228,7 @@ classdef CHLI < handle
         function write_numerics(dbkey, name, r, data)
             K = fame_constants();
             d = single(data(:));
-            d(isnan(d)) = K.FNUMNC;                 % NaN -> FAME NC
+            d(isnan(d)) = K.FNUMNA;                 % NaN -> FAME NA
             dp = libpointer('singlePtr', d);
             tse.fame.CHLI.fame_call('fame_write_numerics', int32(dbkey), char(name), r, dp);
         end
