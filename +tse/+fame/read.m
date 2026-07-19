@@ -25,7 +25,7 @@ function db = read(dbname, names)
 
     db = struct();
     for i = 1:numel(names)
-        nm = char(names{i});
+        nm = lower(char(names{i}));
         try
             db.(matlab.lang.makeValidName(nm)) = tse.fame.read_object(dbkey, nm);
         catch e
