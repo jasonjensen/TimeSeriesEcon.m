@@ -32,6 +32,11 @@ void cfmnwob(int *status, int dbkey, char *objname,
              int objclass, int freq, int type, int basis, int observed);
 void cfmdlob(int *status, int dbkey, char *objname);
 
+/* namelists (a scalar of type HNAMEL; value is a string of names) */
+void cfmnlen(int *status, int dbkey, char *name, int mode, int *len);
+void cfmgtnl(int *status, int dbkey, char *name, int mode, char *vals, int buflen, int *outlen);
+void cfmwtnl(int *status, int dbkey, char *name, int mode, char *vals);
+
 /* ==== modern fame_* (int return value is the status) ===================== */
 
 /* fame_index is a 64-bit index; fame_freq/fame_type are int. */

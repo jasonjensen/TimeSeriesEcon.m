@@ -296,9 +296,11 @@ classdef CHLI < handle
         %     VALIDATE these signatures against hli.h -- char-buffer calls. ---
 
         function n = namelist_len(dbkey, name)
-            % cfmnlen(int *status, int dbkey, char *name, int *len)
+            % cfmnlen(int *status, int dbkey, char *name, int mode, int *len)
+            K = fame_constants();
             lp = libpointer('int32Ptr', int32(0));
-            tse.fame.CHLI.raw_call('cfmnlen', int32(dbkey), char(name), lp);
+            tse.fame.CHLI.raw_call('cfmnlen', int32(dbkey), char(name), ...
+                int32(K.HNLALL), lp);
             n = double(lp.Value);
         end
 
