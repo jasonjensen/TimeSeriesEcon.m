@@ -40,7 +40,7 @@ end
 
 function local_write_namelist(dbkey, name, v)
     K = fame_constants();
-    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HUNDFT, K.HNAMEL, K.HBSDAY, K.HOBUND);
+    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HCASEX, K.HNAMEL, K.HBSDAY, K.HOBUND);
     str = strjoin(cellstr(string(v(:))), ', ');
     tse.fame.CHLI.write_namelist(dbkey, name, str);
 end
@@ -68,7 +68,7 @@ function local_write_scalar(dbkey, name, v)
     else
         type = K.HPRECN;  observed = K.HOBSUM;
     end
-    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HUNDFT, type, K.HBSDAY, observed);
+    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HCASEX, type, K.HBSDAY, observed);
 
     if isa(v, 'tse.MIT')
         yp  = tse.mit2yp(v);

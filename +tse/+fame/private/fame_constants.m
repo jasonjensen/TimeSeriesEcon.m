@@ -43,6 +43,9 @@ function c = fame_constants()
         k.HOBHIG = 7;
         k.HOBLOW = 8;
 
+        % --- scalar / case ---
+        k.HCASEX = 232;  % CASE frequency (scalars and namelists use this)
+
         % --- namelist ---
         k.HNLALL = -1;   % cfmgtnl/cfmwtnl mode: the whole namelist
 
