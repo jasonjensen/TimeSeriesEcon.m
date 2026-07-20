@@ -317,17 +317,41 @@ classdef CHLI < handle
         function s = get_namelist(dbkey, name)
             % cfmgtnl(int *status, int dbkey, char *name, int mode,
             %         char *vals, int buflen, int *outlen)
+            %
+            % A libpointer('cstring') buffer does NOT reflect the C write back
+            % through its .Value (MATLAB fills a discarded copy), which is why
+            % the value read back as all blanks even though cfmwtnl had stored
+            % it (diag_namelist: cfmnlen len=16, cfmgtnl str=blanks).  Instead
+            % pass a plain char buffer and take the value calllib RETURNS -- the
+            % same pattern check() uses to read cfmferr's message.  MATLAB
+            % returns every by-ref argument as an output; the object name may or
+            % may not be among them depending on const-ness in the loaded
+            % prototype, so pick the returned char buffer by its length (n+1).
             K = fame_constants();
+            inst = tse.fame.CHLI.instance();
+            tse.fame.CHLI.ensure_loaded();
             n = tse.fame.CHLI.namelist_len(dbkey, name);
             if n <= 0
                 s = '';
                 return
             end
-            bufp = libpointer('cstring', blanks(n + 1));
-            op   = libpointer('int32Ptr', int32(0));
-            tse.fame.CHLI.raw_call('cfmgtnl', int32(dbkey), char(name), ...
-                int32(K.HNLALL), bufp, int32(n + 1), op);
-            s = bufp.Value;
+            sp  = libpointer('int32Ptr', int32(0));
+            buf = blanks(n + 1);
+            op  = libpointer('int32Ptr', int32(0));
+            [o1, o2, o3] = calllib(inst.libname, 'cfmgtnl', sp, int32(dbkey), ...
+                char(name), int32(K.HNLALL), buf, int32(n + 1), op);
+            tse.fame.CHLI.check(double(o1));
+            s = '';
+            for v = {o2, o3}
+                if ischar(v{1}) && numel(v{1}) == n + 1
+                    s = v{1};
+                    break
+                end
+            end
+            z = find(s == char(0), 1);      % trim at the null terminator
+            if ~isempty(z)
+                s = s(1:z-1);
+            end
         end
 
         function write_namelist(dbkey, name, str)
