@@ -43,8 +43,11 @@ function c = fame_constants()
         k.HOBHIG = 7;
         k.HOBLOW = 8;
 
-        % --- scalar / case ---
-        k.HCASEX = 232;  % CASE frequency (scalars and namelists use this)
+        % --- frequencies used directly by the interop ---
+        k.HUNDFX = 0;    % undefined frequency: FAME scalars and namelists use
+                         %   this (FAME.jl refame builds every scalar as
+                         %   FameObject{:scalar,<type>,:undefined}).
+        k.HCASEX = 232;  % CASE frequency (case series)
 
         % --- namelist ---
         k.HNLALL = -1;   % cfmgtnl/cfmwtnl mode: the whole namelist

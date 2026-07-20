@@ -26,7 +26,10 @@ function val = read_object(dbkey, name)
         case K.HSCALA
             isScalar = true;
             nobs = 1;
-            r    = [];                      % NULL range for a scalar
+            % A scalar has undefined frequency and 0:0 indices, so no valid
+            % range can be built; read it with a NULL range as FAME.jl does
+            % (Read.jl: do_read!(scalar) passes C_NULL).
+            r    = tse.fame.CHLI.null_range();
         otherwise
             error('tseries:fame', ...
                 'read_object supports series and scalar objects (%s has class %d).', ...

@@ -40,9 +40,14 @@ end
 
 function local_write_namelist(dbkey, name, v)
     K = fame_constants();
-    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HCASEX, K.HNAMEL, K.HBSDAY, K.HOBUND);
-    str = strjoin(cellstr(string(v(:))), ', ');
-    tse.fame.CHLI.write_namelist(dbkey, name, str);
+    % A namelist is a scalar of type HNAMEL with undefined frequency (as
+    % FAME.jl builds it).  Its value is a single brace-delimited, upper-cased
+    % string "{NAME1,NAME2,...}" -- FAME only recognises a namelist literal in
+    % that form (FAME.jl Bridge.jl: refame treats "{...}" as a namelist and
+    % documents the value format as "{NAME1,NAME2,ETC}").
+    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HUNDFX, K.HNAMEL, K.HBSDAY, K.HOBUND);
+    str = "{" + upper(strjoin(cellstr(string(v(:))), ', ')) + "}";
+    tse.fame.CHLI.write_namelist(dbkey, name, char(str));
 end
 
 function tf = local_is_scalar(v)
@@ -68,19 +73,22 @@ function local_write_scalar(dbkey, name, v)
     else
         type = K.HPRECN;  observed = K.HOBSUM;
     end
-    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HCASEX, type, K.HBSDAY, observed);
+    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HUNDFX, type, K.HBSDAY, observed);
 
+    % A FAME scalar has no time axis; its read/write range is a NULL pointer
+    % (FAME.jl: _get_range(::FameObject{:scalar}) = C_NULL).
+    r = tse.fame.CHLI.null_range();
     if isa(v, 'tse.MIT')
         yp  = tse.mit2yp(v);
         idx = tse.fame.CHLI.yp_to_index(valfreq, yp(1), yp(2));
-        tse.fame.CHLI.write_dates(dbkey, name, [], valfreq, int64(idx));
+        tse.fame.CHLI.write_dates(dbkey, name, r, valfreq, int64(idx));
     elseif isstring(v) || ischar(v)
-        tse.fame.CHLI.write_strings(dbkey, name, [], string(v));
+        tse.fame.CHLI.write_strings(dbkey, name, r, string(v));
     elseif islogical(v)
-        tse.fame.CHLI.write_booleans(dbkey, name, [], v);
+        tse.fame.CHLI.write_booleans(dbkey, name, r, v);
     elseif isa(v, 'single')
-        tse.fame.CHLI.write_numerics(dbkey, name, [], v);
+        tse.fame.CHLI.write_numerics(dbkey, name, r, v);
     else
-        tse.fame.CHLI.write_precisions(dbkey, name, [], v);
+        tse.fame.CHLI.write_precisions(dbkey, name, r, v);
     end
 end

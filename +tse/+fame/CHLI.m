@@ -190,6 +190,16 @@ classdef CHLI < handle
             r.r_end   = int64(last);
         end
 
+        function r = null_range()
+            % A genuine NULL fame_range* pointer.  FAME.jl passes C_NULL as the
+            % range for every scalar (Write.jl: _get_range(::FameObject{:scalar})
+            % = C_NULL; Read.jl: do_read!(scalar) reads with C_NULL).  MATLAB's
+            % [] does NOT reliably marshal to NULL for a struct-pointer argument
+            % -- passing [] leaves fame_* reading freq 0 and failing HBFREQ(17)
+            % -- so build an explicit null pointer of the fame_range* type.
+            r = libpointer('fame_rangePtr');
+        end
+
         function data = get_precisions(dbkey, name, r, nobs)
             dp = libpointer('doublePtr', zeros(nobs, 1));
             tse.fame.CHLI.fame_call('fame_get_precisions', int32(dbkey), char(name), r, dp);
