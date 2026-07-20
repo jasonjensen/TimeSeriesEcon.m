@@ -46,7 +46,10 @@ function local_write_namelist(dbkey, name, v)
     % that form (FAME.jl Bridge.jl: refame treats "{...}" as a namelist and
     % documents the value format as "{NAME1,NAME2,ETC}").
     tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HUNDFX, K.HNAMEL, K.HBSDAY, K.HOBUND);
-    str = "{" + upper(strjoin(cellstr(string(v(:))), ', ')) + "}";
+    % Join with bare commas (no spaces): a space is not a legal character in a
+    % FAME name, so "{A, B}" is rejected wholesale and stores an empty namelist.
+    % FAME.jl writes and round-trips "{A,B,...}" (see its test's "{a,hello,b}").
+    str = "{" + upper(strjoin(cellstr(string(v(:))), ',')) + "}";
     tse.fame.CHLI.write_namelist(dbkey, name, char(str));
 end
 
