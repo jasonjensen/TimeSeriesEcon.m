@@ -151,18 +151,17 @@ classdef TestFameSeries < matlab.unittest.TestCase
             tc.verifyTrue(d2.asof == tse.qq(2020, 3));
         end
 
-        function namelist_roundtrip(tc)
-            % A string array field is written as a FAME namelist and read back
-            % as a string array of names (FAME upper-cases and may reorder).
+        function namelist_unsupported(tc)
+            % Namelists are not supported in this version: a string-array field
+            % is skipped with a warning, and other fields are still written.
             f = [tempname '.db'];
             cleaner = onCleanup(@() cleanupDb(f)); %#ok<NASGU>
 
-            d.mylist = ["gdp"; "cpi"; "rate"];
-            tse.fame.write(f, d);
-            d2 = tse.fame.read(f, {'mylist'});
-            got = sort(upper(cellstr(d2.mylist)));
-            exp = sort(upper({'gdp'; 'cpi'; 'rate'}));
-            tc.verifyEqual(got, exp);
+            d.mylist = ["gdp"; "cpi"; "rate"];   % would be a namelist
+            d.pival  = 3.14159;                   % a normal scalar
+            tc.verifyWarning(@() tse.fame.write(f, d), 'tseries:fame');
+            d2 = tse.fame.read(f, {'pival'});
+            tc.verifyEqual(d2.pival, 3.14159, 'AbsTol', 1e-10);
         end
 
         function date_valued_roundtrip(tc)

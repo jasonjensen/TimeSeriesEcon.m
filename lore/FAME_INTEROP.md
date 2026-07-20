@@ -24,7 +24,11 @@ A `+tse/+fame/` subpackage, same shape as `+tse/+iris/` and `+tse/+daec/`:
 | Dates / ranges | `to_date`, `from_date`, `to_range`, `from_range` |
 | Series | `read`, `write`, `read_object`, `write_object` |
 
-`read(db)` with no name list enumerates the whole database.
+`read(db)` with no name list enumerates the whole database. A FAME **scalar**
+(class `HSCALA`, undefined frequency) round-trips too: a scalar
+`double`/`single`/`logical`, a scalar `string`, or a scalar `tse.MIT`
+(date scalar) writes and reads back as the same MATLAB value. **Namelists are
+not supported in this version** — see §4a.
 
 ### Type model
 
@@ -132,6 +136,45 @@ future errors read e.g. `error 14 (HBRNG)` instead of a bare number.
 
 ---
 
+## 4a. Scalars and namelists
+
+Scalars and namelists came after the series layer, and mirror FAME.jl's object
+model exactly. Two more non-obvious facts, both confirmed against a real CHLI
+with a throw-away diagnostic:
+
+11. **Scalars have *undefined* frequency and a NULL range.** Every FAME scalar
+    is created with `cfmnwob(HSCALA, HUNDFX, <type>, …)` — frequency
+    `undefined` (0), not `CASE` — exactly as FAME.jl's `refame` builds
+    `FameObject{:scalar,<type>,:undefined}`. Its read/write range is a **true
+    NULL pointer** (FAME.jl passes `C_NULL`). MATLAB's `[]` does **not**
+    marshal to NULL for a `fame_range *` argument — passing `[]` leaves FAME
+    reading frequency 0 and failing `HBFREQ` (17). `CHLI.null_range`
+    (`libpointer('fame_rangePtr')`) is the genuine NULL. A date scalar carries
+    its value frequency in the `type` field, same as a date series.
+
+12. **Namelists write but cannot be read back under `calllib` — so the feature
+    is disabled.** The write side is correct and verified: `cfmnwob(HSCALA,
+    HUNDFX, HNAMEL, …)` then `cfmwtnl(dbkey, name, HNLALL, "{A,B,C}")` stores
+    the members (`fame_quick_info` reports `first=1 last=3`, `cfmnlen` reports
+    the length, and FAME normalises the value to `{A, B, C}`). The read side is
+    the blocker: `cfmgtnl` returns status 0 but the value buffer comes back as
+    **all blanks**. It was passed as `libpointer('cstring', blanks(n+1))` and
+    read via `.Value`, but MATLAB fills a *discarded copy* for a `cstring`
+    pointer, so `.Value` never sees the C write. Reading the value the way
+    `check` reads `cfmferr`'s message (a plain char buffer, taking the value
+    `calllib` **returns**) still did not surface the members. With no reliable
+    round trip, `tse.fame.read`/`write` skip namelists: a string-array field is
+    skipped on write with a warning, and reading a `HNAMEL` object errors. The
+    low-level `CHLI.namelist_len` / `get_namelist` / `write_namelist` bindings
+    are kept, with the exact signatures, for a future attempt (the most likely
+    fix is a byte-buffer marshalling that reflects the C write, or reading the
+    value through the FAME command interpreter as the R `fame` package does).
+
+The `index`/`HNLALL` argument was also pinned down: writing the whole namelist
+needs `index = HNLALL = -1` (indices `0`/`1` fail with status 25).
+
+---
+
 ## 5. Setup and tests
 
 ```matlab
@@ -146,7 +189,7 @@ library path and `$FAME` set (the licensing/header location).
 | --- | --- |
 | `tests/TestFameMapping.m` | no (pure frequency/type mapping) |
 | `tests/TestFameDates.m` | yes (date/range round-trips) |
-| `tests/TestFameSeries.m` | yes (precision, numeric, missing, annual, enumeration, multi-frequency incl. weekly, boolean, string, date) |
+| `tests/TestFameSeries.m` | yes (precision, numeric, missing, annual, enumeration, multi-frequency incl. weekly, boolean, string, date, scalars; and that namelists are skipped) |
 
 `TestFameMapping` always runs; the CHLI-backed suites skip cleanly when the
 library is not loaded.
@@ -164,3 +207,5 @@ Branch `claude/timeseriesecon-fame-integration`.
 | Series I/O (classic, then re-based on modern `fame_*`) | `54d817c`, `8e4cbe5`, `be4d5d4`, `513b81d`, `e80d812` |
 | Missing values + enumeration | `37ce738`, `356fede`, `42ef159`, `92a7f74` |
 | Boolean / string / date types, weekly | `6924915`, `f041703`, `eb5c582` |
+| Scalars (NULL range, undefined freq) | `80bae8d`, `1b3f7d9` |
+| Namelists: investigated, then disabled | `9a82f1b`, `74b177f`, and the disable commit |

@@ -13,7 +13,8 @@ function val = read_object(dbkey, name)
 %   Series/date/string with no tse container are returned as bare arrays (tse
 %   has no string- or date-valued TSeries).  A date object stores its value
 %   frequency in the `type` field, so `type` is a FAME frequency code rather
-%   than a scalar type code.  Requires the CHLI loaded.
+%   than a scalar type code.  Namelists (type HNAMEL) are not supported in this
+%   version and raise an error.  Requires the CHLI loaded.
 %
 %   See also: tse.fame.read, tse.fame.write_object.
     info = tse.fame.CHLI.quick_info(dbkey, name);
@@ -36,10 +37,12 @@ function val = read_object(dbkey, name)
                 name, info.class);
     end
 
-    % A namelist is a scalar of type HNAMEL, whose value is a string of names.
+    % Namelists (scalar of type HNAMEL) are not supported in this version: the
+    % value cannot be read back under MATLAB's calllib (cfmgtnl does not return
+    % the value buffer).  See the FAME namelist note in lore/FAME_INTEROP.md.
     if info.type == K.HNAMEL
-        val = local_parse_namelist(tse.fame.CHLI.get_namelist(dbkey, name));
-        return
+        error('tseries:fame', ...
+            'FAME namelists are not supported in this version (object %s).', name);
     end
 
     % A date-valued object stores its value frequency in the type field, so
@@ -96,14 +99,4 @@ function v = local_scalarize(arr, isScalar)
     else
         v = arr;
     end
-end
-
-function names = local_parse_namelist(s)
-    % A FAME namelist value is a single string of names; split on braces,
-    % commas, and whitespace into a string array.
-    s = regexprep(char(s), '[{}]', ' ');
-    parts = regexp(strtrim(s), '[,\s]+', 'split');
-    parts = string(parts);
-    names = parts(strlength(parts) > 0);
-    names = names(:);
 end

@@ -303,7 +303,13 @@ classdef CHLI < handle
 
         % --- namelists (classic cfm*; a namelist is a scalar of type HNAMEL,
         %     whose value is a single string of names).
-        %     VALIDATE these signatures against hli.h -- char-buffer calls. ---
+        %
+        %     Namelist read/write is NOT wired into tse.fame.read/write in this
+        %     version: writing works (cfmwtnl stores the members and cfmnlen
+        %     reports the length), but cfmgtnl does not return the value buffer
+        %     under MATLAB's calllib, so a round trip cannot be verified.  These
+        %     bindings are kept -- with the exact signatures -- for a future
+        %     attempt.  See the FAME namelist note in lore/FAME_INTEROP.md. ---
 
         function n = namelist_len(dbkey, name)
             % cfmnlen(int *status, int dbkey, char *name, int mode, int *len)

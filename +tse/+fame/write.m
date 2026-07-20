@@ -7,8 +7,9 @@ function write(dbname, db, mode)
 %   Each field of `db` is stored under the field name: a tse.TSeries becomes
 %   a FAME series; a scalar value (double/single/logical, a scalar string, or
 %   a scalar tse.MIT) becomes a FAME scalar.  Anything else is skipped with a
-%   warning.  The database is posted before closing.  Requires the CHLI to be
-%   loaded (tse.fame.startup).
+%   warning.  FAME namelists are not supported in this version (see the FAME
+%   namelist note in lore/FAME_INTEROP.md).  The database is posted before
+%   closing.  Requires the CHLI to be loaded (tse.fame.startup).
 %
 %   See also: tse.fame.read, tse.fame.write_object.
     if ~isstruct(db)
@@ -27,7 +28,11 @@ function write(dbname, db, mode)
         if isa(v, 'tse.TSeries')
             tse.fame.write_object(dbkey, fns{i}, v);
         elseif (isstring(v) || iscellstr(v)) && ~isscalar(v)
-            local_write_namelist(dbkey, fns{i}, v);   % a list of names
+            % Namelists are not supported in this version (see the FAME namelist
+            % note in lore/FAME_INTEROP.md): cfmgtnl does not return the value
+            % buffer under MATLAB's calllib, so a round trip cannot be verified.
+            warning('tseries:fame', ...
+                'Skipping field %s: FAME namelists are not supported in this version.', fns{i});
         elseif local_is_scalar(v)
             local_write_scalar(dbkey, fns{i}, v);
         else
@@ -36,21 +41,6 @@ function write(dbname, db, mode)
         end
     end
     tse.fame.CHLI.postdb(dbkey);
-end
-
-function local_write_namelist(dbkey, name, v)
-    K = fame_constants();
-    % A namelist is a scalar of type HNAMEL with undefined frequency (as
-    % FAME.jl builds it).  Its value is a single brace-delimited, upper-cased
-    % string "{NAME1,NAME2,...}" -- FAME only recognises a namelist literal in
-    % that form (FAME.jl Bridge.jl: refame treats "{...}" as a namelist and
-    % documents the value format as "{NAME1,NAME2,ETC}").
-    tse.fame.CHLI.newobj(dbkey, name, K.HSCALA, K.HUNDFX, K.HNAMEL, K.HBSDAY, K.HOBUND);
-    % Join with bare commas (no spaces): a space is not a legal character in a
-    % FAME name, so "{A, B}" is rejected wholesale and stores an empty namelist.
-    % FAME.jl writes and round-trips "{A,B,...}" (see its test's "{a,hello,b}").
-    str = "{" + upper(strjoin(cellstr(string(v(:))), ',')) + "}";
-    tse.fame.CHLI.write_namelist(dbkey, name, char(str));
 end
 
 function tf = local_is_scalar(v)
