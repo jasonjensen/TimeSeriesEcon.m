@@ -4,7 +4,7 @@ Built by .github/workflows/libdaec.yml; do not edit by hand.
 
 - DataEcon source: bankofcanada/DataEcon@1a108688a044380f808bebf64079e32dbb9cd1a4
 - Library version: 0.4.0
-- Built: 2026-10-10 in run https://github.com/jasonjensen/TimeSeriesEcon.m/actions/runs/38063571242
+- Built: 2026-10-10 in run https://github.com/jasonjensen/TimeSeriesEcon.m/actions/runs/38063810370
 - Linux build: manylinux_2_28 (glibc 2.28 or newer)
 
 DataEcon is BSD-3-Clause (LICENSE-DataEcon.md). It embeds SQLite, which is in the public domain.
@@ -15,5 +15,5 @@ DataEcon is BSD-3-Clause (LICENSE-DataEcon.md). It embeds SQLite, which is in th
 | glnxa64/libdaec_thunk_glnxa64.so | 4dfde14df1a983306436dcd85eafe3644b70bf17a466215edf7c4985770c94ee |
 | maca64/libdaec.dylib | bd76be88113d9161dacb514ffb605c8277973831d04f43bea02a8dabbb85d302 |
 | maca64/libdaec_thunk_maca64.dylib | ec6bcc11b9db3d5ccbd7dbff617dbc7c05c1076dbff547334362c5b521d690e0 |
-| win64/libdaec.dll | 49b45634a54b352ca275904c57ba3407072d8d470a7fddcccdc190a5b82b39f5 |
-| win64/libdaec_thunk_win64.dll | a44b54905b9a62ac88dfb162945ca09bdd679ccc69e6e4de88bd88ea0637c922 |
+| win64/libdaec.dll | d9d0fac58ce872fe7331310b7347ec4ca32ca908fd665dff6be02be541bd1fe4 |
+| win64/libdaec_thunk_win64.dll | 0b12fb239d8b9b58933677ec93123fa788d41a7e962ec59ad1c9ee0c2196748e |
