@@ -796,16 +796,41 @@ classdef MVTSeries
         % dims missing or () -> reduce to scalar
         % dims=3 (or higher) -> identity (return matrix)
 
+        %
+        % For BDaily data, mean/median/std/var/quantile/cov/cor also take
+        % 'skip_all_nans', 'skip_holidays' and 'holidays_map' (see
+        % tse.cleanedvalues).  With dims=2 the filtered result is a plain
+        % column, since the dropped rows leave no contiguous dates.
+
         function r = sum(x, varargin),     r = mvReduce(x, @sum,     varargin{:}); end
         function r = prod(x, varargin),    r = mvReduce(x, @prod,    varargin{:}); end
-        function r = mean(x, varargin),    r = mvReduce(x, @mean,    varargin{:}); end
-        function r = median(x, varargin),  r = mvReduce(x, @median,  varargin{:}); end
-        function r = std(x, varargin),     r = mvReduce(x, @std,     varargin{:}); end
-        function r = var(x, varargin),     r = mvReduce(x, @var,     varargin{:}); end
-        function r = min(x, varargin),     r = mvReduce(x, @min,     varargin{:}); end
-        function r = max(x, varargin),     r = mvReduce(x, @max,     varargin{:}); end
+        function r = mean(x, varargin),    r = mvStat(x, @mean,      varargin{:}); end
+        function r = median(x, varargin),  r = mvStat(x, @median,    varargin{:}); end
+        function r = std(x, varargin),     r = mvStat(x, @std,       varargin{:}); end
+        function r = var(x, varargin),     r = mvStat(x, @var,       varargin{:}); end
+        function r = min(x, varargin),     r = mvReduce(x, @mvMinOp, varargin{:}); end
+        function r = max(x, varargin),     r = mvReduce(x, @mvMaxOp, varargin{:}); end
         function r = any(x, varargin),     r = mvReduce(x, @any,     varargin{:}); end
         function r = all(x, varargin),     r = mvReduce(x, @all,     varargin{:}); end
+
+        function r = quantile(x, p, varargin)
+            % quantile(x, p) over all values; quantile(x, p, 'dims', 1)
+            % per column; 'dims', 2 per row (a TSeries).
+            r = mvStat(x, @(a, varargin) quantile(a, p, varargin{:}), varargin{:});
+        end
+
+        function r = cov(x, varargin)
+            % Covariance matrix of the columns (columns are variables).
+            [v, rest] = mvSkipFilter(x, varargin);
+            r = cov(v, rest{:});
+        end
+
+        function r = cor(x, varargin)
+            % Correlation matrix of the columns (columns are variables).
+            % corrcoef is base MATLAB; corr needs a toolbox.
+            [v, rest] = mvSkipFilter(x, varargin);
+            r = corrcoef(v, rest{:});
+        end
 
         % ---------- cumulative / difference ----------
 
@@ -1573,9 +1598,64 @@ end
 
 % ---------- reductions ----------
 
+function r = mvStat(x, op, varargin)
+% mvReduce for the statistics that take the BDaily skip options.
+    [v, rest, cleaned] = mvSkipFilter(x, varargin);
+    if cleaned
+        r = mvReduceValues(x, v, false, op, rest{:});
+    else
+        r = mvReduceValues(x, v, true, op, rest{:});
+    end
+end
+
+function [v, rest, cleaned] = mvSkipFilter(x, args)
+% Split off 'skip_all_nans' / 'skip_holidays' / 'holidays_map' and, for a
+% BDaily MVTSeries, return the cleaned rows.  Other frequencies ignore the
+% options, as TSeries does.
+    skipKeys = {'skip_all_nans', 'skip_holidays', 'holidays_map'};
+    skipArgs = {};
+    rest = {};
+    k = 1;
+    while k <= numel(args)
+        a = args{k};
+        if (ischar(a) || isstring(a)) && any(strcmpi(a, skipKeys))
+            if k + 1 > numel(args)
+                error('tseries:noMatch', '''%s'' requires a value.', char(a));
+            end
+            skipArgs(end+1:end+2) = {char(a), args{k+1}}; %#ok<AGROW>
+            k = k + 2;
+        else
+            rest{end+1} = a; %#ok<AGROW>
+            k = k + 1;
+        end
+    end
+    cleaned = ~isempty(skipArgs) && isa(tse.frequencyof(x), 'tse.BDaily');
+    if cleaned
+        v = tse.cleanedvalues(x, skipArgs{:});
+    else
+        v = x.values;
+    end
+end
+
+function r = mvMinOp(a, varargin)
+% Always pass a dimension: min(a, []) with none failed on CI's MATLAB
+% (MATLAB:sizeDimensionsMustMatch).
+    if isempty(varargin), varargin = {1}; end
+    r = min(a, [], varargin{:});
+end
+
+function r = mvMaxOp(a, varargin)
+    if isempty(varargin), varargin = {1}; end
+    r = max(a, [], varargin{:});
+end
+
 function r = mvReduce(x, op, varargin)
-% Hoist x.values once and split args by 'dims' position (skip inputParser).
-    v = x.values;
+    r = mvReduceValues(x, x.values, true, op, varargin{:});
+end
+
+function r = mvReduceValues(x, v, labelRows, op, varargin)
+% Split args by 'dims' position (skip inputParser) and reduce v, the
+% values of x (or a row subset of them when labelRows is false).
     pos  = {};
     dims = [];
     k = 1;
@@ -1595,10 +1675,9 @@ function r = mvReduce(x, op, varargin)
     end
 
     if isempty(dims)
-        r = op(v, pos{:});
-        if isnumeric(r) && ~isscalar(r)
-            r = op(r(:), pos{:});
-        end
+        % Reduce over every value at once: a reduction of per-column
+        % results is wrong for median, std, var and quantile.
+        r = op(v(:), pos{:});
         return
     end
 
@@ -1608,7 +1687,11 @@ function r = mvReduce(x, op, varargin)
     end
     if dims == 2
         rv = op(v, pos{:}, 2);
-        r = tse.TSeries(x.firstdate, rv(:));
+        if labelRows
+            r = tse.TSeries(x.firstdate, rv(:));
+        else
+            r = rv(:);
+        end
         return
     end
     if dims >= 3

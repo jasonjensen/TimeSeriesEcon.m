@@ -105,7 +105,7 @@ range's dates (`x[rng, cols] = y[rng, cols]`); MATLAB now does too.
 
 ## P2: features missing from MATLAB
 
-### G5. MVTSeries `cov`, `cor`, `quantile` — Open
+### G5. MVTSeries `cov`, `cor`, `quantile` — Fixed in PR
 
 Julia supports `cov(mv)`, `cor(mv)` and `quantile` through the `AbstractMatrix`
 fallback, plus BDaily overloads with `skip_all_nans` / `skip_holidays` /
@@ -113,11 +113,22 @@ fallback, plus BDaily overloads with `skip_all_nans` / `skip_holidays` /
 keywords (`src/tsecon/_stats.py`). `MVTSeries.m` defines `mean`, `std`, `var`,
 `median` but not these three.
 
-### G6. `stdm`, `varm`, `bdvalues` — Open
+### G6. `stdm`, `varm`, `bdvalues` — Fixed in PR
 
 `stdm`/`varm` (known-mean std/var, with BDaily keywords) exist in Julia
 (`tsmath.jl` 246-247) and Python. `bdvalues` exists in Julia
 (`tseries.jl`, `mvtseries.jl`) and Python. None are in MATLAB.
+
+Found while fixing G5/G6, all now matching Julia:
+
+- `std`, `var` and `median` of an MVTSeries without `'dims'` reduced the
+  per-column results again (e.g. the median of column medians) instead of
+  using every value.
+- `min(mv, 'dims', 1)` called `min(v, 1)`, an elementwise min against 1.
+- MVTSeries `mean`/`median`/`std`/`var` ignored the BDaily skip options.
+- `cov(a, b)` on two TSeries returned MATLAB's 2x2 matrix; Julia returns the
+  scalar. `cov`/`cor` of two series now also require the same frequency and
+  start date, as in Julia.
 
 ### G7. DataEcon coverage beyond series and structs — Open
 
