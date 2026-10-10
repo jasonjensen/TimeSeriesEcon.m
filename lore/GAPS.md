@@ -145,7 +145,7 @@ fix):
 
 - **No MATLAB type, refused (254):** Int128/UInt128 (165) and ComplexF16
   (89) elements. Python reads them as stored-only objects.
-- **Malformed or foreign, refused (52):** controls Julia never writes or
+- **Malformed or foreign, refused (50):** controls Julia never writes or
   Python also rejects: dates that are not 8 bytes wide, a frequency on
   non-date elements, strings with embedded zeros, invalid UTF-8 or no
   terminator, and Bool markers on values other than 0 and 1.
@@ -156,7 +156,7 @@ fix):
   itself.
 - **Bool markers on payloads other than Int8 (20):** 0/1 values marked Bool
   read as logical, which lays out as Int8 again (as Julia's loader does).
-- **Unit dates at the Int64 extremes (2):** MITRange lengths overflow.
+- **Unit dates at the Int64 extremes (4):** MITRange lengths overflow.
 - **Markers other than Bool are ignored:** `Rational`, `Symbol`, `Date`,
   `Complex{Int64}` and other `jtype`/`jeltype` values read as their stored
   payload. These pass the byte check, so they are not in the list.
