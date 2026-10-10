@@ -1,0 +1,3 @@
+# Objects in the Julia-written fixtures that tse.daec does not read as stored.
+# Tab-separated: fixture, object path, outcome (refused, or misread:<fields>).
+# tests/TestDaecFixtures.m fails when an outcome differs from this list.

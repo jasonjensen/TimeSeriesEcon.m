@@ -1,0 +1,440 @@
+{
+"file": "julia_workspace.daec",
+"objects": [
+{
+"path": "/f",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000000000000f83f",
+"attrs": {
+"note": "user attribute"
+}
+},
+{
+"path": "/i",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0700000000000000",
+"attrs": {}
+},
+{
+"path": "/i8",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "fd",
+"attrs": {}
+},
+{
+"path": "/u",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/c",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "000000000000f03f0000000000000040",
+"attrs": {}
+},
+{
+"path": "/s",
+"class": 1,
+"type": 6,
+"freq": 0,
+"hex": "76696e7461676520e28096203300",
+"attrs": {}
+},
+{
+"path": "/b",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "01",
+"attrs": {}
+},
+{
+"path": "/d",
+"class": 1,
+"type": 3,
+"freq": 67,
+"hex": "901f000000000000",
+"attrs": {}
+},
+{
+"path": "/dur",
+"class": 1,
+"type": 1,
+"freq": 32,
+"hex": "0200000000000000",
+"attrs": {}
+},
+{
+"path": "/sym",
+"class": 1,
+"type": 6,
+"freq": 0,
+"hex": "73796d626f6c00",
+"attrs": {
+"jtype": "Symbol"
+}
+},
+{
+"path": "/r",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000000000000e03f",
+"attrs": {
+"jtype": "Rational{Int64}"
+}
+},
+{
+"path": "/date",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000000809587d741",
+"attrs": {
+"jtype": "Date"
+}
+},
+{
+"path": "/ts",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 3,
+"freq": 32,
+"first": "24288",
+"names": null
+}
+],
+"hex": "000000000000f03f00000000000000400000000000000840",
+"attrs": {}
+},
+{
+"path": "/tsi",
+"class": 2,
+"type": 12,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 67,
+"first": "8080",
+"names": null
+}
+],
+"hex": "01000000000000000200000000000000",
+"attrs": {}
+},
+{
+"path": "/tsb",
+"class": 2,
+"type": 12,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 268,
+"first": "2020",
+"names": null
+}
+],
+"hex": "0100",
+"attrs": {
+"jeltype": "Bool"
+}
+},
+{
+"path": "/tse",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 32,
+"first": "24288",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/tsd",
+"class": 2,
+"type": 12,
+"eltype": 3,
+"elfreq": 32,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 32,
+"first": "24288",
+"names": null
+}
+],
+"hex": "e05e000000000000e15e000000000000",
+"attrs": {}
+},
+{
+"path": "/mv",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 67,
+"first": "8096",
+"names": null
+},
+{
+"type": 2,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": [
+"p",
+"q"
+]
+}
+],
+"hex": "000000000000f03f000000000000084000000000000000400000000000001040",
+"attrs": {}
+},
+{
+"path": "/mat",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "000000000000f03f000000000000084000000000000000400000000000001040",
+"attrs": {}
+},
+{
+"path": "/v",
+"class": 2,
+"type": 10,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "010000000200000003000000",
+"attrs": {}
+},
+{
+"path": "/vs",
+"class": 2,
+"type": 10,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "61006200",
+"attrs": {}
+},
+{
+"path": "/ur",
+"class": 2,
+"type": 11,
+"eltype": 0,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 5,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {}
+},
+{
+"path": "/mr",
+"class": 2,
+"type": 11,
+"eltype": 0,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 4,
+"freq": 67,
+"first": "8080",
+"names": null
+}
+],
+"hex": "",
+"attrs": {}
+},
+{
+"path": "/t3",
+"class": 4,
+"type": 30,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 4,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0100000000000000020000000000000003000000000000000400000000000000050000000000000006000000000000000700000000000000080000000000000009000000000000000a000000000000000b000000000000000c000000000000000d000000000000000e000000000000000f00000000000000100000000000000011000000000000001200000000000000130000000000000014000000000000001500000000000000160000000000000017000000000000001800000000000000",
+"attrs": {}
+},
+{
+"path": "/nested/x",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/nested/deeper/y",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0000000000000040",
+"attrs": {}
+},
+{
+"path": "/nested/deeper/\u65e5\u672c\u8a9e",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0900000000000000",
+"attrs": {}
+},
+{
+"path": "/order/b",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/order/a",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0200000000000000",
+"attrs": {}
+},
+{
+"path": "/order/B",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0300000000000000",
+"attrs": {}
+},
+{
+"path": "/order/\u00e4",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0400000000000000",
+"attrs": {}
+},
+{
+"path": "/order/_",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0500000000000000",
+"attrs": {}
+},
+{
+"path": "/order/10",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0600000000000000",
+"attrs": {}
+},
+{
+"path": "/order/9",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0700000000000000",
+"attrs": {}
+}
+]
+}

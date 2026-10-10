@@ -1,0 +1,77 @@
+{
+"file": "julia_float64_scalars.daec",
+"objects": [
+{
+"path": "/scalar_finite",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/scalar_negative",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "00000000000004c0",
+"attrs": {}
+},
+{
+"path": "/scalar_zero",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/scalar_negative_zero",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/scalar_nan",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000000000000f87f",
+"attrs": {}
+},
+{
+"path": "/scalar_positive_inf",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000000000000f07f",
+"attrs": {}
+},
+{
+"path": "/scalar_negative_inf",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000000000000f0ff",
+"attrs": {}
+},
+{
+"path": "/scalar_float32",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0000a03f",
+"attrs": {}
+},
+{
+"path": "/scalar_integer",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0700000000000000",
+"attrs": {}
+}
+]
+}

@@ -1,0 +1,509 @@
+{
+"file": "julia_quarterly.daec",
+"objects": [
+{
+"path": "/q1_cross_year",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 4,
+"freq": 65,
+"first": "8099",
+"names": null
+}
+],
+"hex": "000000000000f43f00000000000004c000000000000000000000000000001340",
+"attrs": {}
+},
+{
+"path": "/q1_negative",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 65,
+"first": "-1",
+"names": null
+}
+],
+"hex": "000000000000f43f00000000000004c0",
+"attrs": {}
+},
+{
+"path": "/q1_zero",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 65,
+"first": "0",
+"names": null
+}
+],
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/q1_minimum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 65,
+"first": "-131200",
+"names": null
+}
+],
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/q1_maximum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 65,
+"first": "2147483647",
+"names": null
+}
+],
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/q1_empty",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 65,
+"first": "8096",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/q1_empty_minimum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 65,
+"first": "-131200",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/q1_empty_maximum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 65,
+"first": "2147483647",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/q1_native_empty",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 65,
+"first": "8096",
+"names": null
+}
+],
+"hex": "",
+"attrs": {}
+},
+{
+"path": "/q2_cross_year",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 4,
+"freq": 66,
+"first": "8099",
+"names": null
+}
+],
+"hex": "000000000000f43f00000000000004c000000000000000000000000000001340",
+"attrs": {}
+},
+{
+"path": "/q2_negative",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 66,
+"first": "-1",
+"names": null
+}
+],
+"hex": "000000000000f43f00000000000004c0",
+"attrs": {}
+},
+{
+"path": "/q2_zero",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 66,
+"first": "0",
+"names": null
+}
+],
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/q2_minimum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 66,
+"first": "-131200",
+"names": null
+}
+],
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/q2_maximum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 66,
+"first": "2147483647",
+"names": null
+}
+],
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/q2_empty",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 66,
+"first": "8096",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/q2_empty_minimum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 66,
+"first": "-131200",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/q2_empty_maximum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 66,
+"first": "2147483647",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/q2_native_empty",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 66,
+"first": "8096",
+"names": null
+}
+],
+"hex": "",
+"attrs": {}
+},
+{
+"path": "/q3_cross_year",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 4,
+"freq": 67,
+"first": "8099",
+"names": null
+}
+],
+"hex": "000000000000f43f00000000000004c000000000000000000000000000001340",
+"attrs": {}
+},
+{
+"path": "/q3_negative",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 67,
+"first": "-1",
+"names": null
+}
+],
+"hex": "000000000000f43f00000000000004c0",
+"attrs": {}
+},
+{
+"path": "/q3_zero",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 67,
+"first": "0",
+"names": null
+}
+],
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/q3_minimum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 67,
+"first": "-131200",
+"names": null
+}
+],
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/q3_maximum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 67,
+"first": "2147483647",
+"names": null
+}
+],
+"hex": "000000000000f43f",
+"attrs": {}
+},
+{
+"path": "/q3_empty",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 67,
+"first": "8096",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/q3_empty_minimum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 67,
+"first": "-131200",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/q3_empty_maximum",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 67,
+"first": "2147483647",
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/q3_native_empty",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 67,
+"first": "8096",
+"names": null
+}
+],
+"hex": "",
+"attrs": {}
+}
+]
+}

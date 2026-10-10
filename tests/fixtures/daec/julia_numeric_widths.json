@@ -1,0 +1,937 @@
+{
+"file": "julia_numeric_widths.daec",
+"objects": [
+{
+"path": "/w_f16_zero",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0000",
+"attrs": {}
+},
+{
+"path": "/w_f16_negative_zero",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0080",
+"attrs": {}
+},
+{
+"path": "/w_f16_one_and_half",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "003e",
+"attrs": {}
+},
+{
+"path": "/w_f16_tenth",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "662e",
+"attrs": {}
+},
+{
+"path": "/w_f16_max",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "ff7b",
+"attrs": {}
+},
+{
+"path": "/w_f16_negative_max",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "fffb",
+"attrs": {}
+},
+{
+"path": "/w_f16_min_normal",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0004",
+"attrs": {}
+},
+{
+"path": "/w_f16_min_subnormal",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0100",
+"attrs": {}
+},
+{
+"path": "/w_f16_nan",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "007e",
+"attrs": {}
+},
+{
+"path": "/w_f16_inf",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "007c",
+"attrs": {}
+},
+{
+"path": "/w_f16_negative_inf",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "00fc",
+"attrs": {}
+},
+{
+"path": "/w_f16_two_pow_11_plus_one",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0068",
+"attrs": {}
+},
+{
+"path": "/w_f16_pi",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "4842",
+"attrs": {}
+},
+{
+"path": "/w_f32_zero",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "00000000",
+"attrs": {}
+},
+{
+"path": "/w_f32_negative_zero",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "00000080",
+"attrs": {}
+},
+{
+"path": "/w_f32_one_quarter",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0000a03f",
+"attrs": {}
+},
+{
+"path": "/w_f32_tenth",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "cdcccc3d",
+"attrs": {}
+},
+{
+"path": "/w_f32_max",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "ffff7f7f",
+"attrs": {}
+},
+{
+"path": "/w_f32_negative_max",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "ffff7fff",
+"attrs": {}
+},
+{
+"path": "/w_f32_min_normal",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "00008000",
+"attrs": {}
+},
+{
+"path": "/w_f32_min_subnormal",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "01000000",
+"attrs": {}
+},
+{
+"path": "/w_f32_nan",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0000c07f",
+"attrs": {}
+},
+{
+"path": "/w_f32_inf",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0000807f",
+"attrs": {}
+},
+{
+"path": "/w_f32_negative_inf",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000080ff",
+"attrs": {}
+},
+{
+"path": "/w_f32_two_pow_24_plus_one",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "0000804b",
+"attrs": {}
+},
+{
+"path": "/w_f32_pi",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "db0f4940",
+"attrs": {}
+},
+{
+"path": "/w_i8_zero",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "00",
+"attrs": {}
+},
+{
+"path": "/w_i8_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "01",
+"attrs": {}
+},
+{
+"path": "/w_i8_negative_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ff",
+"attrs": {}
+},
+{
+"path": "/w_i8_seven",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "07",
+"attrs": {}
+},
+{
+"path": "/w_i8_min",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "80",
+"attrs": {}
+},
+{
+"path": "/w_i8_max",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "7f",
+"attrs": {}
+},
+{
+"path": "/w_i8_min_plus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "81",
+"attrs": {}
+},
+{
+"path": "/w_i8_max_minus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "7e",
+"attrs": {}
+},
+{
+"path": "/w_i16_zero",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0000",
+"attrs": {}
+},
+{
+"path": "/w_i16_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100",
+"attrs": {}
+},
+{
+"path": "/w_i16_negative_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffff",
+"attrs": {}
+},
+{
+"path": "/w_i16_seven",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0700",
+"attrs": {}
+},
+{
+"path": "/w_i16_min",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0080",
+"attrs": {}
+},
+{
+"path": "/w_i16_max",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ff7f",
+"attrs": {}
+},
+{
+"path": "/w_i16_min_plus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0180",
+"attrs": {}
+},
+{
+"path": "/w_i16_max_minus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "fe7f",
+"attrs": {}
+},
+{
+"path": "/w_i32_zero",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "00000000",
+"attrs": {}
+},
+{
+"path": "/w_i32_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "01000000",
+"attrs": {}
+},
+{
+"path": "/w_i32_negative_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffffffff",
+"attrs": {}
+},
+{
+"path": "/w_i32_seven",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "07000000",
+"attrs": {}
+},
+{
+"path": "/w_i32_min",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "00000080",
+"attrs": {}
+},
+{
+"path": "/w_i32_max",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffffff7f",
+"attrs": {}
+},
+{
+"path": "/w_i32_min_plus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "01000080",
+"attrs": {}
+},
+{
+"path": "/w_i32_max_minus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "feffff7f",
+"attrs": {}
+},
+{
+"path": "/w_u8_zero",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "00",
+"attrs": {}
+},
+{
+"path": "/w_u8_one",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "01",
+"attrs": {}
+},
+{
+"path": "/w_u8_seven",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "07",
+"attrs": {}
+},
+{
+"path": "/w_u8_max",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "ff",
+"attrs": {}
+},
+{
+"path": "/w_u8_max_minus_one",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "fe",
+"attrs": {}
+},
+{
+"path": "/w_u8_high_bit",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "80",
+"attrs": {}
+},
+{
+"path": "/w_u16_zero",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0000",
+"attrs": {}
+},
+{
+"path": "/w_u16_one",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0100",
+"attrs": {}
+},
+{
+"path": "/w_u16_seven",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0700",
+"attrs": {}
+},
+{
+"path": "/w_u16_max",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "ffff",
+"attrs": {}
+},
+{
+"path": "/w_u16_max_minus_one",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "feff",
+"attrs": {}
+},
+{
+"path": "/w_u16_high_bit",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0080",
+"attrs": {}
+},
+{
+"path": "/w_u32_zero",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "00000000",
+"attrs": {}
+},
+{
+"path": "/w_u32_one",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "01000000",
+"attrs": {}
+},
+{
+"path": "/w_u32_seven",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "07000000",
+"attrs": {}
+},
+{
+"path": "/w_u32_max",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "ffffffff",
+"attrs": {}
+},
+{
+"path": "/w_u32_max_minus_one",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "feffffff",
+"attrs": {}
+},
+{
+"path": "/w_u32_high_bit",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "00000080",
+"attrs": {}
+},
+{
+"path": "/w_u64_zero",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/w_u64_one",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/w_u64_seven",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0700000000000000",
+"attrs": {}
+},
+{
+"path": "/w_u64_max",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/w_u64_max_minus_one",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "feffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/w_u64_high_bit",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/w_c32_plain",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "0000c03f000010c0",
+"attrs": {}
+},
+{
+"path": "/w_c32_negative_zero_real",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "0000008000000000",
+"attrs": {}
+},
+{
+"path": "/w_c32_negative_zero_imag",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/w_c32_nan_real",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "0000c07f0000803f",
+"attrs": {}
+},
+{
+"path": "/w_c32_inf_imag",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "0000803f000080ff",
+"attrs": {}
+},
+{
+"path": "/w_c32_max_min",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "ffff7f7f00008000",
+"attrs": {}
+},
+{
+"path": "/w_c32_subnormal",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/w_c32_tenths",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "cdcccc3dcdcc4c3e",
+"attrs": {}
+},
+{
+"path": "/w_c64_plain",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "000000000000f83f00000000000002c0",
+"attrs": {}
+},
+{
+"path": "/w_c64_negative_zero_real",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "00000000000000800000000000000000",
+"attrs": {}
+},
+{
+"path": "/w_c64_negative_zero_imag",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "00000000000000000000000000000080",
+"attrs": {}
+},
+{
+"path": "/w_c64_nan_real",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "000000000000f87f000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/w_c64_inf_imag",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "000000000000f03f000000000000f0ff",
+"attrs": {}
+},
+{
+"path": "/w_c64_max_min",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "ffffffffffffef7f0000000000001000",
+"attrs": {}
+},
+{
+"path": "/w_c64_subnormal",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "01000000000000000000000000000000",
+"attrs": {}
+},
+{
+"path": "/w_c64_tenths",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "9a9999999999b93f9a9999999999c93f",
+"attrs": {}
+},
+{
+"path": "/wn_f16_tenth",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "662e",
+"attrs": {}
+},
+{
+"path": "/wn_f16_nan",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "007e",
+"attrs": {}
+},
+{
+"path": "/wn_f32_tenth",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "cdcccc3d",
+"attrs": {}
+},
+{
+"path": "/wn_f32_negative_zero",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "00000080",
+"attrs": {}
+},
+{
+"path": "/wn_i8_min",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "80",
+"attrs": {}
+},
+{
+"path": "/wn_i16_max",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ff7f",
+"attrs": {}
+},
+{
+"path": "/wn_i32_min",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "00000080",
+"attrs": {}
+},
+{
+"path": "/wn_u8_max",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "ff",
+"attrs": {}
+},
+{
+"path": "/wn_u16_max",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "ffff",
+"attrs": {}
+},
+{
+"path": "/wn_u32_max",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "ffffffff",
+"attrs": {}
+},
+{
+"path": "/wn_u64_max",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/wn_u64_high_bit",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/wn_c32_plain",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "0000c03f000010c0",
+"attrs": {}
+},
+{
+"path": "/wn_c64_plain",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "00000000000020400000000000000840",
+"attrs": {}
+},
+{
+"path": "/wn_c64_negative_zero",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "00000000000000800000000000000080",
+"attrs": {}
+},
+{
+"path": "/wctl_int128",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "07000000000000000000000000000000",
+"attrs": {}
+},
+{
+"path": "/wctl_int128_max",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffffffffffffffffffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/wctl_uint128",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "07000000000000000000000000000000",
+"attrs": {}
+},
+{
+"path": "/wctl_uint128_max",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "ffffffffffffffffffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/wctl_c16",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "003e80c0",
+"attrs": {}
+},
+{
+"path": "/wctl_bool_true",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "01",
+"attrs": {}
+},
+{
+"path": "/wctl_bool_false",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "00",
+"attrs": {}
+},
+{
+"path": "/wctl_int8_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "01",
+"attrs": {}
+},
+{
+"path": "/wctl_int8_zero",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "00",
+"attrs": {}
+},
+{
+"path": "/wctl_complex_int",
+"class": 1,
+"type": 5,
+"freq": 0,
+"hex": "00000000000020400000000000000840",
+"attrs": {
+"jtype": "Complex{Int64}"
+}
+},
+{
+"path": "/wctl_marker_true",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "01",
+"attrs": {
+"jtype": "Bool"
+}
+}
+]
+}
