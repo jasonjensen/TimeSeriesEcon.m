@@ -1,0 +1,1765 @@
+{
+"file": "julia_matrices_text.daec",
+"objects": [
+{
+"path": "/matrix_Int8",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "80ff007f0709",
+"attrs": {}
+},
+{
+"path": "/matrix_Int8_empty",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Int8"
+}
+},
+{
+"path": "/matrix_Int16",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0080ffff0000ff7f07000900",
+"attrs": {}
+},
+{
+"path": "/matrix_Int16_empty",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Int16"
+}
+},
+{
+"path": "/matrix_Int32",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "00000080ffffffff00000000ffffff7f0700000009000000",
+"attrs": {}
+},
+{
+"path": "/matrix_Int32_empty",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Int32"
+}
+},
+{
+"path": "/matrix_Int64",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0000000000000080ffffffffffffffff0000000000000000ffffffffffffff7f07000000000000000900000000000000",
+"attrs": {}
+},
+{
+"path": "/matrix_Int64_empty",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Int64"
+}
+},
+{
+"path": "/matrix_UInt8",
+"class": 3,
+"type": 20,
+"eltype": 2,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0001ff07090b",
+"attrs": {}
+},
+{
+"path": "/matrix_UInt8_empty",
+"class": 3,
+"type": 20,
+"eltype": 2,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "UInt8"
+}
+},
+{
+"path": "/matrix_UInt16",
+"class": 3,
+"type": 20,
+"eltype": 2,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "00000100ffff070009000b00",
+"attrs": {}
+},
+{
+"path": "/matrix_UInt16_empty",
+"class": 3,
+"type": 20,
+"eltype": 2,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "UInt16"
+}
+},
+{
+"path": "/matrix_UInt32",
+"class": 3,
+"type": 20,
+"eltype": 2,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0000000001000000ffffffff07000000090000000b000000",
+"attrs": {}
+},
+{
+"path": "/matrix_UInt32_empty",
+"class": 3,
+"type": 20,
+"eltype": 2,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "UInt32"
+}
+},
+{
+"path": "/matrix_UInt64",
+"class": 3,
+"type": 20,
+"eltype": 2,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "00000000000000000100000000000000ffffffffffffffff070000000000000009000000000000000b00000000000000",
+"attrs": {}
+},
+{
+"path": "/matrix_UInt64_empty",
+"class": 3,
+"type": 20,
+"eltype": 2,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "UInt64"
+}
+},
+{
+"path": "/matrix_Float16",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "00800100003d557e007c0200",
+"attrs": {}
+},
+{
+"path": "/matrix_Float16_empty",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float16"
+}
+},
+{
+"path": "/matrix_Float32",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "00000080010000000000a03f5500c07f0000807f02000000",
+"attrs": {}
+},
+{
+"path": "/matrix_Float32_empty",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float32"
+}
+},
+{
+"path": "/matrix_Float64",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "00000000000000800100000000000000000000000000f43f550000000000f87f000000000000f07f0200000000000000",
+"attrs": {}
+},
+{
+"path": "/matrix_Float64_empty",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/matrix_ComplexF32",
+"class": 3,
+"type": 20,
+"eltype": 5,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "000000800000a03f00002040000040c000000000000000800000803f0000004000004040000080400000a0400000c040",
+"attrs": {}
+},
+{
+"path": "/matrix_ComplexF32_empty",
+"class": 3,
+"type": 20,
+"eltype": 5,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "ComplexF32"
+}
+},
+{
+"path": "/matrix_ComplexF64",
+"class": 3,
+"type": 20,
+"eltype": 5,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0000000000000080000000000000f43f000000000000044000000000000008c000000000000000000000000000000080000000000000f03f00000000000000400000000000000840000000000000104000000000000014400000000000001840",
+"attrs": {}
+},
+{
+"path": "/matrix_ComplexF64_empty",
+"class": 3,
+"type": 20,
+"eltype": 5,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "ComplexF64"
+}
+},
+{
+"path": "/matrix_Bool",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "000100010100",
+"attrs": {
+"jeltype": "Bool"
+}
+},
+{
+"path": "/matrix_Bool_empty",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Bool"
+}
+},
+{
+"path": "/matrix_zero_rows",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/matrix_zero_cols",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/matrix_1x1",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0000000000000440",
+"attrs": {}
+},
+{
+"path": "/matrix_mit",
+"class": 3,
+"type": 20,
+"eltype": 3,
+"elfreq": 32,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "ffffffffffffffff000000000000000001000000000000000200000000000000",
+"attrs": {}
+},
+{
+"path": "/matrix_duration",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 32,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0100000000000000020000000000000003000000000000000400000000000000",
+"attrs": {}
+},
+{
+"path": "/matrix_int128",
+"class": 3,
+"type": 20,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "00000000000000000000000000000080ffffffffffffffffffffffffffffffff00000000000000000000000000000000ffffffffffffffffffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/matrix_uint128",
+"class": 3,
+"type": 20,
+"eltype": 2,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "000000000000000000000000000000000100000000000000000000000000000002000000000000000000000000000000ffffffffffffffffffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/matrix_complexf16",
+"class": 3,
+"type": 20,
+"eltype": 5,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0080003d00400042",
+"attrs": {}
+},
+{
+"path": "/matrix_diagonal",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0000000000000840000000000000000000000000000000000000000000001440",
+"attrs": {
+"jtype": "Diagonal"
+}
+},
+{
+"path": "/matrix_symmetric",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "000000000000f03f000000000000084000000000000008400000000000001040",
+"attrs": {
+"jtype": "Symmetric"
+}
+},
+{
+"path": "/matrix_hermitian",
+"class": 3,
+"type": 20,
+"eltype": 5,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "000000000000f03f00000000000000000000000000000040000000000000f0bf0000000000000040000000000000f03f00000000000010400000000000000000",
+"attrs": {
+"jtype": "Hermitian"
+}
+},
+{
+"path": "/mvts_float64",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 3,
+"freq": 32,
+"first": "24288",
+"names": null
+},
+{
+"type": 2,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": [
+"a",
+"b"
+]
+}
+],
+"hex": "000000000000f03f00000000000000400000000000000840000000000000104000000000000014400000000000001840",
+"attrs": {}
+},
+{
+"path": "/mvts_int64",
+"class": 3,
+"type": 21,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 67,
+"first": "8080",
+"names": null
+},
+{
+"type": 2,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": [
+"x",
+"y"
+]
+}
+],
+"hex": "0100000000000000020000000000000003000000000000000400000000000000",
+"attrs": {}
+},
+{
+"path": "/mvts_bool",
+"class": 3,
+"type": 21,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 32,
+"first": "24288",
+"names": null
+},
+{
+"type": 2,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": [
+"a",
+"b"
+]
+}
+],
+"hex": "01000001",
+"attrs": {
+"jeltype": "Bool"
+}
+},
+{
+"path": "/mvts_one_col",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 32,
+"first": "24288",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"only"
+]
+}
+],
+"hex": "000000000000f03f0000000000000040",
+"attrs": {}
+},
+{
+"path": "/mvts_unicode",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 32,
+"first": "24288",
+"names": null
+},
+{
+"type": 2,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": [
+"a\u00e9",
+"\ud83d\ude42"
+]
+}
+],
+"hex": "000000000000f03f000000000000004000000000000008400000000000001040",
+"attrs": {}
+},
+{
+"path": "/mvts_empty_name",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 32,
+"first": "24288",
+"names": null
+},
+{
+"type": 2,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": [
+"",
+"b"
+]
+}
+],
+"hex": "000000000000f03f000000000000004000000000000008400000000000001040",
+"attrs": {}
+},
+{
+"path": "/mvts_zero_rows",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 0,
+"freq": 32,
+"first": "24288",
+"names": null
+},
+{
+"type": 2,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": [
+"a",
+"b"
+]
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Float64"
+}
+},
+{
+"path": "/mvts_min_u",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 11,
+"first": "-9223372036854775808",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_max_u",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 11,
+"first": "9223372036854775807",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_min_d",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 12,
+"first": "-11980259",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_max_d",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 12,
+"first": "11979954",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_min_b",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 13,
+"first": "-8557114",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_max_b",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 13,
+"first": "8557110",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_min_w7",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 23,
+"first": "-1711422",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_max_w7",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 23,
+"first": "1711422",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_min_m",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 32,
+"first": "-393600",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_max_m",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 32,
+"first": "2147483647",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_min_q1",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 65,
+"first": "-131200",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_max_q1",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 65,
+"first": "2147483647",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_min_h1",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 129,
+"first": "-65600",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_max_h1",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 129,
+"first": "2147483647",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_min_y1",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 257,
+"first": "-2147483648",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/mvts_max_y1",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 1,
+"freq": 257,
+"first": "2147483647",
+"names": null
+},
+{
+"type": 2,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": [
+"a"
+]
+}
+],
+"hex": "000000000000f03f",
+"attrs": {}
+},
+{
+"path": "/text_ascii",
+"class": 2,
+"type": 10,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "616c70686100007a00",
+"attrs": {}
+},
+{
+"path": "/text_symbol",
+"class": 2,
+"type": 10,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "616c70686100007a00",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text_empty",
+"class": 2,
+"type": 10,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "String"
+}
+},
+{
+"path": "/text_multibyte",
+"class": 2,
+"type": 10,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "c3a900f09f99820061c3a900",
+"attrs": {}
+},
+{
+"path": "/text_multibyte_symbol",
+"class": 2,
+"type": 10,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "c3a900f09f99820061c3a900",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text_one_empty_string",
+"class": 2,
+"type": 10,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "00",
+"attrs": {}
+}
+]
+}

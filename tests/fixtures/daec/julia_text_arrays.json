@@ -1,0 +1,1062 @@
+{
+"file": "julia_text_arrays.daec",
+"objects": [
+{
+"path": "/text2_2x3",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "723163310072326331007231633200723263320072316333007232633300",
+"attrs": {}
+},
+{
+"path": "/text2_3x2",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "723163310072316332007231633300723263310072326332007232633300",
+"attrs": {}
+},
+{
+"path": "/text2_blank_2x2",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "00000000",
+"attrs": {}
+},
+{
+"path": "/text2_symbol_2x2",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "616c706861000062006400",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text2_substring_1x2",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "616200626300",
+"attrs": {
+"jeltype": "SubString{String}"
+}
+},
+{
+"path": "/text2_empty_0x0",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "String"
+}
+},
+{
+"path": "/text2_empty_0x3",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "String"
+}
+},
+{
+"path": "/text2_empty_3x0",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "String"
+}
+},
+{
+"path": "/text2_symbol_empty_0x2",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text3_2x2x3",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "653100653200653300653400653500653600653700653800653900653130006531310065313200",
+"attrs": {}
+},
+{
+"path": "/text3_3x2x4",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 4,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "683100683200683300683400683500683600683700683800683900683130006831310068313200683133006831340068313500683136006831370068313800683139006832300068323100683232006832330068323400",
+"attrs": {}
+},
+{
+"path": "/text3_4x3x2",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 4,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "683100683200683300683400683500683600683700683800683900683130006831310068313200683133006831340068313500683136006831370068313800683139006832300068323100683232006832330068323400",
+"attrs": {}
+},
+{
+"path": "/text4_1x2x3x1",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "663100663200663300663400663500663600",
+"attrs": {}
+},
+{
+"path": "/text5_2x1x2x1x1",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "673100673200673300673400",
+"attrs": {}
+},
+{
+"path": "/text3_symbol_1x2x3",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "6100626200636363000065006600",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text5_symbol_1x1x2x1x1",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "70007100",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text3_substring_1x1x2",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "616200626300",
+"attrs": {
+"jeltype": "SubString{String}"
+}
+},
+{
+"path": "/text2_multibyte_2x2",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "c3a900f09f99820061c3a9007a00",
+"attrs": {}
+},
+{
+"path": "/text2_multibyte_symbol_2x2",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "c3a900f09f99820061c3a9007a00",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text3_multibyte_1x2x2",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "c3a900f09f99820061c3a9007a00",
+"attrs": {}
+},
+{
+"path": "/text5_multibyte_symbol_2x1x1x1x2",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "c3a900f09f99820061c3a9007a00",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text3_empty_0x2x3",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {}
+},
+{
+"path": "/text3_empty_marked_0x2x3",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "String"
+}
+},
+{
+"path": "/text5_symbol_empty_0x0x0x0x0",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text4_empty_1x0x1x0",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 0,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "",
+"attrs": {}
+},
+{
+"path": "/text2_string_marker_2x3",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "723163310072326331007231633200723263320072316333007232633300",
+"attrs": {
+"jeltype": "String"
+}
+},
+{
+"path": "/text3_string_marker_2x2x3",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "653100653200653300653400653500653600653700653800653900653130006531310065313200",
+"attrs": {
+"jeltype": "String"
+}
+},
+{
+"path": "/text2_abstract_2x3",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "723163310072326331007231633200723263320072316333007232633300",
+"attrs": {
+"jeltype": "AbstractString"
+}
+},
+{
+"path": "/text_ws/tm",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "723163310072326331007231633200723263320072316333007232633300",
+"attrs": {}
+},
+{
+"path": "/text_ws/ts",
+"class": 3,
+"type": 20,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "616c706861000062006400",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text_ws/tt",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "653100653200653300653400653500653600653700653800653900653130006531310065313200",
+"attrs": {}
+},
+{
+"path": "/text_ws/t5",
+"class": 4,
+"type": 30,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "70007100",
+"attrs": {
+"jeltype": "Symbol"
+}
+},
+{
+"path": "/text_ws/tv",
+"class": 2,
+"type": 10,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "61006200",
+"attrs": {}
+}
+]
+}

@@ -1,0 +1,65 @@
+{
+"file": "julia_file_operations.daec",
+"objects": [
+{
+"path": "/keep/z",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0400000000000000",
+"attrs": {}
+},
+{
+"path": "/keep/inner/w",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0500000000000000",
+"attrs": {}
+},
+{
+"path": "/s2",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 3,
+"freq": 32,
+"first": "24288",
+"names": null
+}
+],
+"hex": "000000000000f03f00000000000000400000000000000840",
+"attrs": {}
+},
+{
+"path": "/a",
+"class": 1,
+"type": 6,
+"freq": 0,
+"hex": "7265706c6163656400",
+"attrs": {}
+},
+{
+"path": "/overwritten_series",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 3,
+"freq": 32,
+"first": "24288",
+"names": null
+}
+],
+"hex": "000000000000f03f00000000000000400000000000000840",
+"attrs": {}
+}
+]
+}

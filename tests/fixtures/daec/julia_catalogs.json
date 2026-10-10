@@ -1,0 +1,313 @@
+{
+"file": "julia_catalogs.daec",
+"objects": [
+{
+"path": "/cat/scalar",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000000000000f83f",
+"attrs": {
+"": "empty name",
+"delim": "a\u2016b",
+"empty": "",
+"k\u20163": "v3",
+"long": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+"note": "second",
+"run\u001e\u001f\u001f": "r",
+"unicod\u00e9/\u540d ": "v\u00e4lue \ud83d\ude42\nline\ttab",
+"unit": "a\u001fb"
+}
+},
+{
+"path": "/cat/sub/text",
+"class": 1,
+"type": 6,
+"freq": 0,
+"hex": "76696e7461676520e28096203300",
+"attrs": {}
+},
+{
+"path": "/cat/sub/vector",
+"class": 2,
+"type": 10,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "010000000200000003000000",
+"attrs": {}
+},
+{
+"path": "/cat/sub/matrix",
+"class": 3,
+"type": 20,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "000000000000f03f000000000000084000000000000000400000000000001040",
+"attrs": {}
+},
+{
+"path": "/cat/sub/deep/tensor",
+"class": 4,
+"type": 30,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 3,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 4,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "0100000000000000020000000000000003000000000000000400000000000000050000000000000006000000000000000700000000000000080000000000000009000000000000000a000000000000000b000000000000000c000000000000000d000000000000000e000000000000000f00000000000000100000000000000011000000000000001200000000000000130000000000000014000000000000001500000000000000160000000000000017000000000000001800000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/sub/deep/series",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 3,
+"freq": 32,
+"first": "24288",
+"names": null
+}
+],
+"hex": "000000000000f03f00000000000000400000000000000840",
+"attrs": {}
+},
+{
+"path": "/cat/sub/mvtseries",
+"class": 3,
+"type": 21,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 67,
+"first": "8096",
+"names": null
+},
+{
+"type": 2,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": [
+"p",
+"q"
+]
+}
+],
+"hex": "000000000000f03f000000000000084000000000000000400000000000001040",
+"attrs": {}
+},
+{
+"path": "/cat/sub/bools",
+"class": 2,
+"type": 12,
+"eltype": 1,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 32,
+"first": "24288",
+"names": null
+}
+],
+"hex": "0100",
+"attrs": {
+"jeltype": "Bool"
+}
+},
+{
+"path": "/cat/sub/text_vector",
+"class": 2,
+"type": 10,
+"eltype": 6,
+"elfreq": 0,
+"axes": [
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "61006200",
+"attrs": {}
+},
+{
+"path": "/cat/\u65e5\u672c\u8a9e/dates",
+"class": 2,
+"type": 12,
+"eltype": 3,
+"elfreq": 32,
+"axes": [
+{
+"type": 1,
+"length": 2,
+"freq": 32,
+"first": "24288",
+"names": null
+}
+],
+"hex": "e05e000000000000e15e000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/\u65e5\u672c\u8a9e/date_array",
+"class": 3,
+"type": 20,
+"eltype": 3,
+"elfreq": 32,
+"axes": [
+{
+"type": 0,
+"length": 1,
+"freq": 0,
+"first": null,
+"names": null
+},
+{
+"type": 0,
+"length": 2,
+"freq": 0,
+"first": null,
+"names": null
+}
+],
+"hex": "e05e000000000000e15e000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/b",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/B",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/a",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/1",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/ sp",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/_u",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/\u00e4",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/Z",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/scalar_parent",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0200000000000000",
+"attrs": {}
+},
+{
+"path": "/cat/scalar_parent/child",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0300000000000000",
+"attrs": {}
+}
+]
+}

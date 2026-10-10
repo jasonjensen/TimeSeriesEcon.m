@@ -1,0 +1,215 @@
+{
+"file": "julia_int64_scalars.daec",
+"objects": [
+{
+"path": "/int_zero",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/int_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/int_negative_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/int_seven",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0700000000000000",
+"attrs": {}
+},
+{
+"path": "/int_negative_seven",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "f9ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/int_pow53",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0000000000002000",
+"attrs": {}
+},
+{
+"path": "/int_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/int_pow53_minus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffffffffffff1f00",
+"attrs": {}
+},
+{
+"path": "/int_negative_pow53_minus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffffffffffffdfff",
+"attrs": {}
+},
+{
+"path": "/int_pow62_plus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000040",
+"attrs": {}
+},
+{
+"path": "/int_max",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/int_min",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/int_min_plus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000000080",
+"attrs": {}
+},
+{
+"path": "/int_max_minus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "feffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/int_native_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/int_native_min",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/int_native_max",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/int_native_negative_one",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/ctl_bool_true",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "01",
+"attrs": {}
+},
+{
+"path": "/ctl_int32",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "07000000",
+"attrs": {}
+},
+{
+"path": "/ctl_int128",
+"class": 1,
+"type": 1,
+"freq": 0,
+"hex": "07000000000000000000000000000000",
+"attrs": {}
+},
+{
+"path": "/ctl_uint64",
+"class": 1,
+"type": 2,
+"freq": 0,
+"hex": "0700000000000000",
+"attrs": {}
+},
+{
+"path": "/ctl_duration_monthly",
+"class": 1,
+"type": 1,
+"freq": 32,
+"hex": "0300000000000000",
+"attrs": {}
+},
+{
+"path": "/ctl_mit_monthly",
+"class": 1,
+"type": 3,
+"freq": 32,
+"hex": "e05e000000000000",
+"attrs": {}
+},
+{
+"path": "/ctl_rational",
+"class": 1,
+"type": 4,
+"freq": 0,
+"hex": "000000000000e03f",
+"attrs": {
+"jtype": "Rational{Int64}"
+}
+},
+{
+"path": "/ctl_string",
+"class": 1,
+"type": 6,
+"freq": 0,
+"hex": "3700",
+"attrs": {}
+}
+]
+}

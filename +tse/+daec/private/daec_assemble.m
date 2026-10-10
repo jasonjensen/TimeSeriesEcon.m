@@ -7,10 +7,10 @@ function v = daec_assemble(objType, axes, values, jeltype)
 %   1:n for a plain axis.  Anything else, such as names-by-dates or a 3-d
 %   array with a range axis, gives a tse.daec.Array.
 %
-%   jeltype 'Bool' turns the stored 1-byte integers back into logicals.
+%   jeltype 'Bool' turns stored 0 and 1 back into logicals.
     e = daec_enums();
     if strcmp(jeltype, 'Bool') && isnumeric(values)
-        values = logical(values);
+        values = daec_bool(values);
     end
     lens = [axes.length];
     kinds = [axes.kind];

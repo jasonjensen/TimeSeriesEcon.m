@@ -8,7 +8,8 @@ function v = daec_unpack(ptr, eltype, elfreq, nbytes, n)
 %
 %   The element width is nbytes / n, as in TimeSeriesEcon.jl: a float of 4
 %   bytes reads as single, an integer of 4 bytes as int32, and so on.
-%   Dates read as tse.MIT and integers with a frequency as tse.Duration.
+%   Dates read as tse.MIT and integers with a frequency as tse.Duration;
+%   both need 8 bytes per element, and no other type takes a frequency.
 %
 %   Reading retypes ptr in place (setdatatype), which is safe because each
 %   value pointer is read once.
@@ -18,6 +19,9 @@ function v = daec_unpack(ptr, eltype, elfreq, nbytes, n)
     elfreq = daec_code('frequency_t', elfreq);
     nbytes = double(nbytes);
     n = double(n);
+    if elfreq ~= 0 && ~ismember(eltype, [T.type_date T.type_signed])
+        error('tseries:daec', 'Elements of type %d cannot have a frequency.', eltype);
+    end
 
     switch eltype
         case T.type_string
@@ -27,19 +31,26 @@ function v = daec_unpack(ptr, eltype, elfreq, nbytes, n)
             end
             bytes = readPointer(ptr, 'uint8', nbytes);
             stops = find(bytes == 0);
-            if numel(stops) < n
-                error('tseries:daec', 'Expected %d strings in %d bytes.', n, nbytes);
+            if numel(stops) ~= n || stops(end) ~= nbytes
+                error('tseries:daec', ['Expected %d zero-terminated strings ' ...
+                    'in %d bytes.'], n, nbytes);
             end
             start = 1;
             for k = 1:n
-                v(k) = string(native2unicode(reshape(bytes(start:stops(k)-1), 1, []), 'UTF-8'));
+                b = reshape(bytes(start:stops(k)-1), 1, []);
+                v(k) = string(native2unicode(b, 'UTF-8'));
+                if ~isequal(reshape(unicode2native(char(v(k)), 'UTF-8'), 1, []), b)
+                    error('tseries:daec', 'String %d is not valid UTF-8.', k);
+                end
                 start = stops(k) + 1;
             end
         case T.type_date
-            v = toDates(@tse.MIT, elfreq, readPointer(ptr, 'int64', n * (nbytes > 0)), n);
+            elementWidth(nbytes, n, 8, 8);
+            v = toDates(@tse.MIT, elfreq, readPointer(ptr, 'int64', n), n);
         case {T.type_signed, T.type_unsigned}
             if eltype == T.type_signed && elfreq ~= 0
-                v = toDates(@tse.Duration, elfreq, readPointer(ptr, 'int64', n * (nbytes > 0)), n);
+                elementWidth(nbytes, n, 8, 8);
+                v = toDates(@tse.Duration, elfreq, readPointer(ptr, 'int64', n), n);
                 return
             end
             sign = 'int';
@@ -73,7 +84,7 @@ function x = readPointer(ptr, cls, count)
 end
 
 function width = elementWidth(nbytes, n, default, allowed)
-    if n == 0 || nbytes == 0
+    if n == 0
         width = default;
         return
     end

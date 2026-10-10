@@ -1,0 +1,1637 @@
+{
+"file": "julia_unit_calendar_scalars.daec",
+"objects": [
+{
+"path": "/mit_d_typical",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "54460b0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_d_year_end",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "b3470b0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_d_year_start",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "b4470b0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_d_leap_day",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "81460b0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_d_first_day",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_d_year_zero",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "39ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_d_negative_year",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "aef7ffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_d_negative_one",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_d_zero",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_d_minimum",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "1d3249ffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_d_maximum",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "b2ccb60000000000",
+"attrs": {}
+},
+{
+"path": "/mit_d_py_max_year",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "dbb9370000000000",
+"attrs": {}
+},
+{
+"path": "/mit_d_beyond_py_year",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "deb9370000000000",
+"attrs": {}
+},
+{
+"path": "/dur_d_zero",
+"class": 1,
+"type": 1,
+"freq": 12,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_d_one",
+"class": 1,
+"type": 1,
+"freq": 12,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_d_negative_one",
+"class": 1,
+"type": 1,
+"freq": 12,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_d_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 12,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/dur_d_max",
+"class": 1,
+"type": 1,
+"freq": 12,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_d_min",
+"class": 1,
+"type": 1,
+"freq": 12,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_b_typical",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "aa0d080000000000",
+"attrs": {}
+},
+{
+"path": "/mit_b_year_end",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "a50e080000000000",
+"attrs": {}
+},
+{
+"path": "/mit_b_year_start",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "a60e080000000000",
+"attrs": {}
+},
+{
+"path": "/mit_b_leap_day",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "cb0d080000000000",
+"attrs": {}
+},
+{
+"path": "/mit_b_first_day",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_b_year_zero",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "73ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_b_negative_year",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "10faffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_b_negative_one",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_b_zero",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_b_minimum",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "c66d7dffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_b_maximum",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "3692820000000000",
+"attrs": {}
+},
+{
+"path": "/mit_b_py_max_year",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "e7cd270000000000",
+"attrs": {}
+},
+{
+"path": "/mit_b_beyond_py_year",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "e8cd270000000000",
+"attrs": {}
+},
+{
+"path": "/dur_b_zero",
+"class": 1,
+"type": 1,
+"freq": 13,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_b_one",
+"class": 1,
+"type": 1,
+"freq": 13,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_b_negative_one",
+"class": 1,
+"type": 1,
+"freq": 13,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_b_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 13,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/dur_b_max",
+"class": 1,
+"type": 1,
+"freq": 13,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_b_min",
+"class": 1,
+"type": 1,
+"freq": 13,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_w1_typical",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "569c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w1_year_end",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "899c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w1_year_start",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "899c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w1_leap_day",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "5d9c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w1_first_day",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w1_year_zero",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "e5ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w1_negative_year",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "d1feffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w1_negative_one",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w1_zero",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w1_minimum",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "c2e2e5ffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w1_maximum",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "3e1d1a0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w1_py_max_year",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w1_beyond_py_year",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w1_zero",
+"class": 1,
+"type": 1,
+"freq": 17,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w1_one",
+"class": 1,
+"type": 1,
+"freq": 17,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w1_negative_one",
+"class": 1,
+"type": 1,
+"freq": 17,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_w1_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 17,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/dur_w1_max",
+"class": 1,
+"type": 1,
+"freq": 17,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_w1_min",
+"class": 1,
+"type": 1,
+"freq": 17,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_w2_typical",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "569c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w2_year_end",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w2_year_start",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "899c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w2_leap_day",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "5d9c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w2_first_day",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w2_year_zero",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "e5ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w2_negative_year",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "d1feffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w2_negative_one",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w2_zero",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w2_minimum",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "c2e2e5ffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w2_maximum",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "3e1d1a0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w2_py_max_year",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w2_beyond_py_year",
+"class": 1,
+"type": 3,
+"freq": 18,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w2_zero",
+"class": 1,
+"type": 1,
+"freq": 18,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w2_one",
+"class": 1,
+"type": 1,
+"freq": 18,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w2_negative_one",
+"class": 1,
+"type": 1,
+"freq": 18,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_w2_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 18,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/dur_w2_max",
+"class": 1,
+"type": 1,
+"freq": 18,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_w2_min",
+"class": 1,
+"type": 1,
+"freq": 18,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_w3_typical",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "569c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w3_year_end",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w3_year_start",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w3_leap_day",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "5d9c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w3_first_day",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w3_year_zero",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "e5ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w3_negative_year",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "d1feffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w3_negative_one",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w3_zero",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w3_minimum",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "c2e2e5ffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w3_maximum",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "3e1d1a0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w3_py_max_year",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w3_beyond_py_year",
+"class": 1,
+"type": 3,
+"freq": 19,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w3_zero",
+"class": 1,
+"type": 1,
+"freq": 19,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w3_one",
+"class": 1,
+"type": 1,
+"freq": 19,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w3_negative_one",
+"class": 1,
+"type": 1,
+"freq": 19,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_w3_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 19,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/dur_w3_max",
+"class": 1,
+"type": 1,
+"freq": 19,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_w3_min",
+"class": 1,
+"type": 1,
+"freq": 19,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_w4_typical",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "569c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w4_year_end",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w4_year_start",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w4_leap_day",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "5c9c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w4_first_day",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w4_year_zero",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "e4ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w4_negative_year",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "d1feffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w4_negative_one",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w4_zero",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w4_minimum",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "c2e2e5ffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w4_maximum",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "3e1d1a0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w4_py_max_year",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w4_beyond_py_year",
+"class": 1,
+"type": 3,
+"freq": 20,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w4_zero",
+"class": 1,
+"type": 1,
+"freq": 20,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w4_one",
+"class": 1,
+"type": 1,
+"freq": 20,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w4_negative_one",
+"class": 1,
+"type": 1,
+"freq": 20,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_w4_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 20,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/dur_w4_max",
+"class": 1,
+"type": 1,
+"freq": 20,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_w4_min",
+"class": 1,
+"type": 1,
+"freq": 20,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_w5_typical",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "569c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w5_year_end",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w5_year_start",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w5_leap_day",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "5c9c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w5_first_day",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w5_year_zero",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "e4ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w5_negative_year",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "d0feffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w5_negative_one",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w5_zero",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w5_minimum",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "c2e2e5ffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w5_maximum",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "3e1d1a0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w5_py_max_year",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "fbf5070000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w5_beyond_py_year",
+"class": 1,
+"type": 3,
+"freq": 21,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w5_zero",
+"class": 1,
+"type": 1,
+"freq": 21,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w5_one",
+"class": 1,
+"type": 1,
+"freq": 21,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w5_negative_one",
+"class": 1,
+"type": 1,
+"freq": 21,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_w5_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 21,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/dur_w5_max",
+"class": 1,
+"type": 1,
+"freq": 21,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_w5_min",
+"class": 1,
+"type": 1,
+"freq": 21,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_w6_typical",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "569c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w6_year_end",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w6_year_start",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w6_leap_day",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "5c9c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w6_first_day",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w6_year_zero",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "e4ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w6_negative_year",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "d0feffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w6_negative_one",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w6_zero",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w6_minimum",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "c2e2e5ffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w6_maximum",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "3e1d1a0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w6_py_max_year",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "fbf5070000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w6_beyond_py_year",
+"class": 1,
+"type": 3,
+"freq": 22,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w6_zero",
+"class": 1,
+"type": 1,
+"freq": 22,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w6_one",
+"class": 1,
+"type": 1,
+"freq": 22,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w6_negative_one",
+"class": 1,
+"type": 1,
+"freq": 22,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_w6_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 22,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/dur_w6_max",
+"class": 1,
+"type": 1,
+"freq": 22,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_w6_min",
+"class": 1,
+"type": 1,
+"freq": 22,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_w7_typical",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "569c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w7_year_end",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w7_year_start",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "889c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w7_leap_day",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "5c9c010000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w7_first_day",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w7_year_zero",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "e4ffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w7_negative_year",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "d0feffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w7_negative_one",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w7_zero",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w7_minimum",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "c2e2e5ffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_w7_maximum",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "3e1d1a0000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w7_py_max_year",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "fbf5070000000000",
+"attrs": {}
+},
+{
+"path": "/mit_w7_beyond_py_year",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "fcf5070000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w7_zero",
+"class": 1,
+"type": 1,
+"freq": 23,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w7_one",
+"class": 1,
+"type": 1,
+"freq": 23,
+"hex": "0100000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_w7_negative_one",
+"class": 1,
+"type": 1,
+"freq": 23,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_w7_pow53_plus_one",
+"class": 1,
+"type": 1,
+"freq": 23,
+"hex": "0100000000002000",
+"attrs": {}
+},
+{
+"path": "/dur_w7_max",
+"class": 1,
+"type": 1,
+"freq": 23,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_w7_min",
+"class": 1,
+"type": 1,
+"freq": 23,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_u_min",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/dur_u_min",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "0000000000000080",
+"attrs": {}
+},
+{
+"path": "/mit_u_neg_pow40",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "0000000000ffffff",
+"attrs": {}
+},
+{
+"path": "/dur_u_neg_pow40",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "0000000000ffffff",
+"attrs": {}
+},
+{
+"path": "/mit_u_below_int32",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "ffffff7fffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_u_below_int32",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "ffffff7fffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_u_int32_min",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "00000080ffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_u_int32_min",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "00000080ffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_u_negative_one",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/dur_u_negative_one",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "ffffffffffffffff",
+"attrs": {}
+},
+{
+"path": "/mit_u_zero",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_u_zero",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "0000000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_u_five",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "0500000000000000",
+"attrs": {}
+},
+{
+"path": "/dur_u_five",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "0500000000000000",
+"attrs": {}
+},
+{
+"path": "/mit_u_int32_max",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "ffffff7f00000000",
+"attrs": {}
+},
+{
+"path": "/dur_u_int32_max",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "ffffff7f00000000",
+"attrs": {}
+},
+{
+"path": "/mit_u_beyond_int32",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "0000008000000000",
+"attrs": {}
+},
+{
+"path": "/dur_u_beyond_int32",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "0000008000000000",
+"attrs": {}
+},
+{
+"path": "/mit_u_pow40",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "0000000000010000",
+"attrs": {}
+},
+{
+"path": "/dur_u_pow40",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "0000000000010000",
+"attrs": {}
+},
+{
+"path": "/mit_u_max",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/dur_u_max",
+"class": 1,
+"type": 1,
+"freq": 11,
+"hex": "ffffffffffffff7f",
+"attrs": {}
+},
+{
+"path": "/ctl_mit_d_below_window",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "1c3249ffffffffff",
+"attrs": {}
+},
+{
+"path": "/ctl_mit_b_below_window",
+"class": 1,
+"type": 3,
+"freq": 13,
+"hex": "c56d7dffffffffff",
+"attrs": {}
+},
+{
+"path": "/ctl_mit_w7_below_window",
+"class": 1,
+"type": 3,
+"freq": 23,
+"hex": "c1e2e5ffffffffff",
+"attrs": {}
+},
+{
+"path": "/ctl_weekly8_mit",
+"class": 1,
+"type": 3,
+"freq": 17,
+"hex": "559c010000000000",
+"attrs": {}
+},
+{
+"path": "/native_date_weekly16",
+"class": 1,
+"type": 3,
+"freq": 16,
+"hex": "559c010000000000",
+"attrs": {}
+},
+{
+"path": "/native_date_freq14",
+"class": 1,
+"type": 3,
+"freq": 14,
+"hex": "54460b0000000000",
+"attrs": {}
+},
+{
+"path": "/native_date_weekly24",
+"class": 1,
+"type": 3,
+"freq": 24,
+"hex": "559c010000000000",
+"attrs": {}
+},
+{
+"path": "/native_date_unit_four_bytes",
+"class": 1,
+"type": 3,
+"freq": 11,
+"hex": "05000000",
+"attrs": {}
+},
+{
+"path": "/native_date_daily_above_maximum",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "b3ccb60000000000",
+"attrs": {}
+},
+{
+"path": "/native_date_daily_int32_wrap",
+"class": 1,
+"type": 3,
+"freq": 12,
+"hex": "54460b0001000000",
+"attrs": {}
+},
+{
+"path": "/native_duration_weekly16",
+"class": 1,
+"type": 1,
+"freq": 16,
+"hex": "0200000000000000",
+"attrs": {}
+}
+]
+}

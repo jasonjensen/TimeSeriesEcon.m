@@ -1,0 +1,23 @@
+{
+"file": "julia_monthly.daec",
+"objects": [
+{
+"path": "/sample",
+"class": 2,
+"type": 12,
+"eltype": 4,
+"elfreq": 0,
+"axes": [
+{
+"type": 1,
+"length": 4,
+"freq": 32,
+"first": "24288",
+"names": null
+}
+],
+"hex": "000000000000f43f00000000000004c000000000000000000000000000001340",
+"attrs": {}
+}
+]
+}
