@@ -66,7 +66,8 @@ end
 
 function loadLibrary(alias)
     % ndtseries_t holds an axis_t[DE_MAX_AXES] array, which loadlibrary
-    % cannot describe and warns about; the N-d calls take pointers instead.
+    % cannot describe and warns about.  Only N-d reads touch that struct;
+    % they are handled when N-d support is ported.
     w = warning('off', 'MATLAB:loadlibrary:TypeNotFoundForStructure');
     restore = onCleanup(@() warning(w));
     custom = getenv('TSE_LIBDAEC');
