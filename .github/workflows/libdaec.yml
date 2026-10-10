@@ -3,14 +3,13 @@ name: Build libdaec
 # Builds the DataEcon C library at a pinned commit for Linux, Windows and
 # macOS, generates the loadlibrary prototype and thunk files on each, and
 # commits them into +tse/+daec/private so users need neither a C compiler
-# nor a DataEcon checkout.  Runs when this workflow or the build scripts
-# change on a pull request, or by hand.
+# nor a DataEcon checkout.
+#
+# Run it by hand (Actions > Build libdaec > Run workflow, on your branch)
+# only when the pin below changes; the committed binaries are reused
+# otherwise.
 
 on:
-  pull_request:
-    paths:
-      - .github/workflows/libdaec.yml
-      - tools/libdaec/**
   workflow_dispatch:
 
 permissions:
@@ -25,9 +24,6 @@ env:
 jobs:
   build:
     name: Build (${{ matrix.arch }})
-    # The commit job's own push re-triggers this workflow; skip that run,
-    # or every build would commit fresh timestamps and start another.
-    if: github.actor != 'github-actions[bot]'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -129,7 +125,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
+          ref: ${{ github.ref_name }}
 
       - uses: actions/download-artifact@v4
         with:
