@@ -1,0 +1,183 @@
+name: Build libdaec
+
+# Builds the DataEcon C library at a pinned commit for Linux, Windows and
+# macOS, generates the loadlibrary prototype and thunk files on each, and
+# commits them into +tse/+daec/private so users need neither a C compiler
+# nor a DataEcon checkout.
+#
+# Run it by hand (Actions > Build libdaec > Run workflow, on your branch)
+# only when the pin below changes; the committed binaries are reused
+# otherwise.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  DATAECON_SHA: 1a108688a044380f808bebf64079e32dbb9cd1a4
+  DATAECON_ZIP_SHA256: d2b48df3a47d173c43354fe033438253bb46d878ae6c3824c6224fbd4e6a2d71
+  DAEC_H_SHA256: b593ac15cf4d262705d2b19b1cc3cf7936322e8cb28079ed0fa07c2049a97c10
+
+jobs:
+  build:
+    name: Build (${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: glnxa64
+            lib: libdaec.so
+          - os: windows-latest
+            arch: win64
+            lib: libdaec.dll
+          - os: macos-latest
+            arch: maca64
+            lib: libdaec.dylib
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch DataEcon source
+        run: |
+          curl -fsSL -o dataecon.zip "https://codeload.github.com/bankofcanada/DataEcon/zip/${DATAECON_SHA}"
+          python3 - <<'PY'
+          import hashlib, os, sys, zipfile
+          data = open("dataecon.zip", "rb").read()
+          got = hashlib.sha256(data).hexdigest()
+          if got != os.environ["DATAECON_ZIP_SHA256"]:
+              sys.exit(f"DataEcon zip hash {got} does not match the pin")
+          zipfile.ZipFile("dataecon.zip").extractall(".")
+          PY
+          mv "DataEcon-${DATAECON_SHA}" dataecon
+          python3 - <<'PY'
+          import hashlib, os, sys
+          got = hashlib.sha256(open("dataecon/include/daec.h", "rb").read()).hexdigest()
+          if got != os.environ["DAEC_H_SHA256"]:
+              sys.exit(f"daec.h hash {got} does not match the pin")
+          PY
+
+      # glibc 2.28 floor (RHEL 8 era), so the library also loads on older
+      # servers and HPC nodes, as Python's manylinux_2_28 wheels do.
+      - name: Build (Linux, manylinux_2_28)
+        if: runner.os == 'Linux'
+        run: |
+          docker run --rm -v "$PWD/dataecon:/src" -w /src quay.io/pypa/manylinux_2_28_x86_64 \
+            bash -c 'make libdaec CFLAGS="-std=c99 -O2 -fPIC" && strip --strip-unneeded lib/libdaec.so'
+          sudo chown -R "$(id -u)" dataecon
+          cp dataecon/lib/libdaec.so libdaec.so
+
+      - name: Build (Windows, MinGW)
+        if: runner.os == 'Windows'
+        run: |
+          cd dataecon
+          make CC=gcc libdaec CFLAGS="-std=c99 -O2" LDFLAGS="-static-libgcc -static"
+          strip --strip-unneeded lib/daec.dll
+          cp lib/daec.dll ../libdaec.dll
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cd dataecon
+          make CC=clang libdaec CFLAGS="-std=c99 -O2 -fPIC"
+          strip -x lib/libdaec.so
+          cp lib/libdaec.so ../libdaec.dylib
+
+      - uses: matlab-actions/setup-matlab@v2
+        with:
+          release: latest
+
+      - name: Generate prototype and thunk
+        uses: matlab-actions/run-command@v2
+        with:
+          command: >-
+            mex -setup C;
+            addpath('tools/libdaec');
+            mkdir('proto');
+            make_proto(fullfile(pwd, '${{ matrix.lib }}'),
+            fullfile(pwd, 'dataecon', 'include', 'daec.h'),
+            fullfile(pwd, 'proto'));
+
+      - name: Collect
+        run: |
+          mkdir -p out/bin/${{ matrix.arch }}
+          cp ${{ matrix.lib }} out/bin/${{ matrix.arch }}/
+          cp proto/bin/${{ matrix.arch }}/libdaec_thunk_${{ matrix.arch }}.* out/bin/${{ matrix.arch }}/
+          rm -f out/bin/${{ matrix.arch }}/*.{c,obj,o,exp,lib,def}
+          cp proto/daec_proto_${{ matrix.arch }}.m out/
+          ls -lR out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libdaec-${{ matrix.arch }}
+          path: out/
+
+  commit:
+    name: Commit binaries
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: libdaec-*
+          merge-multiple: true
+          path: artifacts
+
+      - name: Place files
+        run: |
+          dest='+tse/+daec/private'
+          rm -rf "$dest/bin" "$dest"/daec_proto_*.m
+          mkdir -p "$dest/bin" "$dest/include"
+          cp -r artifacts/bin/* "$dest/bin/"
+          cp artifacts/daec_proto_*.m "$dest/"
+          curl -fsSL -o "$dest/include/daec.h" \
+            "https://raw.githubusercontent.com/bankofcanada/DataEcon/${DATAECON_SHA}/include/daec.h"
+          curl -fsSL -o "$dest/bin/LICENSE-DataEcon.md" \
+            "https://raw.githubusercontent.com/bankofcanada/DataEcon/${DATAECON_SHA}/LICENSE.md"
+          echo "$DAEC_H_SHA256  $dest/include/daec.h" | sha256sum -c -
+          {
+            echo "# Bundled libdaec"
+            echo
+            echo "Built by .github/workflows/libdaec.yml; do not edit by hand."
+            echo
+            echo "- DataEcon source: bankofcanada/DataEcon@${DATAECON_SHA}"
+            echo "- Library version: $(grep -o 'DE_VERSION "[^"]*"' "$dest/include/daec.h" | cut -d'"' -f2)"
+            echo "- Built: $(date -u +%Y-%m-%d) in run ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "- Linux build: manylinux_2_28 (glibc 2.28 or newer)"
+            echo
+            echo "DataEcon is BSD-3-Clause (LICENSE-DataEcon.md). It embeds SQLite, which is in the public domain."
+            echo
+            echo "| File | SHA-256 |"
+            echo "| --- | --- |"
+            (cd "$dest/bin" && find . -type f ! -name '*.md' | sort | while read -r f; do
+              echo "| ${f#./} | $(sha256sum "$f" | cut -d' ' -f1) |"
+            done)
+          } > "$dest/bin/README.md"
+          ls -lR "$dest"
+
+      - name: Commit and push
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '+tse/+daec/private'
+          if git diff --cached --quiet; then
+            echo "Binaries unchanged."
+            exit 0
+          fi
+          git commit -m "Build libdaec at DataEcon ${DATAECON_SHA:0:7}"
+          git push origin HEAD
+          # Pushes made with the workflow token start no workflows, so run
+          # the test suite on the new commit explicitly.
+          gh workflow run tests.yml --ref "$(git rev-parse --abbrev-ref HEAD)"
