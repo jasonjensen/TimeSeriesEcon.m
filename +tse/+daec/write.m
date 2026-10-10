@@ -1,23 +1,13 @@
 function write(path, db)
-%WRITE  Write a database of tse.* series to a DataEcon .daec file.
+%WRITE  Replace the contents of a .daec file with a struct.
 %
 %   tse.daec.write('data.daec', db)
 %
-%   db is a struct whose fields are tse.TSeries / tse.MVTSeries (and/or
-%   plain scalars, vectors, matrices, strings, or nested structs -- DataEcon
-%   stores those too).  The file is truncated and rewritten.  Requires a
-%   loaded libdaec; call tse.daec.startup(daecPath) first.
-    if ~tse.daec.isavailable()
-        error('tseries:noMatch', ...
-            'DataEcon MATLAB classes are not on the path; cannot write a .daec file.');
-    end
-    if ~DAEC.isloaded()
-        error('tseries:noMatch', ...
-            'libdaec is not loaded; call tse.daec.startup(daecPath) before writing.');
-    end
+%   Same as tse.daec.writedb(path, db, 'append', false): the file is
+%   emptied first.  See also tse.daec.writedb.
     if ~isstruct(db)
         error('tseries:noMatch', ...
             'write expects a struct database (got %s). Wrap a single series in a struct.', class(db));
     end
-    DAEC.writedb(path, db);
+    tse.daec.writedb(path, db, 'append', false);
 end

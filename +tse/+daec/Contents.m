@@ -1,22 +1,34 @@
-% TSE.DAEC  Interop helpers between TimeSeriesEcon.m and DataEcon (.daec).
+% TSE.DAEC  Read and write DataEcon (.daec) files.
 %
-% Round-trip conversions between DataEcon's MATLAB classes (DEDate, DESeries,
-% DEFile) and the tse.* equivalents.  Nothing else in +tse/ depends on
-% DataEcon being installed; these helpers only check for it at call time.
+% .daec files are SQLite databases written by DataEcon, the library behind
+% TimeSeriesEcon.jl's DataEcon module and tsecon.dataecon in Python, so a
+% file written here reads there and back.  The library ships with tse for
+% Windows, Linux and macOS; nothing else needs installing.
 %
-% Unlike the IRIS bridge, no frequency remapping is needed: DataEcon is the C
-% backend for TimeSeriesEcon.jl, and tse's MATLAB port matches it bit-for-bit
-% -- the tse frequency codes ARE DataEcon's frequency_t enum, and both store
-% dates as the same rata die / period-since-epoch integer.  So MIT<->DEDate is
-% the identity on (frequency, value); only file I/O needs the native libdaec.
+% The tse frequency codes ARE DataEcon's frequency_t enum, and both store
+% dates as the same integer, so dates need no conversion.
+%
+% Files (the names follow TimeSeriesEcon.jl)
+%   readdb         - read a file, or a catalog in it, into a struct
+%   writedb        - write a struct to a file
+%   opendaec       - open a file as a tse.daec.File, for finer control
+%   opendaecmem    - open an in-memory file
+%   closedaec      - close a file
+%   File           - an open file: catalogs, attributes, store_*/load_*
+%   read, write    - readdb, and writedb into an emptied file
+%
+% Arrays in any layout
+%   Axis           - one dimension: plain, a date range, or names
+%   Array          - values with one Axis per dimension, in any order
 %
 % Native library (bundled for Windows, Linux and macOS; see
 % private/bin/README.md)
 %   version        - version of the libdaec in use
 %
-% Availability
+% Interop with DataEcon's own MATLAB classes (DEDate, DEAxis, DESeries),
+% which need DataEcon's matlab/ folder on the path
 %   isavailable    - true iff the DataEcon MATLAB classes are on the path
-%   startup        - addpath the DataEcon matlab/ folder and load libdaec
+%   startup        - addpath the DataEcon matlab/ folder and load its libdaec
 %
 % Dates and ranges (these layers need no native library)
 %   to_date        - tse.MIT      -> DataEcon DEDate
@@ -32,6 +44,3 @@
 %   to_db          - struct of tse.* series -> struct of DESeries
 %   from_db        - struct of DESeries -> struct of tse.* series
 %
-% Files (these require a loaded libdaec; call tse.daec.startup first)
-%   write          - write a struct of tse.* series to a .daec file
-%   read           - read a .daec file into a struct of tse.* series
