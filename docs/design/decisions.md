@@ -30,7 +30,7 @@ the deviations that aren't obvious from reading the code.
 | 08 | Statistics axis | Julia's `dims=` keyword becomes `'dims'` name-value (`mean(mv, 'dims', 1)`). |
 | 09 | Recurrences | Julia's `@rec` macro becomes the higher-order `rec(rng, target, fn)`; no `rec_linear`. |
 | 10 | Matrix product | `*` (and `\`, `/`, transpose) forward to the underlying numeric storage and drop labels, matching Julia. |
-| 11 | Out of scope | `x13` and DataEcon file I/O are not ported. |
+| 11 | x13 and DataEcon | Both are ported: `tse.x13` (the `x13as` binary is not bundled) and `tse.daec`, which bundles libdaec and loads it with `loadlibrary`/`calllib` rather than MEX, so one folder works across platforms. DataEcon's own `matlab` branch is feature-frozen. |
 | 12 | Test stack | `matlab.unittest`, mirroring the Julia test suite where applicable (see `TEST_PARITY_REPORT.md`). |
 | 13 | Holidays | Calendar data (`+tse/private/holidays.bin`) is **bundled** from the Julia upstream rather than fetched at runtime. |
 | 14 | Errors | A small error-ID hierarchy (`tseries:mixedFreq`, `tseries:bounds`, `tseries:invalidArith`, `tseries:noMatch`, `tseries:dimMismatch`, `tseries:inexact`). |

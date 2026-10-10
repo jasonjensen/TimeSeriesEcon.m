@@ -54,3 +54,10 @@ also run `help tse` for the same overview, or `help tse.<name>` for any item.
 `tse.getoption`, `tse.setoption`, `tse.set_holidays_map`,
 `tse.get_holidays_options`, `tse.clear_holidays_map` — see
 [Options](reference/options.md).
+
+## Subpackages
+
+| Package | Contents | Page |
+|---------|----------|------|
+| `tse.x13` | X-13ARIMA-SEATS specs, `run`, `deseasonalize` | [x13](reference/x13.md) |
+| `tse.daec` | `readdb`, `writedb`, `read`, `write`, `opendaec`, `opendaecmem`, `closedaec`, `File`, `Axis`, `Array`, `version` | [DataEcon files](reference/daec.md) |
