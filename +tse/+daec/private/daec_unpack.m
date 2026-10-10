@@ -39,7 +39,7 @@ function v = daec_unpack(ptr, eltype, elfreq, nbytes, n)
             for k = 1:n
                 b = reshape(bytes(start:stops(k)-1), 1, []);
                 v(k) = string(native2unicode(b, 'UTF-8'));
-                if ~isequal(unicode2native(char(v(k)), 'UTF-8'), b)
+                if ~isequal(reshape(unicode2native(char(v(k)), 'UTF-8'), 1, []), b)
                     error('tseries:daec', 'String %d is not valid UTF-8.', k);
                 end
                 start = stops(k) + 1;
