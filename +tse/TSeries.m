@@ -679,13 +679,34 @@ classdef TSeries
             [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
             r = quantile(v, p, extra{:});
         end
+        function r = stdm(t, m, varargin)
+            % Sample standard deviation about a given mean m (Julia's
+            % Statistics.stdm); NaN for fewer than two values.
+            r = sqrt(varm(t, m, varargin{:}));
+        end
+        function r = varm(t, m, varargin)
+            % Sample variance about a given mean m (Julia's Statistics.varm).
+            [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
+            if ~isempty(extra)
+                error('tseries:noMatch', 'varm/stdm take only the BDaily skip options.');
+            end
+            d = double(v(:)) - m;
+            if numel(d) <= 1
+                r = NaN;
+            else
+                r = sum(d .^ 2) / (numel(d) - 1);
+            end
+        end
         function r = cov(t, varargin)
-            % cov(t) or cov(t, t2) with optional skip options
+            % cov(t) or cov(t, t2) with optional skip options.  cov(t, t2)
+            % is the scalar covariance, as in Julia.
             if nargin >= 2 && isa(varargin{1}, 'tse.TSeries')
                 t2 = varargin{1};
+                checkAligned(t, t2, 'Covariance');
                 [v1, extra] = tse.TSeries.bdaily_filter_(t, varargin{2:end});
                 [v2, ~]     = tse.TSeries.bdaily_filter_(t2, varargin{2:end});
-                r = cov(v1, v2, extra{:});
+                c = cov([v1(:), v2(:)], extra{:});
+                r = c(1, 2);
             else
                 [v, extra] = tse.TSeries.bdaily_filter_(t, varargin{:});
                 r = cov(v, extra{:});
@@ -696,6 +717,7 @@ classdef TSeries
             % Single-vector cor is always 1.0 (matches Julia semantics).
             if nargin >= 2 && isa(varargin{1}, 'tse.TSeries')
                 t2 = varargin{1};
+                checkAligned(t, t2, 'Correlation');
                 [v1, extra] = tse.TSeries.bdaily_filter_(t, varargin{2:end});
                 [v2, ~]     = tse.TSeries.bdaily_filter_(t2, varargin{2:end});
                 % corrcoef is base MATLAB; corr needs the Statistics and
@@ -1250,6 +1272,15 @@ function out = doMitVecGet(t, mits)
             error('tseries:bounds', 'MIT index out of range.');
         end
         out(k) = t.values(ki);
+    end
+end
+
+function checkAligned(t, t2, what)
+% Julia runs cov/cor on two TSeries only when they line up exactly.
+    if t.frequency ~= t2.frequency || ~eq(t.firstdate, t2.firstdate)
+        error('tseries:noMatch', ['%s can only be run on TSeries with the ' ...
+            'same frequency and start date. Pass their values to compare ' ...
+            'misaligned data.'], what);
     end
 end
 

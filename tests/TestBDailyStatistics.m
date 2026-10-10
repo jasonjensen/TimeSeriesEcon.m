@@ -224,9 +224,9 @@ classdef TestBDailyStatistics < matlab.unittest.TestCase
             rng2 = rand(size(sub.values));
             noisy = tse.TSeries(sub.firstdate, sub.values + rng2);
             r = cov(sub, noisy, 'skip_holidays', true);
-            % MATLAB cov(x,y) returns a 2x2 matrix; extract cross-covariance
-            tc.verifyTrue(isscalar(r(1,2)));
-            tc.verifyTrue(r(1,2) < 1.0);
+            % Scalar cross-covariance, as in Julia.
+            tc.verifyTrue(isscalar(r));
+            tc.verifyTrue(r < 1.0);
         end
 
         %% --- cor ---
