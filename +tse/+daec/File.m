@@ -339,9 +339,7 @@ classdef File < handle
             s.axis = axisStruct();
             [~, out] = daec_lib('check_call', 'de_load_tseries', cptr(de), id, ...
                 libpointer('tseries_t', s));
-            axes = daec_axis(out.axis);
-            values = daec_unpack(out.value, out.eltype, out.elfreq, out.nbytes, axes.length);
-            value = finishArray(de, id, out.object.obj_type, axes, values);
+            value = finishLoad(de, id, out, {out.axis});
         end
 
         function value = load_mvtseries(de, varargin)
@@ -353,10 +351,7 @@ classdef File < handle
             s.axis2 = axisStruct();
             [~, out] = daec_lib('check_call', 'de_load_mvtseries', cptr(de), id, ...
                 libpointer('mvtseries_t', s));
-            axes = [daec_axis(out.axis1), daec_axis(out.axis2)];
-            values = daec_unpack(out.value, out.eltype, out.elfreq, out.nbytes, ...
-                prod([axes.length]));
-            value = finishArray(de, id, out.object.obj_type, axes, values);
+            value = finishLoad(de, id, out, {out.axis1, out.axis2});
         end
 
         function value = load_ndtseries(de, varargin)
@@ -369,14 +364,9 @@ classdef File < handle
             end
             [~, out] = daec_lib('check_call', 'de_load_ndtseries', cptr(de), id, ...
                 libpointer('ndtseries_t', s));
-            naxes = double(out.naxes);
-            axes = tse.daec.Axis.empty(1, 0);
-            for k = 1:naxes
-                axes(k) = daec_axis(out.(sprintf('axis%d', k)));
-            end
-            values = daec_unpack(out.value, out.eltype, out.elfreq, out.nbytes, ...
-                prod([axes.length]));
-            value = finishArray(de, id, out.object.obj_type, axes, values);
+            raw = arrayfun(@(k) out.(sprintf('axis%d', k)), 1:double(out.naxes), ...
+                'UniformOutput', false);
+            value = finishLoad(de, id, out, raw);
         end
 
         % ---------- any value ----------
@@ -591,9 +581,34 @@ classdef File < handle
             id = idp.Value;
         end
 
+        function value = finishLoad(de, id, out, raw)
+            % out is the loaded tseries_t, mvtseries_t or ndtseries_t and
+            % raw its axis_t structs.  Copy the values out first: libdaec
+            % reuses that buffer on the next call.
+            e = daec_enums();
+            objType = daec_code('type_t', out.object.obj_type);
+            if objType == e.type_t.type_range
+                values = [];
+            else
+                n = prod(cellfun(@(a) double(a.length), raw));
+                values = daec_unpack(out.value, out.eltype, out.elfreq, out.nbytes, n);
+            end
+            % A names axis points into SQLite's row buffer, which loading
+            % the next axis overwrites, so only the last axis's names
+            % survive the load.  Reload each names axis on its own.
+            axes = tse.daec.Axis.empty(1, 0);
+            for k = 1:numel(raw)
+                a = raw{k};
+                if daec_code('axis_type_t', a.ax_type) == e.axis_type_t.axis_names
+                    [~, a] = daec_lib('check_call', 'de_load_axis', cptr(de), ...
+                        int64(a.id), libpointer('axis_t', axisStruct()));
+                end
+                axes(k) = daec_axis(a);
+            end
+            value = finishArray(de, id, objType, axes, values);
+        end
+
         function value = finishArray(de, id, objType, axes, values)
-            % values must already be copied out: attribute calls reuse
-            % libdaec's buffers
             jeltype = get_attribute(de, id, 'jeltype');
             if ismissing(jeltype)
                 jeltype = '';

@@ -58,7 +58,8 @@ classdef TestDaecFile < matlab.unittest.TestCase
             tse.daec.writedb(tc.file, d);
             r = tse.daec.readdb(tc.file);
 
-            tc.verifyEqual(fieldnames(r), fieldnames(d));
+            % libdaec lists a catalog by name
+            tc.verifyEqual(fieldnames(r), sort(fieldnames(d)));
             for f = fieldnames(d)'
                 tc.verifyEqual(r.(f{1}), d.(f{1}), f{1});
             end
@@ -236,7 +237,7 @@ classdef TestDaecFile < matlab.unittest.TestCase
 
             de = tse.daec.opendaec(tc.file);
             list = de.list_catalog('quiet', true);
-            tc.verifyEqual(list, ["/top"; "/models/gdp"; "/models/inner/n"]);
+            tc.verifyEqual(list, ["/models/gdp"; "/models/inner/n"; "/top"]);
             tc.verifyEqual(de.catalog_size(), 3);
             tc.verifyEqual(de.catalog_size('/models'), 2);
             tc.verifyEqual(de.load_scalar('/models/inner', 'n'), int64(3));
