@@ -300,7 +300,7 @@ classdef File < handle
                 value = char(value);
             end
             if isequal(get_attribute(de, id, 'jtype'), 'Bool')
-                value = logical(value);
+                value = daec_bool(value);
             end
         end
 
