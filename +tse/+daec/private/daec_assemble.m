@@ -32,9 +32,19 @@ function v = daec_assemble(objType, axes, values, jeltype)
         v = values;
     elseif numericValues && isequal(kinds, "range")
         v = tse.TSeries(axes(1).firstdate(), values);
+        v.values = keepComplex(v.values, values);
     elseif numericValues && isequal(kinds, ["range" "names"])
         v = tse.MVTSeries(axes(1).firstdate(), axes(2).names, values);
+        v.values = keepComplex(v.values, values);
     else
         v = tse.daec.Array(axes, values);
+    end
+end
+
+function v = keepComplex(v, source)
+% Indexing drops the complex flag of values whose imaginary parts are all
+% zero; keep it so that a stored complex series reads back complex.
+    if ~isreal(source) && isreal(v)
+        v = complex(v);
     end
 end

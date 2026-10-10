@@ -7,7 +7,9 @@ function v = daec_unpack(ptr, eltype, elfreq, nbytes, n)
 %   next library call, so unpack before calling anything else.
 %
 %   The element width is nbytes / n, as in TimeSeriesEcon.jl: a float of 4
-%   bytes reads as single, an integer of 4 bytes as int32, and so on.
+%   bytes reads as single, an integer of 4 bytes as int32, and so on.  A
+%   2-byte float (Julia's Float16) reads as single, which holds every
+%   Float16 value exactly.
 %   Dates read as tse.MIT and integers with a frequency as tse.Duration;
 %   both need 8 bytes per element, and no other type takes a frequency.
 %
@@ -60,8 +62,12 @@ function v = daec_unpack(ptr, eltype, elfreq, nbytes, n)
             width = elementWidth(nbytes, n, 8, [1 2 4 8]);
             v = readPointer(ptr, sprintf('%s%d', sign, 8 * width), n);
         case T.type_float
-            width = elementWidth(nbytes, n, 8, [4 8]);
-            v = readPointer(ptr, floatClass(width), n);
+            width = elementWidth(nbytes, n, 8, [2 4 8]);
+            if width == 2
+                v = halfToSingle(readPointer(ptr, 'uint16', n));
+            else
+                v = readPointer(ptr, floatClass(width), n);
+            end
         case T.type_complex
             width = elementWidth(nbytes, n, 16, [8 16]);
             x = readPointer(ptr, floatClass(width / 2), 2 * n);
@@ -111,4 +117,24 @@ function v = toDates(ctor, freq, codes, n)
     for k = 2:n
         v(k) = ctor(freq, codes(k));
     end
+end
+
+function s = halfToSingle(h)
+% IEEE half-precision bit patterns to single, exactly.
+    h = uint32(h);
+    sign = bitshift(bitand(h, uint32(32768)), 16);
+    e = bitand(bitshift(h, -10), uint32(31));
+    m = bitand(h, uint32(1023));
+    bits = sign;
+    normal = e > 0 & e < 31;
+    bits(normal) = bitor(sign(normal), ...
+        bitor(bitshift(e(normal) + 112, 23), bitshift(m(normal), 13)));
+    special = e == 31;   % infinities and NaNs, payload kept
+    bits(special) = bitor(sign(special), ...
+        bitor(bitshift(uint32(255), 23), bitshift(m(special), 13)));
+    s = typecast(bits, 'single');
+    sub = e == 0 & m > 0;   % subnormal: m * 2^-24, a normal single
+    s(sub) = single(double(m(sub)) * 2^-24);
+    s(sub & sign > 0) = -s(sub & sign > 0);
+    s = reshape(s, [], 1);
 end

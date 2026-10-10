@@ -155,7 +155,7 @@ function a = layout(v, o)
 % Lay out a value read by tse.daec the way libdaec stores it.
     a = struct('type', [], 'eltype', 0, 'elfreq', 0, 'axes', [], 'hex', "");
     if o.class == 1
-        [a.eltype, a.elfreq, a.hex] = elements(v);
+        [a.eltype, a.elfreq, a.hex] = elements(v, storedWidth(o));
         return
     end
     values = [];
@@ -193,7 +193,7 @@ function a = layout(v, o)
         a.eltype = 0;
         a.hex = "";
     else
-        [a.eltype, a.elfreq, a.hex] = elements(values);
+        [a.eltype, a.elfreq, a.hex] = elements(values, storedWidth(o));
     end
 end
 
@@ -245,8 +245,29 @@ function tf = sameAxes(got, want)
     end
 end
 
-function [eltype, elfreq, hex] = elements(v)
+function w = storedWidth(o)
+% Bytes per stored element (0 when there are none).
+    n = 1;
+    if o.class ~= 1
+        n = prod(arrayfun(@(a) a.length, toStruct(o.axes)));
+    end
+    w = 0;
+    if n > 0
+        w = numel(o.hex) / 2 / n;
+    end
+end
+
+function s = toStruct(axes)
+    s = axes;
+    if iscell(axes)
+        s = [axes{:}];
+    end
+end
+
+function [eltype, elfreq, hex] = elements(v, width)
 % Element type, element frequency and bytes of values, column-major.
+% Single values stored as 2-byte floats (Julia's Float16) are laid out as
+% half precision again.
     elfreq = 0;
     if isa(v, 'tse.MIT') || isa(v, 'tse.Duration')
         eltype = 1;
@@ -281,6 +302,9 @@ function [eltype, elfreq, hex] = elements(v)
             eltype = 2;
         end
         bytes = typecast(v(:), 'uint8');
+    elseif isa(v, 'single') && isreal(v) && width == 2
+        eltype = 4;
+        bytes = typecast(singleToHalf(v(:)), 'uint8');
     elseif isfloat(v) && isreal(v)
         eltype = 4;
         bytes = typecast(v(:), 'uint8');
@@ -292,4 +316,25 @@ function [eltype, elfreq, hex] = elements(v)
         error('tseries:daec', 'No layout for class %s.', class(v));
     end
     hex = string(lower(reshape(dec2hex(bytes(:), 2)', 1, [])));
+end
+
+function h = singleToHalf(s)
+% Half-precision bit patterns of single values that came from halves.
+    b = typecast(s, 'uint32');
+    sign = uint16(bitand(bitshift(b, -16), uint32(32768)));
+    e = double(bitand(bitshift(b, -23), uint32(255)));
+    m = bitand(b, uint32(8388607));
+    h = zeros(size(b), 'uint16');
+    for k = 1:numel(b)
+        if e(k) == 255                      % Inf, NaN
+            h(k) = uint16(31 * 1024) + uint16(bitshift(m(k), -13));
+        elseif e(k) == 0                    % zero
+            h(k) = 0;
+        elseif e(k) - 127 < -14             % half subnormal
+            h(k) = uint16(abs(double(s(k))) * 2^24);
+        else
+            h(k) = uint16((e(k) - 112) * 1024) + uint16(bitshift(m(k), -13));
+        end
+        h(k) = bitor(h(k), sign(k));
+    end
 end
