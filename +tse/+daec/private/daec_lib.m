@@ -12,6 +12,8 @@ function varargout = daec_lib(action, varargin)
 %                                         with libdaec's message unless it
 %                                         is DE_SUCCESS, and returns the
 %                                         remaining outputs
+%   daec_lib('check', status)            error tseries:daec with libdaec's
+%                                         message unless status is DE_SUCCESS
 %   old = daec_lib('debug', tf)           include the C source location in
 %                                         error messages
 %
@@ -48,6 +50,8 @@ function varargout = daec_lib(action, varargin)
             [out{:}] = calllib(alias, varargin{:});
             checkStatus(alias, out{1}, debugMode);
             varargout = out(2:end);
+        case 'check'
+            checkStatus(alias, varargin{1}, debugMode);
         case 'debug'
             varargout{1} = debugMode;
             if ~isempty(varargin)
@@ -66,8 +70,9 @@ end
 
 function loadLibrary(alias)
     % ndtseries_t holds an axis_t[DE_MAX_AXES] array, which loadlibrary
-    % cannot describe and warns about.  Only N-d reads touch that struct;
-    % they are handled when N-d support is ported.
+    % cannot describe and warns about when it parses daec.h.  The bundled
+    % prototype files spell it out as axis1..axis5 (see make_proto); the
+    % warning only matters on the TSE_LIBDAEC route, where N-d reads fail.
     w = warning('off', 'MATLAB:loadlibrary:TypeNotFoundForStructure');
     restore = onCleanup(@() warning(w));
     custom = getenv('TSE_LIBDAEC');
