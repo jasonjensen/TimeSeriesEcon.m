@@ -10,6 +10,10 @@
 % dates as the same rata die / period-since-epoch integer.  So MIT<->DEDate is
 % the identity on (frequency, value); only file I/O needs the native libdaec.
 %
+% Native library (bundled for Windows, Linux and macOS; see
+% private/bin/README.md)
+%   version        - version of the libdaec in use
+%
 % Availability
 %   isavailable    - true iff the DataEcon MATLAB classes are on the path
 %   startup        - addpath the DataEcon matlab/ folder and load libdaec
