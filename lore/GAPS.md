@@ -34,7 +34,7 @@ pinned ones; update the table whenever a comparison is redone.
 These were confirmed by reading `+tse/TSeries.m`, `+tse/MVTSeries.m` and
 `+tse/MITRange.m`. Julia gets all of them right, so fixing them is pure parity.
 
-### G1. TSeries read with reversed, strided or empty ranges — Open
+### G1. TSeries read with reversed, strided or empty ranges — Fixed in PR
 
 Python: `efaf64f` *Fix date-range selection and assignment across series
 types*, tests in `tests/test_date_range_selection.py`.
@@ -54,7 +54,7 @@ Expected (Julia/Python): bounds are checked on the dates the range actually
 selects; empty ranges select nothing but still enforce frequency; unit-step
 forward ranges return a TSeries, any other step returns a plain vector.
 
-### G2. TSeries assignment with reversed, strided or empty ranges — Open
+### G2. TSeries assignment with reversed, strided or empty ranges — Fixed in PR
 
 Same Python commit. In `TSeries.doSet`:
 
@@ -62,16 +62,18 @@ Same Python commit. In `TSeries.doSet`:
   spurious resize, and `rangeof_span` with a reversed range can grow storage
   to the wrong span;
 - an empty range can grow storage (Python: must not);
-- a mismatched RHS (wrong length, wrong frequency, non-numeric) can be
-  rejected *after* the resize, leaving the series grown. Validation must
-  happen before any mutation;
-- strided assignment from a numeric vector has no length check.
+- strided assignment from a numeric vector has no length check, and a char
+  right-hand side is silently stored as character codes.
+
+(Python also had to make rejected assignments atomic. MATLAB gets that for
+free: `TSeries` is a value class, so an error leaves the caller's variable
+untouched.)
 
 Python test to mirror: `test_reverse_assignment_grows_owner_and_preserves_gaps`
 — assigning `[40 20 0 -20]` to `start+4 : -2 : start-2` on a 2-element series
 gives `[-20 NaN 0 2 20 NaN 40]` starting at `start-2`.
 
-### G3. MVTSeries range rows ignore the step — Open
+### G3. MVTSeries range rows ignore the step — Fixed in PR
 
 Same Python commit ("table selections that ignored the step"). In
 `+tse/MVTSeries.m` the row-range path (`doMvtsGet` around line 1115 and the
@@ -81,7 +83,7 @@ and `x(MITRange(b, a, -1))` returns nothing or errors. Assignment has the same
 problem. Expected: same rules as G1/G2, with column selection (`x(rng, 'a')`,
 `x(rng, {'b','a'})`) following them too.
 
-### G4. MITRange equality for empty and non-landing ranges — Open
+### G4. MITRange equality for empty and non-landing ranges — Fixed in PR
 
 Python: `69126db` *Fix empty and nonempty date-range equality*, tests in
 `tests/test_empty_range_equality.py`.
@@ -94,7 +96,12 @@ Python: `69126db` *Fix empty and nonempty date-range equality*, tests in
 - `MITRange(a, a+5, 2)` equals `MITRange(a, a+4, 2)` (same dates);
 - an empty range never equals a non-empty one.
 
-`isequal` and any hashing/`containers.Map` key use should follow.
+`isequal` should follow. Found while fixing: `MITRange - n` always errored
+(the constructor arguments were in the wrong order), and `~=` was undefined.
+
+Also found: `MVTSeries` assignment `x(rng, cols) = y` with a series on the
+right ignored `rng` and wrote every overlapping date. Julia reads `y` at the
+range's dates (`x[rng, cols] = y[rng, cols]`); MATLAB now does too.
 
 ## P2: features missing from MATLAB
 
@@ -209,3 +216,17 @@ Still open from the Julia comparison (test coverage rather than features):
 - BDaily shift/diff/pct with explicit holiday maps.
 - Exhaustive step-range indexing tests from `test_tseries.jl` 150-380 — these
   overlap G1-G3 and should be written together with those fixes.
+
+## Octave notes (for step 4)
+
+Collected while checking fixes in Octave 8.4 on a patched scratch copy:
+
+- `SetAccess = immutable` is not supported; `private` works.
+- Package `private/` functions are not visible from classdef methods.
+- `import` inside functions is not implemented.
+- `strings` and the `string` class do not exist, so every `MVTSeries` path
+  fails (column names are stored as a string array).
+- `idivide(int64(-5), int64(-2), 'fix')` returns 3, not 2, so
+  `MITRange.length` is wrong for some negative steps.
+- `Frequency.m` declares external methods, which Octave only allows in
+  `@`-folders.

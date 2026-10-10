@@ -22,14 +22,8 @@ function out = lookup(t, keys)
         if keys.frequency ~= t.frequency
             mixed_freq_error(keys.frequency, t.frequency);
         end
-        fdv = t.firstdate.value;
-        kStart = double(keys.startMIT.value - fdv) + 1;
-        kEnd   = double(keys.stopMIT.value  - fdv) + 1;
-        step   = double(keys.stepSize);
-        if kStart < 1 || kEnd > numel(t.values)
-            error('tseries:bounds', 'lookup range out of bounds.');
-        end
-        out = t.values(kStart:step:kEnd);
+        ks = range_positions(keys, t.firstdate.value, numel(t.values));
+        out = reshape(t.values(ks), [], 1);
         return
     end
 

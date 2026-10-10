@@ -1116,12 +1116,13 @@ function out = singleIndex(x, idx)
         if ~eq(idx.frequency, x.frequency)
             mixed_freq_error(idx.frequency, x.frequency);
         end
-        kStart = double(idx.startMIT.value - x.firstdate.value) + 1;
-        kEnd   = double(idx.stopMIT.value  - x.firstdate.value) + 1;
-        if kStart < 1 || kEnd > size(x.values, 1)
-            error('tseries:bounds', 'Range %s is outside %s.', char(idx), char(rangeof(x)));
+        ks = range_positions(idx, x.firstdate.value, size(x.values, 1), rangeof(x));
+        if idx.stepSize == 1
+            out = tse.MVTSeries(idx, x.colnames, x.values(ks, :));
+        else
+            % Strided or reversed rows have no contiguous dates to label.
+            out = x.values(ks, :);
         end
-        out = tse.MVTSeries(idx, x.colnames, x.values(kStart:kEnd, :));
         return
     end
     if (ischar(idx) || (isstring(idx) && isscalar(idx))) && ~isequal(idx, ':')
@@ -1167,7 +1168,7 @@ function out = pairIndex(x, rowIdx, colIdx)
             || (isnumeric(rowIdx) && ~isscalar(rowIdx)) ...
             || islogical(rowIdx)
         % Range row + single column => TSeries; range row + multi cols => MVTSeries
-        if isscalar(ks) && (isa(rowIdx, 'tse.MITRange') ...
+        if isscalar(ks) && (isUnitRange(rowIdx) ...
                 || (ischar(rowIdx) && strcmp(rowIdx, ':')))
             if isa(rowIdx, 'tse.MITRange')
                 fd = rowIdx.startMIT;
@@ -1177,7 +1178,7 @@ function out = pairIndex(x, rowIdx, colIdx)
             out = tse.TSeries(fd, x.values(rowSel, ks));
             return
         end
-        if isa(rowIdx, 'tse.MITRange')
+        if isUnitRange(rowIdx)
             fd = rowIdx.startMIT;
             out = tse.MVTSeries(fd, x.colnames(ks), x.values(rowSel, ks));
             return
@@ -1209,12 +1210,10 @@ function sel = expandRowIndex(x, idx)
         return
     end
     if isa(idx, 'tse.MITRange')
-        kStart = double(idx.startMIT.value - x.firstdate.value) + 1;
-        kEnd   = double(idx.stopMIT.value  - x.firstdate.value) + 1;
-        if kStart < 1 || kEnd > size(x.values, 1)
-            error('tseries:bounds', 'Range %s is outside %s.', char(idx), char(rangeof(x)));
+        if ~eq(idx.frequency, x.frequency)
+            mixed_freq_error(idx.frequency, x.frequency);
         end
-        sel = kStart:kEnd;
+        sel = range_positions(idx, x.firstdate.value, size(x.values, 1), rangeof(x));
         return
     end
     if islogical(idx) || isnumeric(idx)
@@ -1276,22 +1275,23 @@ function x = singleIndexSet(x, idx, val)
         if ~eq(idx.frequency, x.frequency)
             mixed_freq_error(idx.frequency, x.frequency);
         end
-        kStart = double(idx.startMIT.value - x.firstdate.value) + 1;
-        kEnd   = double(idx.stopMIT.value  - x.firstdate.value) + 1;
-        if kStart < 1 || kEnd > size(x.values, 1)
-            error('tseries:bounds', 'Range %s is outside %s.', char(idx), char(rangeof(x)));
-        end
+        ks = range_positions(idx, x.firstdate.value, size(x.values, 1), rangeof(x));
+        nr = numel(ks);
         if isa(val, 'tse.MVTSeries')
             x = pairIndexSet(x, idx, x.colnames, val);
         elseif isnumeric(val) || islogical(val)
             data = val;
-            if isvector(data) && numel(data) == (kEnd - kStart + 1) * size(x.values, 2)
-                data = reshape(data, kEnd - kStart + 1, size(x.values, 2));
+            if isscalar(data)
+                x.values(ks, :) = data;
+                return
             end
-            if size(data, 1) ~= (kEnd - kStart + 1) || size(data, 2) ~= size(x.values, 2)
+            if isvector(data) && numel(data) == nr * size(x.values, 2)
+                data = reshape(data, nr, size(x.values, 2));
+            end
+            if size(data, 1) ~= nr || size(data, 2) ~= size(x.values, 2)
                 error('tseries:dimMismatch', 'Range/data size mismatch.');
             end
-            x.values(kStart:kEnd, :) = data;
+            x.values(ks, :) = data;
         else
             error('tseries:noMatch', 'Unsupported value type for range-assignment.');
         end
@@ -1370,6 +1370,21 @@ function x = pairIndexSet(x, rowIdx, colIdx, val)
 
     rowSel = expandRowIndex(x, rowIdx);
 
+    if isa(val, 'tse.MVTSeries') && isa(rowIdx, 'tse.MITRange')
+        % Labelled source: read it at the range's dates (as Julia's
+        % x[rng, cols] = val[rng, cols]); only columns it has are written.
+        if ~eq(val.frequency, x.frequency)
+            mixed_freq_error(val.frequency, x.frequency);
+        end
+        kSrc = range_positions(rowIdx, val.firstdate.value, size(val.values, 1), rangeof(val));
+        for j = 1:numel(ks)
+            srcK = colIndexOf(val, x.colnames(ks(j)));
+            if isempty(srcK), continue, end
+            x.values(rowSel, ks(j)) = cast(val.values(kSrc, srcK), class(x.values));
+        end
+        return
+    end
+
     if isa(val, 'tse.MVTSeries')
         if ~eq(val.frequency, x.frequency)
             mixed_freq_error(val.frequency, x.frequency);
@@ -1395,10 +1410,13 @@ function x = pairIndexSet(x, rowIdx, colIdx, val)
             mixed_freq_error(val.frequency, x.frequency);
         end
         if isa(rowIdx, 'tse.MITRange')
-            rngRow = rowIdx;
-        else
-            rngRow = rangeof(x);
+            % Labelled source: read it at the range's dates.
+            kSrc = range_positions(rowIdx, val.firstdate.value, numel(val.values), tse.rangeof(val));
+            slice = cast(reshape(val.values(kSrc), [], 1), class(x.values));
+            x.values(rowSel, ks) = repmat(slice, 1, numel(ks));
+            return
         end
+        rngRow = rangeof(x);
         rngHit = intersect(rngRow, tse.rangeof(val));
         if isempty(rngHit)
             return
@@ -1417,6 +1435,10 @@ function x = pairIndexSet(x, rowIdx, colIdx, val)
     end
 
     error('tseries:noMatch', 'Unsupported value type for pair-assignment.');
+end
+
+function tf = isUnitRange(r)
+    tf = isa(r, 'tse.MITRange') && r.stepSize == 1;
 end
 
 function printRows(x, mits, rows, maxLabel)
