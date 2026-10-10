@@ -698,7 +698,10 @@ classdef TSeries
                 t2 = varargin{1};
                 [v1, extra] = tse.TSeries.bdaily_filter_(t, varargin{2:end});
                 [v2, ~]     = tse.TSeries.bdaily_filter_(t2, varargin{2:end});
-                r = corr(v1, v2, extra{:});
+                % corrcoef is base MATLAB; corr needs the Statistics and
+                % Machine Learning Toolbox.
+                c = corrcoef(v1, v2, extra{:});
+                r = c(1, 2);
             else
                 r = 1.0;
             end
