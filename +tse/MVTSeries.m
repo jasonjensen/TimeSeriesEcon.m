@@ -808,8 +808,8 @@ classdef MVTSeries
         function r = median(x, varargin),  r = mvStat(x, @median,    varargin{:}); end
         function r = std(x, varargin),     r = mvStat(x, @std,       varargin{:}); end
         function r = var(x, varargin),     r = mvStat(x, @var,       varargin{:}); end
-        function r = min(x, varargin),     r = mvReduce(x, @(a, varargin) min(a, [], varargin{:}), varargin{:}); end
-        function r = max(x, varargin),     r = mvReduce(x, @(a, varargin) max(a, [], varargin{:}), varargin{:}); end
+        function r = min(x, varargin),     r = mvReduce(x, @mvMinOp, varargin{:}); end
+        function r = max(x, varargin),     r = mvReduce(x, @mvMaxOp, varargin{:}); end
         function r = any(x, varargin),     r = mvReduce(x, @any,     varargin{:}); end
         function r = all(x, varargin),     r = mvReduce(x, @all,     varargin{:}); end
 
@@ -1635,6 +1635,18 @@ function [v, rest, cleaned] = mvSkipFilter(x, args)
     else
         v = x.values;
     end
+end
+
+function r = mvMinOp(a, varargin)
+% Always pass a dimension: min(a, []) with none failed on CI's MATLAB
+% (MATLAB:sizeDimensionsMustMatch).
+    if isempty(varargin), varargin = {1}; end
+    r = min(a, [], varargin{:});
+end
+
+function r = mvMaxOp(a, varargin)
+    if isempty(varargin), varargin = {1}; end
+    r = max(a, [], varargin{:});
 end
 
 function r = mvReduce(x, op, varargin)
