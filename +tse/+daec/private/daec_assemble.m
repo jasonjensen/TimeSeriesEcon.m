@@ -43,8 +43,9 @@ end
 
 function v = keepComplex(v, source)
 % Indexing drops the complex flag of values whose imaginary parts are all
-% zero; keep it so that a stored complex series reads back complex.
+% zero; put the stored values back (reshape does not index, so it keeps
+% the flag and signed zeros) so that a complex series reads back complex.
     if ~isreal(source) && isreal(v)
-        v = complex(v);
+        v = reshape(source, size(v));
     end
 end
