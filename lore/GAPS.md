@@ -130,7 +130,7 @@ Found while fixing G5/G6, all now matching Julia:
   scalar. `cov`/`cor` of two series now also require the same frequency and
   start date, as in Julia.
 
-### G7. DataEcon coverage of Julia-written files — Open
+### G7. DataEcon coverage of Julia-written files — Documented
 
 `tse.daec` (moved from DataEcon, PR #8) reads and writes scalars of every
 MATLAB width, MIT and Duration scalars and arrays, MITRange values, Bool,
@@ -139,34 +139,31 @@ arrays, nested structs, attributes and in-memory files.
 
 `tests/TestDaecFixtures.m` reads every object (3,873) in the 24 Julia-written
 fixtures of TimeSeriesEconPy and compares the result byte for byte with the
-stored data. 3,247 read as stored. `tests/fixtures/daec/known_gaps.tsv` lists
-the other 626:
+stored data. 3,459 read as stored. `tests/fixtures/daec/known_gaps.tsv` lists
+the other 414, all known limitations (decided 2026-10-10: document, don't
+fix):
 
-- **Refused, no MATLAB type (337):** Float16, Int128/UInt128 and ComplexF16
-  elements. Float16 could be read as single without loss; the 128-bit and
-  ComplexF16 values have no MATLAB equivalent, and Python reads them as
-  stored-only objects.
-- **Refused, malformed or foreign (51):** controls Julia never writes or
+- **No MATLAB type, refused (254):** Int128/UInt128 (165) and ComplexF16
+  (89) elements. Python reads them as stored-only objects.
+- **Malformed or foreign, refused (52):** controls Julia never writes or
   Python also rejects: dates that are not 8 bytes wide, a frequency on
   non-date elements, strings with embedded zeros, invalid UTF-8 or no
-  terminator, and Bool markers on values other than 0 and 1. Before PR #9
-  these were silently misread.
-- **Complex values with zero imaginary parts become real (most of the 96
-  eltype,bytes and 50 eltype misreads):** TSeries and MVTSeries drop the
-  complex flag, including on empty complex series.
-- **Empty date and duration arrays lose their frequency (86):** an empty
-  `tse.MIT`/`tse.Duration` array carries no frequency in MATLAB.
-- **Integer MVTSeries become double:** Int64 and UInt64 matrices with a
-  date axis.
-- **Bool markers on 0/1 payloads wider than Int8** read as logical, which
-  re-encodes as Int8 (as Julia's loader does).
-- **Unit dates at the Int64 extremes (4):** MITRange lengths overflow.
+  terminator, and Bool markers on values other than 0 and 1.
+- **Empty date and duration arrays lose their frequency (86):** a `tse.MIT`
+  or `tse.Duration` array keeps a frequency in each element, so an empty one
+  has none, and writing it back is an error. Julia and Python keep it in the
+  type. Fixing it would mean one frequency per MIT array, a change to MIT
+  itself.
+- **Bool markers on payloads other than Int8 (20):** 0/1 values marked Bool
+  read as logical, which lays out as Int8 again (as Julia's loader does).
+- **Unit dates at the Int64 extremes (2):** MITRange lengths overflow.
 - **Markers other than Bool are ignored:** `Rational`, `Symbol`, `Date`,
   `Complex{Int64}` and other `jtype`/`jeltype` values read as their stored
   payload. These pass the byte check, so they are not in the list.
 
-Next: decide which of these to close (Float16 as single, complex flag, empty
-date frequency, integer MVTSeries) and which stay documented limitations.
+Closed: Float16 reads as single (exact); complex series keep their complex
+flag and signed zeros; integer and logical MVTSeries keep their class
+(PR #10).
 
 ### G8. Stale docs and no upstream pin — Open
 
