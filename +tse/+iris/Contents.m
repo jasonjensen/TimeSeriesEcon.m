@@ -18,6 +18,7 @@
 %   to_date        - tse.MIT -> IRIS date double
 %   from_range     - IRIS date vector -> tse.MITRange
 %   to_range       - tse.MITRange -> IRIS date vector
+%   iso_week       - ISO [year, week] of a Weekly MIT (IRIS week numbering)
 %
 % Series and databases
 %   from_tseries   - IRIS tseries -> tse.TSeries / tse.MVTSeries

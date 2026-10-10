@@ -115,6 +115,12 @@ has no end-month concept, so `to_date` warns once if the MIT's end period is
 anything other than 12. If you need a clean round-trip on a fiscal year,
 convert to calendar year first.
 
+IRIS weeks are ISO 8601 weeks (Monday to Sunday). `to_date` numbers weeks with
+`tse.iris.iso_week`, not `tse.mit2yp`, whose week number (`ceil(day-of-year /
+7)`, as in Julia) is one week ahead of ISO in about half of all years. A
+`tse.Weekly` ending on a day other than Sunday maps to the ISO week holding
+its last day, with a warning.
+
 ## See also
 
 - [`IRIS_INTEROP_PLAN.md`](../../IRIS_INTEROP_PLAN.md) -- the full design plan,

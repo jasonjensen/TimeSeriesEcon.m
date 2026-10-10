@@ -31,8 +31,12 @@ function d = to_date(m)
         yp = tse.mit2yp(m);
         d = mm(double(yp(1)), double(yp(2)));
     elseif isa(F, 'tse.Weekly')
-        yp = tse.mit2yp(m);
-        d = ww(double(yp(1)), double(yp(2)));
+        if F.endPeriod ~= 7
+            warning('IRIS weeks are ISO weeks (Monday to Sunday); a week ending on day %d maps to the ISO week containing its last day.', ...
+                F.endPeriod);
+        end
+        yw = tse.iris.iso_week(m);
+        d = ww(yw(1), yw(2));
     elseif isa(F, 'tse.Daily')
         dt = tse.toDate(m);
         d = dd(year(dt), month(dt), day(dt));

@@ -73,6 +73,22 @@ classdef TestIrisInterop < matlab.unittest.TestCase
             tc.verifyTrue(m == m2);
         end
 
+        function weekly_date_roundtrip(tc)
+            % 2021 is a year where ceil(day-of-year / 7) is one week ahead
+            % of the ISO week number IRIS uses.
+            m = tse.week('2021-01-10');
+            d = tse.iris.to_date(m);
+            tc.verifyEqual(d, ww(2021, 1));
+            tc.verifyTrue(m == tse.iris.from_date(d));
+        end
+
+        function tseries_roundtrip_weekly(tc)
+            t = tse.TSeries(tse.week('2020-12-27'), (1:120)');
+            t2 = tse.iris.from_tseries(tse.iris.to_tseries(t));
+            tc.verifyEqual(t2.values, t.values);
+            tc.verifyTrue(tse.firstdate(t) == tse.firstdate(t2));
+        end
+
         function bdaily_to_date_errors(tc)
             m = tse.bday('2020-01-02');
             tc.verifyError(@() tse.iris.to_date(m), 'tseries:noMatch');
