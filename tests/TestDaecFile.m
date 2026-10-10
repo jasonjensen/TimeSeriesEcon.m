@@ -84,6 +84,11 @@ classdef TestDaecFile < matlab.unittest.TestCase
             d.single_vec = single([0.1; 0.2; 1.5]);
             d.complex_vec = [1.1 + 5.5i; 2.2 + 4.4i];
             d.string_vec = ["a"; ""; "ccc"];
+            % non-ASCII written with char codes: e acute, euro sign and a
+            % character outside the BMP (a UTF-16 surrogate pair)
+            d.string_mat = ["a", "caf" + char(233), ""; ...
+                char(8364), "b c", string(char([55357 56898]))];
+            d.string_tensor = reshape("s" + string(1:12), 2, 2, 3);
             d.date_vec = [tse.qq(2020, 1); tse.qq(2020, 2)];
             d.empty_vec = zeros(0, 1);
             d.double_mat = [1.1, 2.2, 3.3; 4.4, 5.5, 6.6];
