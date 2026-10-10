@@ -67,6 +67,7 @@ nav:
       - Options: reference/options.md
       - Plotting: reference/plotting.md
       - "X-13ARIMA-SEATS (x13)": reference/x13.md
+      - "DataEcon files (daec)": reference/daec.md
   - Design notes:
       - Overview: design/decisions.md
       - Frequency model: design/frequency_model.md

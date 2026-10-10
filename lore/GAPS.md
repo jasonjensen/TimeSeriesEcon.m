@@ -165,15 +165,14 @@ Closed: Float16 reads as single (exact); complex series keep their complex
 flag and signed zeros; integer and logical MVTSeries keep their class
 (PR #10).
 
-### G8. Stale docs and no upstream pin — Open
+### G8. Stale docs and no upstream pin — Partly closed
 
-- `README.md` still says DataEcon is "Not included"; `docs/design/decisions.md`
-  #11 still says x13 and DataEcon are out of scope. Both are now ported.
-- There is no DataEcon page under `docs/reference/` (Python has
-  `docs/dataecon.md`).
-- Python records the mirrored Julia commit in code (`MIRRORS_JULIA_SHA`) and
-  runs a weekly upstream diff. MATLAB has no equivalent; the table at the top
-  of this file plays that role for now.
+- Closed: `README.md`, `docs/index.md` and decision #11 now describe `x13`
+  and `tse.daec` as ported, and `docs/reference/daec.md` documents DataEcon
+  files.
+- Open: Python records the mirrored Julia commit in code
+  (`MIRRORS_JULIA_SHA`) and runs a weekly upstream diff. MATLAB has no
+  equivalent; the table at the top of this file plays that role for now.
 
 ## P3: Python-only additions (syntax equivalence / convenience)
 

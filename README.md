@@ -47,8 +47,13 @@ y = fconvert(Yearly(), t, 'method', 'mean');   % convert to annual
   `x13.deseasonalize`, …). The `x13as` binary is not bundled — set its path with
   `tse.setoption('x13path', ...)`.
 
-**Not included:** the DataEcon binary file format, and (within `x13`) the bundled
-`x13as` binary and the per-table English description text.
+- DataEcon `.daec` files (`tse.daec`): `readdb` / `writedb` for structs of
+  series, scalars, arrays and nested catalogs, plus `opendaec` for catalogs,
+  attributes and in-memory files. Files interchange with TimeSeriesEcon.jl and
+  the Python port. The DataEcon library is bundled for Windows, Linux and macOS.
+
+**Not included:** (within `x13`) the bundled `x13as` binary and the per-table
+English description text.
 
 ## Documentation
 

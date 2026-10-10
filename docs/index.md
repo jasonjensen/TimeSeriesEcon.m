@@ -57,9 +57,10 @@ mean: 101.75
 
 ## What's not included
 
-Frequency conversion (`fconvert`), plotting, holidays, and the recursive engine
-*are* implemented. **X-13ARIMA-SEATS (`x13`)** and the **DataEcon** binary file
-format are out of scope — see [the x13 page](reference/x13.md).
+Frequency conversion (`fconvert`), plotting, holidays, the recursive engine,
+X-13ARIMA-SEATS ([`x13`](reference/x13.md)) and DataEcon files
+([`daec`](reference/daec.md)) are all implemented. The `x13as` binary itself is
+not bundled.
 
 ## Quick links
 
