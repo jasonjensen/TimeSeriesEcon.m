@@ -1,0 +1,211 @@
+# Parity gap list
+
+The working list of differences between **TimeSeriesEcon.m** and its sister
+libraries. Each entry names the upstream source so a fix can mirror it, and the
+priority follows the project order: feature parity, then syntax equivalence,
+then performance.
+
+## Upstream commits compared
+
+| Library | Repository | Commit | Date |
+|---|---|---|---|
+| Julia | `bankofcanada/TimeSeriesEcon.jl` | `fc0a0d0` | 2025-12-22 |
+| Python | `Nic2020/TimeSeriesEconPy` | `f941907` (0.0.1.dev3) | 2026-09-15 |
+| MATLAB | `jasonjensen/TimeSeriesEcon.m` | `50fe8e3` | 2026-07-15 |
+
+The Julia upstream has had no commits since `fc0a0d0`, which is also the commit
+the Python port pins (`tsecon._mirror.MIRRORS_JULIA_SHA`). The earlier Julia
+comparison in `TEST_PARITY_REPORT.md` therefore still holds; everything new
+below comes from 107 Python commits since 2026-05-15, of which roughly 70 are
+DataEcon interchange (2026-09-09 .. 09-15) and the rest are bug fixes,
+benchmarks, CI and docs.
+
+The weekly upstream check reads this table and only looks at commits after the
+pinned ones; update the table whenever a comparison is redone.
+
+## Status key
+
+- **Open**: confirmed gap, not yet worked on.
+- **Decide**: needs a call from the maintainer before work starts.
+- **N/A**: does not apply to MATLAB (reason given).
+
+## P1: correctness (bugs Python fixed that MATLAB still has)
+
+These were confirmed by reading `+tse/TSeries.m`, `+tse/MVTSeries.m` and
+`+tse/MITRange.m`. Julia gets all of them right, so fixing them is pure parity.
+
+### G1. TSeries read with reversed, strided or empty ranges — Open
+
+Python: `efaf64f` *Fix date-range selection and assignment across series
+types*, tests in `tests/test_date_range_selection.py`.
+
+`TSeries.doGet` (`+tse/TSeries.m`, `case 'tse.MITRange'`) bounds-checks
+`startMIT`/`stopMIT` as if `start <= stop`:
+
+- a reversed range such as `MITRange(qq(2020,4), qq(2020,1), -1)` whose start
+  is past the end of storage is caught only by MATLAB's own indexing error,
+  not `tseries:bounds`;
+- a strided range whose *stop* lies outside storage but whose *selected dates*
+  are all inside (e.g. `start+4 : -2 : start-1`) is wrongly rejected or not,
+  depending on direction;
+- an empty range outside storage raises instead of returning an empty result.
+
+Expected (Julia/Python): bounds are checked on the dates the range actually
+selects; empty ranges select nothing but still enforce frequency; unit-step
+forward ranges return a TSeries, any other step returns a plain vector.
+
+### G2. TSeries assignment with reversed, strided or empty ranges — Open
+
+Same Python commit. In `TSeries.doSet`:
+
+- `issubrange` assumes `start <= stop`, so a reversed range triggers a
+  spurious resize, and `rangeof_span` with a reversed range can grow storage
+  to the wrong span;
+- an empty range can grow storage (Python: must not);
+- a mismatched RHS (wrong length, wrong frequency, non-numeric) can be
+  rejected *after* the resize, leaving the series grown. Validation must
+  happen before any mutation;
+- strided assignment from a numeric vector has no length check.
+
+Python test to mirror: `test_reverse_assignment_grows_owner_and_preserves_gaps`
+— assigning `[40 20 0 -20]` to `start+4 : -2 : start-2` on a 2-element series
+gives `[-20 NaN 0 2 20 NaN 40]` starting at `start-2`.
+
+### G3. MVTSeries range rows ignore the step — Open
+
+Same Python commit ("table selections that ignored the step"). In
+`+tse/MVTSeries.m` the row-range path (`doMvtsGet` around line 1115 and the
+`(rng, cols)` path around line 1165) always slices `kStart:kEnd` and labels the
+result with `startMIT`, so `x(MITRange(a, 2, b))` returns every row in between
+and `x(MITRange(b, a, -1))` returns nothing or errors. Assignment has the same
+problem. Expected: same rules as G1/G2, with column selection (`x(rng, 'a')`,
+`x(rng, {'b','a'})`) following them too.
+
+### G4. MITRange equality for empty and non-landing ranges — Open
+
+Python: `69126db` *Fix empty and nonempty date-range equality*, tests in
+`tests/test_empty_range_equality.py`.
+
+`MITRange.eq` compares `startMIT`, `stopMIT` and `stepSize` literally. Julia
+(and now Python) compare the *selected dates*:
+
+- all empty ranges of the same frequency are equal, whatever their anchor or
+  step;
+- `MITRange(a, a+5, 2)` equals `MITRange(a, a+4, 2)` (same dates);
+- an empty range never equals a non-empty one.
+
+`isequal` and any hashing/`containers.Map` key use should follow.
+
+## P2: features missing from MATLAB
+
+### G5. MVTSeries `cov`, `cor`, `quantile` — Open
+
+Julia supports `cov(mv)`, `cor(mv)` and `quantile` through the `AbstractMatrix`
+fallback, plus BDaily overloads with `skip_all_nans` / `skip_holidays` /
+`holidays_map` (`src/tsmath.jl` 289-298). Python has them with the same
+keywords (`src/tsecon/_stats.py`). `MVTSeries.m` defines `mean`, `std`, `var`,
+`median` but not these three.
+
+### G6. `stdm`, `varm`, `bdvalues` — Open
+
+`stdm`/`varm` (known-mean std/var, with BDaily keywords) exist in Julia
+(`tsmath.jl` 246-247) and Python. `bdvalues` exists in Julia
+(`tseries.jl`, `mvtseries.jl`) and Python. None are in MATLAB.
+
+### G7. DataEcon coverage beyond series and structs — Open
+
+Python's 0.0.1.dev3 DataEcon layer covers scalars of every width, MIT and
+Duration scalars, lossless `MITRange` values, Bool and Unit-frequency series,
+plain N-d arrays, text arrays, nested workspaces, path addressing, attributes
+and an in-memory file mode, all verified against Julia-written fixtures.
+
+`tse.daec` reads and writes TSeries, MVTSeries and nested structs, and passes
+other values through DataEcon's own `DEFile`. Known holes (see also
+`DATAECON_INTEROP.md` §4):
+
+- a bare `tse.MIT`, `tse.Duration` or `tse.MITRange` is not writable, and is
+  not reconstructed on read when Julia wrote one;
+- logical and integer series widen on round trip;
+- there is no cross-language test: nothing checks that MATLAB reads what Julia
+  and Python write.
+
+Proposed first step: run `tse.daec.read` over the Julia-written fixtures in
+TimeSeriesEconPy `tests/dataecon/fixtures/*.daec` (each has a `.toml` listing
+the expected contents) and turn the mismatches into concrete sub-items.
+Depends on the DataEcon `matlab` branch for anything the `DEFile` class itself
+cannot represent.
+
+### G8. Stale docs and no upstream pin — Open
+
+- `README.md` still says DataEcon is "Not included"; `docs/design/decisions.md`
+  #11 still says x13 and DataEcon are out of scope. Both are now ported.
+- There is no DataEcon page under `docs/reference/` (Python has
+  `docs/dataecon.md`).
+- Python records the mirrored Julia commit in code (`MIRRORS_JULIA_SHA`) and
+  runs a weekly upstream diff. MATLAB has no equivalent; the table at the top
+  of this file plays that role for now.
+
+## P3: Python-only additions (syntax equivalence / convenience)
+
+These exist in Python but not in Julia. Worth having only where a MATLAB
+user would expect them.
+
+### G9. Table interop — Decide
+
+Python: `to_pandas` / `from_pandas`, `to_polars` / `from_polars`. The MATLAB
+analogue would be `timetable` (and possibly `table`) conversion, e.g.
+`tse.to_timetable(mv)` / `tse.from_timetable(tt)`. Needs a decision on naming
+and how BDaily/Weekly/Unit frequencies map to timetable row times.
+
+### G10. JSON serialization — Decide
+
+Python: `tsecon.io.json`, lossless round trip of TSeries, MVTSeries,
+Workspace, MIT, MITRange and Frequency with a `_type` discriminator. A MATLAB
+reader/writer for the *same* JSON format would give a text interchange path
+between the Python and MATLAB ports that needs no native library.
+
+### G11. Name aliases — Decide
+
+| Python | MATLAB today | Julia |
+|---|---|---|
+| `strip_tseries` | `strip_ts` | `strip` |
+| `get_holidays_map` | `getoption('bdaily_holidays_map')` | — |
+| `prettyprint_frequency` | — | `prettyprint_frequency` |
+| `option_scope` (context manager) | — | — |
+| `fconvert_parts`, `fconvert_mit`, `fconvert_range`, `fconvert_tseries` | `fconvert` only | `fconvert` (+ internal `fconvert_parts`) |
+| `hcat` / `vcat` free functions | `[a, b]` / methods | `hcat` / `vcat` |
+
+`prettyprint_frequency` is in Julia's exports, so it is a P2-grade gap; the
+rest are cheap aliases.
+
+### G12. Python returns where MATLAB follows Julia — no action
+
+Recorded so nobody "fixes" them:
+
+- `mean(mv, axis=0)` returns a one-row MVTSeries in Python; Julia and MATLAB
+  (`mean(mv, 'dims', 1)`) return a plain row.
+- `compare` returns a `CompareResult` with a list of differences in Python;
+  Julia and MATLAB return a logical.
+
+## Not applicable
+
+| Python change | Why it does not apply |
+|---|---|
+| Column ownership, `*_inplace` functions (`2541e76`) | MATLAB value classes copy on write; a column is never a live view. |
+| NumPy dispatch guards, NumPy/pickle compatibility baselines (`e95faa5`, `d537aa3`) | NumPy/pickle specific. |
+| `_repr_html_` | Jupyter specific. |
+| Cython kernels, `*_is_cython`, `available_backends` | Python build specific; MATLAB performance is tracked in `benchmarks/`. |
+| Wheel/CI/PyPI commits | Packaging. |
+| `Workspace` type, `copyto(MVTSeries, Workspace)` | Decision #07: MATLAB uses `struct`. |
+| `rec_linear` | Python-only (not in Julia); decision #09. |
+| matplotlib/plotly backends | MATLAB has native plotting (`TestPlot.m`). |
+
+## Carried over from `TEST_PARITY_REPORT.md`
+
+Still open from the Julia comparison (test coverage rather than features):
+
+- BDaily statistics with `skip_all_nans` / `skip_holidays` (partly covered by
+  `TestBDailyStatistics.m`; re-check against `test_business.jl`).
+- BDaily shift/diff/pct with explicit holiday maps.
+- Exhaustive step-range indexing tests from `test_tseries.jl` 150-380 — these
+  overlap G1-G3 and should be written together with those fixes.
