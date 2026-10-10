@@ -232,10 +232,27 @@ classdef MITRange
         end
 
         function tf = eq(a, b)
-            tf = isa(a, 'tse.MITRange') && isa(b, 'tse.MITRange') ...
-                && eq(a.startMIT, b.startMIT) ...
-                && eq(a.stopMIT,  b.stopMIT) ...
-                && a.stepSize == b.stepSize;
+            % Two ranges are equal when they select the same dates, as in
+            % Julia: every empty range of a frequency equals every other,
+            % and a stop the step never lands on does not matter.
+            if ~isa(a, 'tse.MITRange') || ~isa(b, 'tse.MITRange') ...
+                    || a.frequency ~= b.frequency
+                tf = false;
+                return
+            end
+            n = length(a);
+            if n ~= length(b)
+                tf = false;
+            elseif n == 0
+                tf = true;
+            else
+                tf = a.startMIT.value == b.startMIT.value ...
+                    && (n == 1 || a.stepSize == b.stepSize);
+            end
+        end
+
+        function tf = ne(a, b)
+            tf = ~eq(a, b);
         end
 
         function tf = isequal(a, b)
@@ -278,8 +295,8 @@ classdef MITRange
                 F = a.frequency;
                 rng = tse.MITRange( ...
                     tse.MIT(F, a.startMIT.value - shift), ...
-                    tse.MIT(F, a.stopMIT.value  - shift), ...
-                    a.stepSize);
+                    a.stepSize, ...
+                    tse.MIT(F, a.stopMIT.value  - shift));
             else
                 error('tseries:invalidArith', 'Invalid operands to MITRange.minus.');
             end

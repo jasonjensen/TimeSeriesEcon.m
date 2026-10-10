@@ -977,20 +977,27 @@ classdef TSeries
                     if idx.frequency ~= t.frequency
                         mixed_freq_error(idx.frequency, t.frequency);
                     end
-                    kStart = double(idx.startMIT.value - t.firstdate.value) + 1;
-                    kEnd   = double(idx.stopMIT.value  - t.firstdate.value) + 1;
-                    if kStart < 1 || kEnd > length(t.values)
-                        error('tseries:bounds', 'Range %s is outside %s.', ...
-                            char(idx), char(rangeof(t)));
-                    end
+                    % A forward unit-step range returns a TSeries; any other
+                    % step returns the selected values in the range's order.
                     if idx.stepSize == 1
+                        kStart = double(idx.startMIT.value - t.firstdate.value) + 1;
+                        kEnd   = double(idx.stopMIT.value  - t.firstdate.value) + 1;
                         out = tse.TSeries();
                         out.firstdate = idx.startMIT;
-                        out.values = t.values(kStart:kEnd);
                         out.frequency = t.frequency;
+                        if kEnd < kStart
+                            out.values = zeros(0, 1, class(t.values));
+                            return
+                        end
+                        if kStart < 1 || kEnd > length(t.values)
+                            error('tseries:bounds', 'Range %s is outside %s.', ...
+                                char(idx), char(rangeof(t)));
+                        end
+                        out.values = t.values(kStart:kEnd);
                     else
-                        step = double(idx.stepSize);
-                        out = t.values(kStart:step:kEnd);
+                        ks = range_positions(idx, t.firstdate.value, ...
+                            length(t.values), rangeof(t));
+                        out = reshape(t.values(ks), [], 1);
                     end
                 case 'tse.TSeries'
                     if ~islogical(idx.values)
@@ -1072,37 +1079,45 @@ classdef TSeries
                     if idx.frequency ~= t.frequency
                         mixed_freq_error(idx.frequency, t.frequency);
                     end
-                    if ~issubrange(idx, rangeof(t))
-                        t = resize(t, tse.rangeof_span(rangeof(t), idx));
-                    end
-                    kStart =(idx.startMIT.value - t.firstdate.value) + 1;
-                    kEnd   =(idx.stopMIT.value  - t.firstdate.value) + 1;
-                    if idx.stepSize == 1
-                        if isa(val, 'tse.TSeries')
-                            if val.frequency ~= t.frequency
-                                mixed_freq_error(val.frequency, t.frequency);
-                            end
-                            sub = tse.TSeries.doGet(val, idx);
-                            t.values(kStart:kEnd) = sub.values;
-                        elseif isscalar(val)
-                            t.values(kStart:kEnd) = val;
-                        else
-                            if numel(val) ~= (kEnd - kStart + 1)
-                                error('tseries:dimMismatch', ...
-                                    'Vector length does not match range length.');
-                            end
-                            t.values(kStart:kEnd) = val(:);
+                    % Resolve the right-hand side before growing storage.
+                    % A TSeries source is read at the range's dates; plain
+                    % values are taken in the range's order.
+                    n = length(idx);
+                    if isa(val, 'tse.TSeries')
+                        if val.frequency ~= t.frequency
+                            mixed_freq_error(val.frequency, t.frequency);
                         end
+                        src = val.values(range_positions(idx, ...
+                            val.firstdate.value, length(val.values), rangeof(val)));
+                    elseif ischar(val) || isstring(val) || iscell(val) || isstruct(val)
+                        error('tseries:invalidArith', ...
+                            'Cannot assign a %s to a TSeries range.', class(val));
+                    elseif isscalar(val)
+                        src = val;
+                    elseif numel(val) ~= n
+                        error('tseries:dimMismatch', ...
+                            'Vector length does not match range length.');
                     else
-                        step = double(idx.stepSize);
-                        if isa(val, 'tse.TSeries')
-                            sub = tse.TSeries.doGet(val, idx);
-                            t.values(kStart:step:kEnd) = sub;
-                        elseif isscalar(val)
-                            t.values(kStart:step:kEnd) = val;
-                        else
-                            t.values(kStart:step:kEnd) = val(:);
-                        end
+                        src = val(:);
+                    end
+                    if n == 0
+                        return
+                    end
+                    % Grow to cover the dates the range lands on (its stop
+                    % need not be one of them).
+                    v1 = idx.startMIT.value;
+                    v2 = v1 + int64(n - 1) * idx.stepSize;
+                    span = tse.MITRange(tse.MIT(t.frequency, min(v1, v2)), ...
+                        tse.MIT(t.frequency, max(v1, v2)));
+                    if ~issubrange(span, rangeof(t))
+                        t = resize(t, tse.rangeof_span(rangeof(t), span));
+                    end
+                    if idx.stepSize == 1
+                        kStart = double(v1 - t.firstdate.value) + 1;
+                        t.values(kStart:kStart + n - 1) = src;
+                    else
+                        t.values(range_positions(idx, t.firstdate.value, ...
+                            length(t.values))) = src;
                     end
                 case 'tse.TSeries'
                     if ~islogical(idx.values)
