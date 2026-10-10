@@ -34,7 +34,7 @@ function v = daec_assemble(objType, axes, values, jeltype)
         v = tse.TSeries(axes(1).firstdate(), values);
         v.values = keepComplex(v.values, values);
     elseif numericValues && isequal(kinds, ["range" "names"])
-        v = tse.MVTSeries(axes(1).firstdate(), axes(2).names, values);
+        v = tse.MVTSeries(class(values), axes(1).firstdate(), axes(2).names, values);
         v.values = keepComplex(v.values, values);
     else
         v = tse.daec.Array(axes, values);

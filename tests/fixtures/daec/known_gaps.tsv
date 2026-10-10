@@ -224,8 +224,6 @@ julia_int64_scalars	/ctl_int128	refused
 julia_matrices_text	/matrix_int128	refused
 julia_matrices_text	/matrix_uint128	refused
 julia_matrices_text	/matrix_complexf16	refused
-julia_matrices_text	/mvts_int64	misread:eltype,bytes
-julia_matrices_text	/mvts_bool	misread:eltype,bytes
 julia_matrices_text	/mvts_max_u	refused
 julia_numeric_widths	/wctl_int128	refused
 julia_numeric_widths	/wctl_int128_max	refused
@@ -357,13 +355,10 @@ julia_represented_elements	/rs_bool_complexf16	refused
 julia_represented_mvtseries	/rmv_int128	refused
 julia_represented_mvtseries	/rmv_uint128	refused
 julia_represented_mvtseries	/rmv_complexf16	refused
-julia_represented_mvtseries	/rmv_int128_zero_rows	misread:eltype
 julia_represented_mvtseries	/rmv_dur_zero_rows	misread:elfreq
 julia_represented_mvtseries	/rmv_mit_max_u	refused
 julia_represented_mvtseries	/rmv_bool_on_int128	refused
-julia_represented_mvtseries	/rmv_bool_on_int64_01	misread:eltype,bytes
-julia_represented_mvtseries	/rmv_float64_on_int64	misread:eltype,bytes
-julia_represented_mvtseries	/rmv_mit_m_on_int64	misread:eltype,bytes
+julia_represented_mvtseries	/rmv_bool_on_int64_01	misread:bytes
 julia_represented_mvtseries	/rmv_identity_param	refused
 julia_represented_mvtseries	/rmv_empty_mit_marked	misread:elfreq
 julia_represented_mvtseries	/str_sym_u_i128	refused

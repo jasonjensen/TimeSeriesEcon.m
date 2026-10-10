@@ -69,7 +69,7 @@ classdef Array
             if isequal(kinds, "range") && (isnumeric(a.values) || islogical(a.values))
                 s = tse.TSeries(a.axes(1).firstdate(), a.values);
             elseif isequal(kinds, ["range" "names"]) && (isnumeric(a.values) || islogical(a.values))
-                s = tse.MVTSeries(a.axes(1).firstdate(), a.axes(2).names, a.values);
+                s = tse.MVTSeries(class(a.values), a.axes(1).firstdate(), a.axes(2).names, a.values);
             else
                 error('tseries:noMatch', ...
                     'Only a range axis, or a range then a names axis, converts to a series.');
