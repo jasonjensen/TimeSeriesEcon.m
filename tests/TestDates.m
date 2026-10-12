@@ -100,6 +100,36 @@ classdef TestDates < matlab.unittest.TestCase
             tc.verifyEqual(datetime(2021,1,3), tse.toDate(tse.weekly_from_iso(2020,53)));
         end
 
+        function weekly_to_iso_examples(tc)
+            % Sunday-ending weeks around new year, where ISO and
+            % ceil(day-of-year / 7) numbering disagree.
+            cases = { ...
+                '2020-01-05', [2020 1]; ...
+                '2021-01-03', [2020 53]; ...
+                '2021-01-10', [2021 1]; ...
+                '2022-01-02', [2021 52]; ...
+                '2023-01-01', [2022 52]; ...
+                '2023-01-08', [2023 1]; ...
+                '2026-12-27', [2026 52]};
+            for i = 1:size(cases, 1)
+                tc.verifyEqual(tse.weekly_to_iso(tse.week(cases{i, 1})), cases{i, 2}, cases{i, 1});
+            end
+            % a week ending on another day uses the ISO week of its last day
+            tc.verifyEqual(tse.weekly_to_iso(tse.week('2021-01-06', 3)), [2021 1]);
+            tc.verifyError(@() tse.weekly_to_iso(tse.qq(2020, 1)), 'tseries:noMatch');
+        end
+
+        function weekly_to_iso_inverts_weekly_from_iso(tc)
+            d = datetime(2015, 1, 4);              % a Sunday
+            while d <= datetime(2028, 12, 31)
+                m = tse.week(d);
+                yw = tse.weekly_to_iso(m);
+                tc.verifyEqual(yw(2), week(d, 'iso-weekofyear'), char(d));
+                tc.verifyTrue(tse.weekly_from_iso(yw(1), yw(2)) == m, char(d));
+                d = d + days(7);
+            end
+        end
+
         function date_round_trip(tc)
             tc.verifyEqual(datetime(2022,12,31), tse.toDate(tse.yy(2022)));
             tc.verifyEqual(datetime(2022,1,1),   tse.toDate(tse.yy(2022), 'begin'));

@@ -36,6 +36,7 @@
 %   bday(d, ...)        - Business-daily MIT or range ('bias' option)
 %   week(d[, endDay])   - Weekly MIT
 %   weekly_from_iso(y,p)- Weekly{7} MIT from ISO (year, week)
+%   weekly_to_iso(m)    - ISO [year, week] of a Weekly MIT
 %
 % Inspection
 %   frequencyof(x)      - Frequency of an MIT/Duration/range/series

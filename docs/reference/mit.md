@@ -16,6 +16,7 @@ the analogue of Julia's `first:last`.
 | `tse.bday(d, 'bias', b)` | Business-daily MIT (`b` = `strict`/`previous`/`next`/`nearest`) |
 | `tse.week(d, endDay)` | Weekly MIT (default `endDay` 7) |
 | `tse.weekly_from_iso(y, p)` | Weekly{7} MIT from ISO (year, week) |
+| `tse.weekly_to_iso(m)` | ISO `[year, week]` of a Weekly MIT; inverse of `weekly_from_iso` (MATLAB-only: Julia has no public inverse, and `mit2yp`'s week is `ceil(day-of-year / 7)`, not ISO) |
 | `tse.MIT(F, value)` | low-level: frequency object + integer offset |
 | `tse.MIT(F, y, p)` | low-level: frequency + (year, period), e.g. `MIT(HalfYearly(), 2022, 1)` |
 

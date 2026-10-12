@@ -35,7 +35,7 @@ function d = to_date(m)
             warning('IRIS weeks are ISO weeks (Monday to Sunday); a week ending on day %d maps to the ISO week containing its last day.', ...
                 F.endPeriod);
         end
-        yw = tse.iris.iso_week(m);
+        yw = tse.weekly_to_iso(m);
         d = ww(yw(1), yw(2));
     elseif isa(F, 'tse.Daily')
         dt = tse.toDate(m);

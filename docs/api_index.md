@@ -16,7 +16,7 @@ also run `help tse` for the same overview, or `help tse.<name>` for any item.
 ## MIT constructors
 
 `tse.qq`, `tse.mm`, `tse.yy`, `tse.day`, `tse.bday`, `tse.week`,
-`tse.weekly_from_iso` — see [MIT & MITRange](reference/mit.md).
+`tse.weekly_from_iso`, `tse.weekly_to_iso` — see [MIT & MITRange](reference/mit.md).
 
 ## Inspection
 
