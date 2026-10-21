@@ -31,8 +31,8 @@ function d = to_date(m)
         yp = tse.mit2yp(m);
         d = dates('M', double(yp(1)), double(yp(2)));
     elseif isa(F, 'tse.Weekly')
-        yp = tse.mit2yp(m);
-        d = dates('W', double(yp(1)), double(yp(2)));
+        yw = tse.weekly_to_iso(m);           % Dynare weeks are ISO, as in from_date
+        d = dates('W', yw(1), yw(2));
     elseif isa(F, 'tse.Daily')
         dt = tse.toDate(m);
         d = dates('D', year(dt), month(dt), day(dt));
