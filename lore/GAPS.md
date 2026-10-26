@@ -10,7 +10,7 @@ then performance.
 | Library | Repository | Commit | Date |
 |---|---|---|---|
 | Julia | `bankofcanada/TimeSeriesEcon.jl` | `fc0a0d0` | 2025-12-22 |
-| Python | `Nic2020/TimeSeriesEconPy` | `f941907` (0.0.1.dev3) | 2026-09-15 |
+| Python | `Nic2020/TimeSeriesEconPy` | `b02de6f` (0.0.1.dev3) | 2026-10-19 |
 | MATLAB | `jasonjensen/TimeSeriesEcon.m` | `50fe8e3` | 2026-07-15 |
 
 The Julia upstream has had no commits since `fc0a0d0`, which is also the commit
@@ -19,6 +19,9 @@ comparison in `TEST_PARITY_REPORT.md` therefore still holds; everything new
 below comes from 107 Python commits since 2026-05-15, of which roughly 70 are
 DataEcon interchange (2026-09-09 .. 09-15) and the rest are bug fixes,
 benchmarks, CI and docs.
+
+Python commits `6b5f7ac`..`b02de6f` (2026-10-19) change only docs, docstrings
+and CI (checked with docstrings stripped: no code changes), so they add no gaps.
 
 The weekly upstream check reads this table and only looks at commits after the
 pinned ones; update the table whenever a comparison is redone.
