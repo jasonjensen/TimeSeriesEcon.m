@@ -265,7 +265,7 @@ classdef MIT
                 else
                     error('tseries:invalidArith', 'Invalid step in MIT range.');
                 end
-                rng = tse.MITRange(a, b, step);
+                rng = tse.MITRange(a, step, b);
             else
                 error('tseries:invalidArith', 'Wrong number of args to colon.');
             end

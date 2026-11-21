@@ -47,6 +47,24 @@ mv(qq(2020, 2), 'b')       % scalar
 cols = columns(mv);        % struct: cols.a, cols.b, cols.c
 ```
 
+Avoid naming a column `firstdate`, `colnames` or `values`: `x.values` always
+means the field, so such a column is only reachable as `x('values')`, and dot
+access warns (`tseries:shadowedColumn`).
+
+## Adding columns
+
+Assigning to a new name (`mv.d = ts`) is an error. Use `hcat` instead, which
+mirrors Julia's `hcat(x; d=ts)`:
+
+```matlab
+mv = hcat(mv, 'd', ts, 'e', 0);   % TSeries (aligned by date), scalar or vector
+mv = hcat(mv, d=ts, e=0);         % same, with R2021a+ name=value syntax
+mv = [mv, other_mv];              % concatenate MVTSeries (union of ranges)
+```
+
+A `TSeries` value extends the range when it runs past `mv`, as `[mv, other]`
+does. Names that are already columns are an error.
+
 ## Arithmetic and reductions
 
 Element-wise arithmetic aligns on the range intersection and the shared columns.

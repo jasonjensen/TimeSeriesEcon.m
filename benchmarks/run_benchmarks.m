@@ -656,7 +656,7 @@ function r = run_rec_ar2_100(state)
     % via value-class copy-on-write; MATLAB value semantics make `target` a
     % local copy here so each timeit repetition starts from the seed values.
     target = state.target;
-    r = tse.rec(state.rng, target, @(s, k) 0.5 * s(k-1) + 0.3 * s(k-2));
+    r = tse.rec(state.rng, target, @(v, i) 0.5 * v(i-1) + 0.3 * v(i-2), 'fast', true);
 end
 
 % ------
@@ -675,7 +675,7 @@ end
 
 function r = run_rec_backcasting_via_lambda(state)
     target = state.target;
-    r = tse.rec(state.rng, target, @(s, k) s(k+1) - 0.5);
+    r = tse.rec(state.rng, target, @(v, i) v(i+1) - 0.5, 'fast', true);
 end
 
 % ======================================================================

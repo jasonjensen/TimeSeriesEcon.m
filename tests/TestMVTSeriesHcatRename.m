@@ -48,5 +48,53 @@ classdef TestMVTSeriesHcatRename < matlab.unittest.TestCase
             x = rename_columns(x, 'prefix', 'X_', 'suffix', '_Y');
             tc.verifyEqual(x.colnames, ["X_a_Y","X_b_Y"]);
         end
+        function hcat_name_value_tseries(tc)
+            x  = tse.MVTSeries(tse.qq(2020,1):tse.qq(2020,4), {'a','b'}, [1 5; 2 6; 3 7; 4 8]);
+            ts = tse.TSeries(tse.qq(2020,3), [10; 20; 30]);    % runs past x
+            r = hcat(x, 'c', ts);
+            tc.verifyClass(r, 'tse.MVTSeries');
+            tc.verifyEqual(r.colnames, ["a","b","c"]);
+            tc.verifyTrue(tse.rangeof(r).stopMIT == tse.qq(2021,1));
+            tc.verifyEqual(r.c.values, [NaN; NaN; 10; 20; 30]);
+            tc.verifyEqual(r.a.values, [1; 2; 3; 4; NaN]);
+        end
+
+        function hcat_scalar_vector_and_mvts(tc)
+            x = tse.MVTSeries(tse.qq(2020,1):tse.qq(2020,4), {'a'}, (1:4)');
+            y = tse.MVTSeries(tse.qq(2020,1):tse.qq(2020,4), {'d'}, (5:8)');
+            r = hcat(x, "b", 0, 'c', [9 8 7 6], y);
+            tc.verifyEqual(r.colnames, ["a","b","c","d"]);
+            tc.verifyEqual(r.values, [(1:4)', zeros(4,1), (9:-1:6)', (5:8)']);
+        end
+
+        function hcat_errors(tc)
+            x  = tse.MVTSeries(tse.qq(2020,1):tse.qq(2020,4), {'a'}, (1:4)');
+            tc.verifyError(@() hcat(x, 'a', 1), 'tseries:noMatch');           % duplicate
+            tc.verifyError(@() hcat(x, 'b'), 'tseries:noMatch');              % no value
+            tc.verifyError(@() hcat(x, 'b', [1 2]), 'tseries:dimMismatch');
+            tc.verifyError(@() hcat(x, 'b', tse.TSeries(tse.mm(2020,1), (1:3)')), ...
+                'tseries:mixedFreq');
+        end
+
+        function dot_assign_new_column_points_to_hcat(tc)
+            x = tse.MVTSeries(tse.qq(2020,1):tse.qq(2020,4), {'a'}, (1:4)');
+            try
+                x.b = 1;
+                tc.verifyFail('expected an error');
+            catch ME
+                tc.verifyEqual(ME.identifier, 'tseries:bounds');
+                tc.verifySubstring(ME.message, 'hcat(x, ''b'', val)');
+            end
+        end
+
+        function shadowed_column_warns(tc)
+            x = tse.MVTSeries(tse.qq(2020,1):tse.qq(2020,4), {'values','b'}, [1 5; 2 6; 3 7; 4 8]);
+            v = tc.verifyWarning(@() x.values, 'tseries:shadowedColumn');
+            tc.verifyEqual(v, [1 5; 2 6; 3 7; 4 8]);       % still the field
+            col = x('values');
+            tc.verifyEqual(col.values, (1:4)');
+            y = tse.MVTSeries(tse.qq(2020,1):tse.qq(2020,4), {'a','b'}, [1 5; 2 6; 3 7; 4 8]);
+            tc.verifyWarningFree(@() y.values);
+        end
     end
 end
