@@ -268,6 +268,155 @@ classdef NDTSeries
             end
         end
 
+        % ---------- indexing ----------
+
+        function ind = end(x, k, n)
+            %END  Last date of a date axis, or the length of another axis.
+            if n ~= numel(x.axes)
+                % e.g. x.values(end): MATLAB asks the object, so answer
+                % for the values array
+                if n == 1
+                    ind = numel(x.values);
+                else
+                    ind = size(x.values, k);
+                end
+                return
+            end
+            if x.axes(k).kind == "range"
+                ind = x.axes(k).range.startMIT + (x.axes(k).length - 1);
+            else
+                ind = x.axes(k).length;
+            end
+        end
+
+        function n = numArgumentsFromSubscript(x, S, ctx)
+            if strcmp(S(1).type, '.') && any(strcmp(S(1).subs, {'axes', 'values'}))
+                n = builtin('numArgumentsFromSubscript', x, S, ctx);
+            else
+                n = 1;
+            end
+        end
+
+        function varargout = subsref(x, S)
+            if isempty(S)
+                varargout = {x};
+                return
+            end
+            switch S(1).type
+                case '.'
+                    name = S(1).subs;
+                    if any(strcmp(name, {'axes', 'values'}))
+                        [varargout{1:nargout}] = builtin('subsref', x, S);
+                        return
+                    end
+                    k = namesAxisOf(x, name);
+                    if ~isempty(k)
+                        keys = repmat({':'}, 1, numel(x.axes));
+                        keys{k} = string(name);
+                        out = getKeys(x, keys, false);
+                        if numel(S) > 1
+                            out = subsref(out, S(2:end));
+                        end
+                        varargout = {out};
+                        return
+                    end
+                    try
+                        [varargout{1:nargout}] = builtin('subsref', x, S);
+                    catch ME
+                        if any(strcmp(ME.identifier, ...
+                                {'MATLAB:nonExistentField', 'MATLAB:noSuchMethodOrField'}))
+                            error('tseries:bounds', 'Unknown NDTSeries field or name: %s', name);
+                        end
+                        rethrow(ME);
+                    end
+                case '()'
+                    out = getKeys(x, S(1).subs, keepTypeOption());
+                    if numel(S) > 1
+                        out = subsref(out, S(2:end));
+                    end
+                    varargout = {out};
+                otherwise
+                    error('tseries:bounds', 'NDTSeries does not support {} indexing.');
+            end
+        end
+
+        function x = subsasgn(x, S, val)
+            if isempty(S)
+                x = val;
+                return
+            end
+            if strcmp(S(1).type, '.') && strcmp(S(1).subs, 'axes')
+                error('tseries:noMatch', 'NDTSeries axes are read-only.');
+            end
+            if strcmp(S(1).type, '.') && strcmp(S(1).subs, 'values')
+                if numel(S) == 1
+                    v = val;
+                else
+                    v = builtin('subsasgn', x.values, S(2:end), val);
+                end
+                if ~(isnumeric(v) || islogical(v))
+                    error('tseries:noMatch', 'NDTSeries values must be numeric or logical.');
+                end
+                checkSize(x.axes, v);
+                x.values = reshape(v, axesSize(x.axes));
+                return
+            end
+            if numel(S) > 1
+                % composite, e.g. x.gdp(mit, 1) = v: read, change, write back
+                head = subsref(x, S(1));
+                head = subsasgn(head, S(2:end), val);
+                x = subsasgn(x, S(1), head);
+                return
+            end
+            switch S(1).type
+                case '.'
+                    name = S(1).subs;
+                    k = namesAxisOf(x, name);
+                    if isempty(k)
+                        error('tseries:bounds', ...
+                            'Unknown name %s; assignment cannot add names.', name);
+                    end
+                    keys = repmat({':'}, 1, numel(x.axes));
+                    keys{k} = string(name);
+                    x = setKeys(x, keys, val);
+                case '()'
+                    x = setKeys(x, S(1).subs, val);
+                otherwise
+                    error('tseries:bounds', 'NDTSeries does not support {} assignment.');
+            end
+        end
+
+        function r = resize(x, rng, varargin)
+            %RESIZE  Change the range of the date axis, padding with NaN
+            %   (or the type's missing value).  resize(x, rng, 'dims', k)
+            %   for a series with several date axes.
+            k = pickTimeDim(x, varargin);
+            r = resizeAxis(x, k, rng);
+        end
+
+        function L = LinearIndices(x)
+            L = 1:numel(x.values);
+        end
+
+        function varargout = find(x, varargin)
+            %FIND  Like find on the values array.
+            [varargout{1:max(1, nargout)}] = find(x.values, varargin{:});
+        end
+
+        function tf = isassigned(x, varargin)
+            %ISASSIGNED  True if the keys (one per axis) select stored values.
+            if numel(varargin) ~= numel(x.axes)
+                tf = false;
+                return
+            end
+            try
+                resolveAll(x, varargin, false);
+                tf = true;
+            catch
+                tf = false;
+            end
+        end
+
         % ---------- comparison ----------
 
         function tf = isequal(a, b)
@@ -421,6 +570,265 @@ function k = pickTimeDim(x, args)
         error('tseries:noMatch', ...
             'This NDTSeries has %d date axes (%s); pass ''dims'', k to pick one.', ...
             numel(k), num2str(k));
+    end
+end
+
+% ---------- indexing helpers ----------
+
+function tf = keepTypeOption()
+    tf = logical(tse.getoption('slicing_keeps_type'));
+end
+
+function k = namesAxisOf(x, name)
+    % the names axis holding name; empty if none; error if ambiguous
+    k = [];
+    if ~(ischar(name) || isstring(name))
+        return
+    end
+    for j = find([x.axes.kind] == "names")
+        if any(x.axes(j).names == string(name))
+            k(end+1) = j; %#ok<AGROW>
+        end
+    end
+    if numel(k) > 1
+        error('tseries:bounds', ...
+            'Name %s is on more than one axis (%s); index with x(...) instead.', ...
+            char(name), num2str(k));
+    end
+end
+
+function tf = isColon(key)
+    tf = ischar(key) && strcmp(key, ':');
+end
+
+function r = resolveKey(ax, key, k, forAssign)
+    % r.idx   positions along the axis (row vector)
+    % r.drop  true for a single key (the axis is dropped when reading)
+    % r.lo, r.hi  for a range axis: the positions asked for, which can lie
+    %             outside 1..length when assigning (the axis then grows)
+    r = struct('idx', [], 'drop', false, 'lo', 1, 'hi', ax.length);
+    n = ax.length;
+    if isColon(key)
+        r.idx = 1:n;
+        return
+    end
+    switch ax.kind
+        case "range"
+            first = ax.range.startMIT;
+            if isa(key, 'tse.MIT')
+                checkFreq(key, first);
+                pos = double([key.value]) - double(first.value) + 1;
+                if isscalar(key)
+                    r.drop = true;
+                elseif any(diff(pos) ~= 1)
+                    error('tseries:bounds', ...
+                        'Dates on axis %d must be consecutive and increasing.', k);
+                end
+            elseif isa(key, 'tse.MITRange')
+                checkFreq(key.startMIT, first);
+                if key.stepSize ~= 1 && length(key) > 1
+                    error('tseries:bounds', ...
+                        'Index axis %d with a step-1 range; strided and reversed ranges are not supported.', k);
+                end
+                pos = double(key.startMIT.value) - double(first.value) + (1:length(key));
+            else
+                error('tseries:bounds', ...
+                    'Axis %d is a date axis: index it with an MIT, an MITRange or :.', k);
+            end
+            if ~isempty(pos)
+                r.lo = pos(1);
+                r.hi = pos(end);
+            end
+            if ~forAssign && ~isempty(pos) && (pos(1) < 1 || pos(end) > n)
+                error('tseries:bounds', 'Dates on axis %d are outside %s.', k, describe(ax));
+            end
+            r.idx = pos;
+        case "names"
+            if ischar(key) || (isstring(key) && isscalar(key))
+                j = find(ax.names == string(key), 1);
+                if isempty(j)
+                    error('tseries:bounds', 'Unknown name %s on axis %d.', char(string(key)), k);
+                end
+                r.idx = j;
+                r.drop = true;
+            elseif isstring(key) || iscellstr(key)
+                key = string(key);
+                r.idx = zeros(1, numel(key));
+                for j = 1:numel(key)
+                    jj = find(ax.names == key(j), 1);
+                    if isempty(jj)
+                        error('tseries:bounds', 'Unknown name %s on axis %d.', char(key(j)), k);
+                    end
+                    r.idx(j) = jj;
+                end
+            else
+                r = positional(r, key, n, k);
+            end
+        otherwise
+            if ischar(key) || isstring(key) || iscell(key) || isa(key, 'tse.MIT') ...
+                    || isa(key, 'tse.MITRange')
+                error('tseries:bounds', 'Axis %d is a plain axis: index it with numbers.', k);
+            end
+            r = positional(r, key, n, k);
+    end
+end
+
+function r = positional(r, key, n, k)
+    if islogical(key)
+        if numel(key) ~= n
+            error('tseries:bounds', 'Logical index for axis %d needs %d elements.', k, n);
+        end
+        r.idx = find(key(:)');
+    elseif isnumeric(key) && all(key(:) == fix(key(:)))
+        if any(key(:) < 1 | key(:) > n)
+            error('tseries:bounds', 'Index on axis %d is outside 1:%d.', k, n);
+        end
+        r.idx = double(key(:)');
+        r.drop = isscalar(key);
+    else
+        error('tseries:bounds', 'Unsupported index of class %s on axis %d.', class(key), k);
+    end
+end
+
+function checkFreq(m, first)
+    if ~eq(m.frequency, first.frequency)
+        mixed_freq_error(m.frequency, first.frequency);
+    end
+end
+
+function R = resolveAll(x, keys, forAssign)
+    n = numel(x.axes);
+    if numel(keys) ~= n
+        error('tseries:bounds', 'An NDTSeries with %d axes needs %d indices, got %d.', ...
+            n, n, numel(keys));
+    end
+    R = cell(1, n);
+    for k = 1:n
+        R{k} = resolveKey(x.axes(k), keys{k}, k, forAssign);
+    end
+end
+
+function ax = subAxis(ax, idx)
+    % the axis restricted to positions idx (already validated)
+    switch ax.kind
+        case "range"
+            if isempty(idx)
+                ax = tse.Axis(ax.range.startMIT, 0);
+            else
+                ax = tse.Axis(ax.range.startMIT + (idx(1) - 1), numel(idx));
+            end
+        case "names"
+            ax = tse.Axis(ax.names(idx));
+        otherwise
+            ax = tse.Axis(numel(idx));
+    end
+end
+
+function out = getKeys(x, keys, keepType)
+    R = resolveAll(x, keys, false);
+    n = numel(R);
+    idx = cellfun(@(r) r.idx, R, 'UniformOutput', false);
+    drop = cellfun(@(r) r.drop, R);
+    v = x.values(idx{:});
+    if all(drop)
+        out = v;
+        return
+    end
+    keepAx = ~drop | keepType;
+    ax = tse.Axis.empty(1, 0);
+    for k = find(keepAx)
+        if isColon(keys{k})
+            ax(end+1) = x.axes(k); %#ok<AGROW>
+        else
+            ax(end+1) = subAxis(x.axes(k), idx{k}); %#ok<AGROW>
+        end
+    end
+    if n == 1
+        v = v(:);
+    end
+    out = handBack(ax, reshape(v, axesSize(ax)), keepType);
+end
+
+function out = handBack(ax, v, keepType)
+    kinds = [ax.kind];
+    if ~keepType && isequal(kinds, "range") && (isnumeric(v) || islogical(v))
+        out = tse.TSeries(ax(1).firstdate(), v(:));
+    elseif ~keepType && isequal(kinds, ["range" "names"])
+        out = tse.MVTSeries(class(v), ax(1).firstdate(), ax(2).names, v);
+    else
+        out = tse.NDTSeries(ax, v);
+    end
+end
+
+function x = resizeAxis(x, k, rng)
+    ax = x.axes(k);
+    if ~isa(rng, 'tse.MITRange') || (rng.stepSize ~= 1 && length(rng) > 1)
+        error('tseries:noMatch', 'resize needs a step-1 MITRange.');
+    end
+    checkFreq(rng.startMIT, ax.range.startMIT);
+    newAx = tse.Axis(rng.startMIT, length(rng));
+    off = double(ax.range.startMIT.value) - double(rng.startMIT.value);   % old pos 1 -> new pos 1+off
+    T = class(x.values);
+    sz = axesSize(x.axes);
+    sz(k) = newAx.length;
+    if numel(x.axes) == 1
+        sz = [newAx.length 1];
+    end
+    newVals = repmat(cast(tse.typenan(T), T), sz);
+    oldPos = 1:ax.length;
+    newPos = oldPos + off;
+    ok = newPos >= 1 & newPos <= newAx.length;
+    src = repmat({':'}, 1, numel(sz));
+    dst = src;
+    src{k} = oldPos(ok);
+    dst{k} = newPos(ok);
+    newVals(dst{:}) = x.values(src{:});
+    x.axes(k) = newAx;
+    x.values = newVals;
+end
+
+function x = setKeys(x, keys, val)
+    R = resolveAll(x, keys, true);
+    % grow date axes for dates outside the stored range
+    for k = 1:numel(R)
+        if x.axes(k).kind == "range" && ~isColon(keys{k}) && ~isempty(R{k}.idx)
+            lo = min(R{k}.lo, 1);
+            hi = max(R{k}.hi, x.axes(k).length);
+            if lo < 1 || hi > x.axes(k).length
+                first = x.axes(k).range.startMIT + (lo - 1);
+                x = resizeAxis(x, k, tse.MITRange(first, first + (hi - lo)));
+                R{k}.idx = R{k}.idx - (lo - 1);
+            end
+        end
+    end
+    idx = cellfun(@(r) r.idx, R, 'UniformOutput', false);
+    selSz = cellfun(@numel, idx);
+    if isa(val, 'tse.TSeries') || isa(val, 'tse.MVTSeries')
+        % align on dates when exactly one date axis is selected by a range
+        tk = find([x.axes.kind] == "range" & selSz > 0);
+        if isscalar(tk) && selSz(tk) > 1
+            rngSel = tse.MITRange(x.axes(tk).range.startMIT + (idx{tk}(1) - 1), ...
+                x.axes(tk).range.startMIT + (idx{tk}(end) - 1));
+            val = val(rngSel);
+        end
+        val = val.values;
+    elseif isa(val, 'tse.NDTSeries')
+        val = val.values;
+    end
+    if ~(isnumeric(val) || islogical(val))
+        error('tseries:noMatch', 'Cannot assign a %s to an NDTSeries.', class(val));
+    end
+    if isscalar(val)
+        x.values(idx{:}) = val;
+    elseif numel(val) == prod(selSz)
+        if numel(selSz) == 1
+            x.values(idx{:}) = val(:);
+        else
+            x.values(idx{:}) = reshape(val, selSz);
+        end
+    else
+        error('tseries:dimMismatch', ...
+            'Assignment of %d values into a selection of %d.', numel(val), prod(selSz));
     end
 end
 

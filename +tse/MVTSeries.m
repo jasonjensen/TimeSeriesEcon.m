@@ -397,7 +397,10 @@ classdef MVTSeries
 
             if strcmp(S(1).type, '()')
                 subs = S(1).subs;
-                if isscalar(subs)
+                if logical(tse.getoption('slicing_keeps_type')) ...
+                        && (isscalar(subs) || numel(subs) == 2)
+                    out = keepTypeIndex(x, subs);
+                elseif isscalar(subs)
                     out = singleIndex(x, subs{1});
                 elseif numel(subs) == 2
                     out = pairIndex(x, subs{1}, subs{2});
@@ -1216,6 +1219,46 @@ function out = pairIndex(x, rowIdx, colIdx)
         return
     end
     out = x.values(rowSel, ks);
+end
+
+function out = keepTypeIndex(x, subs)
+% Indexing when the 'slicing_keeps_type' option is on: a slice that would
+% become a TSeries or a numeric row stays an MVTSeries.  A single element,
+% and strided or positional selections with no dates to label, behave as
+% usual.
+    if isscalar(subs)
+        idx = subs{1};
+        if isa(idx, 'tse.MIT') && isscalar(idx)
+            k = expandRowIndex(x, idx);
+            out = tse.MVTSeries(class(x.values), idx, x.colnames, x.values(k, :));
+        elseif (ischar(idx) && ~strcmp(idx, ':')) || (isstring(idx) && isscalar(idx))
+            k = expandColIndex(x, idx);
+            out = tse.MVTSeries(class(x.values), x.firstdate, x.colnames(k), x.values(:, k));
+        else
+            out = singleIndex(x, idx);
+        end
+        return
+    end
+    rowIdx = subs{1};
+    colIdx = subs{2};
+    colSel = expandColIndex(x, colIdx);
+    if islogical(colSel), colSel = find(colSel); end
+    if isa(rowIdx, 'tse.MIT') && isscalar(rowIdx)
+        if isscalar(colSel)
+            out = pairIndex(x, rowIdx, colIdx);
+            return
+        end
+        k = expandRowIndex(x, rowIdx);
+        out = tse.MVTSeries(class(x.values), rowIdx, x.colnames(colSel), x.values(k, colSel));
+        return
+    end
+    if isUnitRange(rowIdx) || (ischar(rowIdx) && strcmp(rowIdx, ':'))
+        rowSel = expandRowIndex(x, rowIdx);
+        if isa(rowIdx, 'tse.MITRange'), fd = rowIdx.startMIT; else, fd = x.firstdate; end
+        out = tse.MVTSeries(class(x.values), fd, x.colnames(colSel), x.values(rowSel, colSel));
+        return
+    end
+    out = pairIndex(x, rowIdx, colIdx);
 end
 
 function sel = expandRowIndex(x, idx)

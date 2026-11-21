@@ -10,8 +10,8 @@ has a labelled N-d series. It follows DataEcon's N-d objects, so it can be
 stored in `.daec` files.
 
 !!! note "Work in progress"
-    This page covers construction, shape, axes, conversion, comparison and
-    display. Indexing, time functions (`lag`, `diff`, `pct`, ...),
+    This page covers construction, shape, axes, indexing, conversion,
+    comparison and display. Time functions (`lag`, `diff`, `pct`, ...),
     reductions and arithmetic come in later steps.
 
 ## Axes
@@ -74,6 +74,63 @@ v = NDTSeries({qq(2019,1):qq(2019,4), mm(2020,1):mm(2020,12)});
 firstdate(v, 'dims', 2)          % 2020M1
 rangeof(v, 'dims', 1, 'drop', 1) % 2019Q2:2019Q4
 ```
+
+## Indexing
+
+Give one key per axis. The kind of key depends on the kind of axis:
+
+| Axis | Keys |
+|---|---|
+| range | an `MIT`, a step-1 `MITRange`, consecutive `MIT`s, or `:` |
+| names | a name (char or string), several names (string array or cellstr), positions, a logical mask, or `:` |
+| plain | positions, a logical mask, or `:` |
+
+A single key (one MIT, one name, one position) drops its axis. What is left
+then decides the result:
+
+- no axes left: the plain value
+- one date axis: a `TSeries`
+- a date axis then a names axis: an `MVTSeries`
+- anything else: an `NDTSeries`
+
+```matlab
+x = NDTSeries({qq(2020,1):qq(2020,4), ["gdp" "cpi"], 3}, 0);
+x(qq(2020,2), "gdp", 1)     % a number
+x(:, "gdp", 1)              % TSeries
+x(:, :, 2)                  % MVTSeries
+x(:, {'gdp'}, 2)            % a cell keeps the names axis: one-column MVTSeries
+x(qq(2020,2):end, :, :)     % NDTSeries, 3x2x3
+x.gdp                       % drops the names axis: NDTSeries 4x3
+```
+
+`end` is the last date on a date axis and the length on other axes.
+
+Assignment takes the same keys. The value can be a scalar, an array with the
+right number of elements, or a series. A `TSeries` or `MVTSeries` is lined up on
+the dates you select. Assigning to dates outside the range grows the date axis
+and fills the gap with `NaN`, like a `TSeries`. Names cannot be added by
+assignment.
+
+```matlab
+x(qq(2021,1), "cpi", :) = 1;     % grows the date axis to 2021Q1
+x.gdp = 0;
+x.gdp(qq(2020,3), 2) = 5;
+x.values(1) = 7;                 % values can be set if the size stays the same
+```
+
+`resize(x, rng)` changes the date range (with `'dims', k` when there are
+several date axes). `find`, `LinearIndices` and `isassigned(x, keys...)` work
+as for an `MVTSeries`.
+
+### Keeping the type when slicing
+
+With `tse.setoption('slicing_keeps_type', true)`, slicing never changes the
+class. An `NDTSeries` slice stays an `NDTSeries`, and an axis given a single key
+stays, with length 1. An `MVTSeries` slice (`m(mit)`, `m('a')`, `m(rng, 'a')`,
+`m(mit, names)`) stays an `MVTSeries`. In both modes, a single element
+(`x(mit, "gdp", 1)`, `m(mit, 'a')`) is the plain value, and dot access (`x.gdp`,
+`m.a`) drops the names axis as above. Use `toseries` or `squeeze` to convert
+explicitly. The default (`false`) matches Julia and Python.
 
 ## Conversion
 
