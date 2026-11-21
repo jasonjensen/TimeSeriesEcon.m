@@ -1,12 +1,12 @@
 classdef Array
-    %ARRAY  An array with one tse.daec.Axis per dimension.
+    %ARRAY  An array with one tse.Axis per dimension.
     %
     %   a = tse.daec.Array(axes, values)
-    %       axes is a 1-by-N tse.daec.Axis array (N <= 5), in any order;
+    %       axes is a 1-by-N tse.Axis array (N <= 5), in any order;
     %       size(values, k) must equal axes(k).length.
     %   a = tse.daec.Array(x)
-    %       from a tse.TSeries (one range axis) or a tse.MVTSeries (a range
-    %       axis, then a names axis).
+    %       from a tse.TSeries (one range axis), a tse.MVTSeries (a range
+    %       axis, then a names axis) or a tse.NDTSeries (its axes as they are).
     %
     %   readdb and the load_* functions return an Array for stored data
     %   that is not a plain array, a TSeries or an MVTSeries, for example a
@@ -16,10 +16,10 @@ classdef Array
     %   s = toseries(a) converts back to a TSeries or MVTSeries when the
     %   axes allow it.
     %
-    %   See also tse.daec.Axis, tse.daec.readdb, tse.daec.writedb.
+    %   See also tse.Axis, tse.NDTSeries, tse.daec.readdb, tse.daec.writedb.
 
     properties (SetAccess = private)
-        axes = tse.daec.Axis.empty(1, 0)
+        axes = tse.Axis.empty(1, 0)
         values = []
     end
 
@@ -31,8 +31,8 @@ classdef Array
             if nargin == 1
                 [axes, values] = fromSeries(axes);
             end
-            if ~isa(axes, 'tse.daec.Axis') || isempty(axes)
-                error('tseries:noMatch', 'Array(axes, values) needs at least one tse.daec.Axis.');
+            if ~isa(axes, 'tse.Axis') || isempty(axes)
+                error('tseries:noMatch', 'Array(axes, values) needs at least one tse.Axis.');
             end
             axes = reshape(axes, 1, []);
             if numel(axes) > 5
@@ -86,12 +86,15 @@ end
 
 function [axes, values] = fromSeries(x)
     if isa(x, 'tse.TSeries')
-        axes = tse.daec.Axis(x.firstdate, size(x.values, 1));
+        axes = tse.Axis(x.firstdate, size(x.values, 1));
         values = x.values;
     elseif isa(x, 'tse.MVTSeries')
-        axes = [tse.daec.Axis(x.firstdate, size(x.values, 1)), tse.daec.Axis(x.colnames)];
+        axes = [tse.Axis(x.firstdate, size(x.values, 1)), tse.Axis(x.colnames)];
+        values = x.values;
+    elseif isa(x, 'tse.NDTSeries')
+        axes = x.axes;
         values = x.values;
     else
-        error('tseries:noMatch', 'Array(x) needs a tse.TSeries or tse.MVTSeries.');
+        error('tseries:noMatch', 'Array(x) needs a tse.TSeries, tse.MVTSeries or tse.NDTSeries.');
     end
 end

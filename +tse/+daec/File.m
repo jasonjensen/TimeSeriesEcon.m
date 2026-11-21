@@ -596,7 +596,7 @@ classdef File < handle
             % A names axis points into SQLite's row buffer, which loading
             % the next axis overwrites, so only the last axis's names
             % survive the load.  Reload each names axis on its own.
-            axes = tse.daec.Axis.empty(1, 0);
+            axes = tse.Axis.empty(1, 0);
             for k = 1:numel(raw)
                 a = raw{k};
                 if daec_code('axis_type_t', a.ax_type) == e.axis_type_t.axis_names
@@ -783,7 +783,7 @@ function [objType, axes, values] = arrayLayout(value, want)
     T = e.type_t;
     if isa(value, 'tse.MITRange')
         objType = T.type_range;
-        axes = tse.daec.Axis(value);
+        axes = tse.Axis(value);
         values = [];
     elseif isa(value, 'tse.TSeries')
         a = tse.daec.Array(value);
@@ -836,9 +836,9 @@ function [objType, axes, values] = arrayLayout(value, want)
             end
             sz = numel(value);
         end
-        axes = tse.daec.Axis.empty(1, 0);
+        axes = tse.Axis.empty(1, 0);
         for k = 1:numel(sz)
-            axes(k) = tse.daec.Axis(sz(k));
+            axes(k) = tse.Axis(sz(k));
         end
         values = value;
         switch numel(sz)

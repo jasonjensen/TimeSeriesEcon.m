@@ -1,4 +1,4 @@
-function F = frequencyof(x)
+function F = frequencyof(x, varargin)
 %FREQUENCYOF  Return the frequency of an MIT, Duration, MITRange, or Frequency.
 %
 %   Always returns a tse.Frequency object.  MIT and Duration store frequency
@@ -9,6 +9,8 @@ function F = frequencyof(x)
         F = int2freq(x.frequency);
     elseif isa(x, 'tse.TSeries') || isa(x, 'tse.MVTSeries')
         F = int2freq(x.frequency);
+    elseif isa(x, 'tse.NDTSeries')
+        F = x.frequencyof(varargin{:});
     elseif isa(x, 'tse.MITRange')
         F = int2freq(x.frequency);
     else

@@ -27,6 +27,8 @@
 % Time-series containers (classes)
 %   TSeries             - Univariate time series indexed by MIT
 %   MVTSeries           - Multivariate time series (MIT rows x named cols)
+%   NDTSeries           - N-d series with a date, names or plain axis per dimension
+%   Axis                - One axis of an NDTSeries (range, names or plain)
 %
 % MIT constructors (functions)
 %   qq(y, p)            - Quarterly MIT

@@ -56,6 +56,7 @@ nav:
       - "MIT & MITRange": reference/mit.md
       - TSeries: reference/tseries.md
       - MVTSeries: reference/mvtseries.md
+      - NDTSeries: reference/ndtseries.md
       - "Workspaces (structs)": reference/workspace.md
       - "Math (shift, diff, moving, undiff)": reference/math.md
       - "Statistics (mean, std, cor)": reference/stats.md
