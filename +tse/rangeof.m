@@ -6,7 +6,7 @@ function rng = rangeof(x, varargin)
 %                         negative = from end)
 
     if isa(x, 'tse.NDTSeries')
-        rng = x.rangeof(varargin{:});   % accepts 'dims', k as well as 'drop'
+        rng = rangeof(x, varargin{:});   % accepts 'dims', k as well as 'drop'
         return
     end
 

@@ -6,6 +6,10 @@ function r = strip_ts(t)
 %   Equivalent to Julia's `strip(t)`.  `strip` is not used as a name
 %   because MATLAB has a built-in `strip()` for strings.
 
+    if isa(t, 'tse.NDTSeries')
+        r = strip_ts(t);   % NDTSeries method: along the date axis
+        return
+    end
     if ~isa(t, 'tse.TSeries')
         error('tseries:noMatch', 'strip_ts requires a TSeries.');
     end

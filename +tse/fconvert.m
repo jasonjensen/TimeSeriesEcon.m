@@ -7,7 +7,9 @@ function out = fconvert(varargin)
 %   F_to may be a tse.Frequency instance (e.g. tse.Quarterly()), a class
 %   name ('Quarterly'), or an integer frequency code.  x may be an MIT, an
 %   MITRange, a TSeries or an MVTSeries.  An MVTSeries is converted column
-%   by column with the same options and keeps its column names.
+%   by column with the same options and keeps its column names.  An
+%   NDTSeries is converted along its date axis ('dims', k when it has
+%   several), keeping its other axes.
 %
 %   Name-value options (subset depending on direction):
 %     'method'   : higher -> 'const'(default) | 'even' | 'linear'
@@ -41,6 +43,8 @@ function out = fconvert(varargin)
         out = tseries_convert(Fto, x, fn, opts);
     elseif isa(x, 'tse.MVTSeries')
         out = mvtseries_convert(Fto, x, fn, opts);
+    elseif isa(x, 'tse.NDTSeries')
+        out = ndtseries_convert(Fto, x, fn, opts);
     else
         error('tseries:noMatch', 'fconvert: unsupported input of type %s.', class(x));
     end
@@ -479,6 +483,59 @@ function out = mvtseries_convert(F_to, x, fn, opts)
         cols{k} = c.values(:);
     end
     out = tse.MVTSeries(first.firstdate, names, [cols{:}]);
+end
+
+% ---------- NDTSeries: along the date axis ---------------------------
+
+function out = ndtseries_convert(F_to, x, fn, opts)
+    dimsOpt = {};
+    rest = {};
+    k = 1;
+    while k <= numel(opts)
+        if (ischar(opts{k}) || isstring(opts{k})) && strcmpi(opts{k}, 'dims') && k < numel(opts)
+            dimsOpt = opts(k:k+1);
+            k = k + 2;
+        else
+            rest{end+1} = opts{k}; %#ok<AGROW>
+            k = k + 1;
+        end
+    end
+    d = timedim(x, dimsOpt{:});
+    axes = x.axes;
+    first = axes(d).range.startMIT;
+    if freq_eq(F_to, int2freq(first.frequency))
+        out = x;
+        return
+    end
+    sz = size(x.values);
+    sz(end+1:numel(axes)) = 1;
+    if numel(axes) == 1
+        sz = [axes(1).length 1];
+    end
+    order = [d, setdiff(1:numel(sz), d)];
+    v = reshape(permute(x.values, order), sz(d), []);
+    ncol = size(v, 2);
+    if ncol == 0
+        probe = tseries_convert(F_to, tse.TSeries(first, nan(sz(d), 1)), fn, rest);
+        newFirst = probe.firstdate;
+        nNew = numel(probe.values);
+        w = zeros(nNew, 0);
+    else
+        for c = 1:ncol
+            t = tseries_convert(F_to, tse.TSeries(first, v(:, c)), fn, rest);
+            if c == 1
+                newFirst = t.firstdate;
+                nNew = numel(t.values);
+                w = zeros(nNew, ncol, class(t.values));
+            end
+            w(:, c) = t.values(:);
+        end
+    end
+    newSz = sz(order);
+    newSz(1) = nNew;
+    w = ipermute(reshape(w, newSz), order);
+    axes(d) = tse.Axis(newFirst, nNew);
+    out = tse.NDTSeries(axes, w);
 end
 
 % ---------- YP -> YP, to higher --------------------------------------

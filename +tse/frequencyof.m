@@ -10,7 +10,7 @@ function F = frequencyof(x, varargin)
     elseif isa(x, 'tse.TSeries') || isa(x, 'tse.MVTSeries')
         F = int2freq(x.frequency);
     elseif isa(x, 'tse.NDTSeries')
-        F = x.frequencyof(varargin{:});
+        F = frequencyof(x, varargin{:});
     elseif isa(x, 'tse.MITRange')
         F = int2freq(x.frequency);
     else

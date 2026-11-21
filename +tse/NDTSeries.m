@@ -176,10 +176,18 @@ classdef NDTSeries
             n = x.axes(k).names;
         end
 
-        function tf = haskey(x, name)
+        function tf = haskey(x, name, varargin)
             %HASKEY  True if any names axis contains name.
+            %
+            %   haskey(x, name, 'dims', k) looks on axis k only.
             tf = false;
-            for k = find([x.axes.kind] == "names")
+            ks = find([x.axes.kind] == "names");
+            if numel(varargin) == 2 && strcmpi(string(varargin{1}), "dims")
+                ks = intersect(ks, varargin{2});
+            elseif ~isempty(varargin)
+                error('tseries:noMatch', 'haskey options are ''dims'', k.');
+            end
+            for k = ks
                 if any(x.axes(k).names == string(name))
                     tf = true;
                     return
@@ -560,6 +568,142 @@ classdef NDTSeries
             end
         end
 
+        % ---------- arithmetic (element-wise) ----------
+        %
+        % An NDTSeries combines with a scalar, with a numeric array of the
+        % same size, or with another series whose axes line up: the same
+        % kinds in the same order, the same names, the same plain lengths
+        % and the same frequency on date axes.  Date axes are cut to the
+        % dates both operands have, as for MVTSeries.  A TSeries or an
+        % MVTSeries operand is treated as the NDTSeries it converts to.
+
+        function r = plus(a, b),    r = ndBinary(a, b, @plus);    end
+        function r = minus(a, b),   r = ndBinary(a, b, @minus);   end
+        function r = times(a, b),   r = ndBinary(a, b, @times);   end
+        function r = rdivide(a, b), r = ndBinary(a, b, @rdivide); end
+        function r = ldivide(a, b), r = ndBinary(a, b, @ldivide); end
+        function r = power(a, b),   r = ndBinary(a, b, @power);   end
+        function r = eq(a, b),      r = ndBinary(a, b, @eq);      end
+        function r = ne(a, b),      r = ndBinary(a, b, @ne);      end
+        function r = lt(a, b),      r = ndBinary(a, b, @lt);      end
+        function r = le(a, b),      r = ndBinary(a, b, @le);      end
+        function r = gt(a, b),      r = ndBinary(a, b, @gt);      end
+        function r = ge(a, b),      r = ndBinary(a, b, @ge);      end
+        function r = and(a, b),     r = ndBinary(a, b, @and);     end
+        function r = or(a, b),      r = ndBinary(a, b, @or);      end
+
+        function r = mtimes(a, b)
+            if (isnumeric(a) && isscalar(a)) || (isnumeric(b) && isscalar(b))
+                r = ndBinary(a, b, @times);
+            else
+                error('tseries:noMatch', ...
+                    'NDTSeries has no matrix product; use .* for element-wise products.');
+            end
+        end
+
+        function r = mrdivide(a, b)
+            if isnumeric(b) && isscalar(b)
+                r = ndBinary(a, b, @rdivide);
+            else
+                error('tseries:noMatch', 'NDTSeries / needs a scalar divisor; use ./ otherwise.');
+            end
+        end
+
+        function r = uminus(x), r = x; r.values = -x.values; end
+        function r = uplus(x),  r = x; end
+        function r = not(x),    r = x; r.values = ~x.values; end
+        function r = log(x),    r = x; r.values = log(x.values); end
+        function r = exp(x),    r = x; r.values = exp(x.values); end
+        function r = abs(x),    r = x; r.values = abs(x.values); end
+
+        % ---------- combining ----------
+
+        function r = cat(k, varargin)
+            %CAT  cat(k, a, b, ...) joins NDTSeries along axis k.
+            %
+            %   Along a names axis the names are joined (they must stay
+            %   unique); along a plain axis the lengths add up; along a date
+            %   axis each series must start right after the previous one.
+            %   All other axes must match exactly.
+            r = catND(k, varargin);
+        end
+
+        function r = horzcat(varargin) %#ok<STOUT>
+            error('tseries:noMatch', 'Use cat(k, a, b, ...) to join NDTSeries along axis k.');
+        end
+
+        function r = vertcat(varargin) %#ok<STOUT>
+            error('tseries:noMatch', 'Use cat(k, a, b, ...) to join NDTSeries along axis k.');
+        end
+
+        function x = rename(x, old, new, varargin)
+            %RENAME  rename(x, old, new) renames old to new on the names axis
+            %   that holds old.  old and new can be lists of the same length.
+            %
+            %   rename(x, old, new, 'dims', k) renames on names axis k only.
+            %   Use it when old is on more than one names axis; without it
+            %   that case is an error.
+            k = [];
+            if ~isempty(varargin)
+                if numel(varargin) ~= 2 || ~strcmpi(string(varargin{1}), "dims")
+                    error('tseries:noMatch', 'rename options are ''dims'', k.');
+                end
+                k = varargin{2};
+                if ~(isnumeric(k) && isscalar(k) && k == round(k) && k >= 1 && k <= numel(x.axes)) ...
+                        || x.axes(k).kind ~= "names"
+                    error('tseries:noMatch', 'rename: ''dims'' must be the number of a names axis.');
+                end
+            end
+            old = string(old);
+            new = string(new);
+            if numel(old) ~= numel(new)
+                error('tseries:noMatch', 'rename needs as many new names as old ones.');
+            end
+            for j = 1:numel(old)
+                if isempty(k)
+                    kj = namesAxisOf(x, old(j), "use rename(x, old, new, 'dims', k)");
+                elseif any(x.axes(k).names == old(j))
+                    kj = k;
+                else
+                    kj = [];
+                end
+                if isempty(kj)
+                    error('tseries:bounds', 'Unknown name %s.', old(j));
+                end
+                nm = x.axes(kj).names;
+                nm(nm == old(j)) = new(j);
+                if numel(unique(nm)) ~= numel(nm)
+                    error('tseries:noMatch', 'Renaming %s to %s repeats a name.', old(j), new(j));
+                end
+                x.axes(kj) = tse.Axis(nm);
+            end
+        end
+
+        function r = strip_ts(x, varargin)
+            %STRIP_TS  Drop leading and trailing dates where every value is
+            %   missing ('dims', k picks the date axis).
+            d = pickTimeDim(x, varargin);
+            n = x.axes(d).length;
+            miss = missingMask(x.values);
+            other = setdiff(1:ndims(x.values), d);
+            if isempty(other)
+                allMiss = miss(:)';
+            else
+                allMiss = reshape(all(permute(miss, [d other]), 2:numel(other) + 1), 1, n);
+            end
+            i1 = find(~allMiss, 1, 'first');
+            i2 = find(~allMiss, 1, 'last');
+            if isempty(i1)
+                i1 = 1;
+                i2 = 0;
+            end
+            idx = repmat({':'}, 1, ndims(x.values));
+            idx{d} = i1:i2;
+            r = x;
+            r.axes(d) = tse.Axis(x.axes(d).range.startMIT + (i1 - 1), i2 - i1 + 1);
+            r.values = reshape(x.values(idx{:}), axesSize(r.axes));
+        end
+
         % ---------- comparison ----------
 
         function tf = isequal(a, b)
@@ -596,6 +740,13 @@ classdef NDTSeries
 
         function summary(x)
             printHeader(x);
+        end
+    end
+
+    methods (Static)
+        function r = overlayAll(varargin)
+            %OVERLAYALL  tse.overlay for NDTSeries (see tse.overlay).
+            r = overlayND(varargin);
         end
     end
 end
@@ -722,8 +873,11 @@ function tf = keepTypeOption()
     tf = logical(tse.getoption('slicing_keeps_type'));
 end
 
-function k = namesAxisOf(x, name)
+function k = namesAxisOf(x, name, hint)
     % the names axis holding name; empty if none; error if ambiguous
+    if nargin < 3
+        hint = "index with x(...) and put the name in the position of its axis";
+    end
     k = [];
     if ~(ischar(name) || isstring(name))
         return
@@ -735,8 +889,8 @@ function k = namesAxisOf(x, name)
     end
     if numel(k) > 1
         error('tseries:bounds', ...
-            'Name %s is on more than one axis (%s); index with x(...) instead.', ...
-            char(name), num2str(k));
+            'Name %s is on more than one names axis (%s); %s.', ...
+            char(name), num2str(k), char(hint));
     end
 end
 
@@ -1150,6 +1304,199 @@ function out = mapslicesArray(A, f, dims)
             out = zeros(outSz, class(chunk));
         end
         out(sliceIdx{:}) = chunk;
+    end
+end
+
+% ---------- arithmetic and combining helpers ----------
+
+function m = missingMask(v)
+    % element-wise tse.istypenan
+    if isfloat(v)
+        m = isnan(v);
+    elseif isinteger(v)
+        m = v == intmax(class(v));
+    else
+        m = false(size(v));
+    end
+end
+
+function r = ndBinary(a, b, op)
+    if isa(a, 'tse.TSeries') || isa(a, 'tse.MVTSeries'), a = tse.NDTSeries(a); end
+    if isa(b, 'tse.TSeries') || isa(b, 'tse.MVTSeries'), b = tse.NDTSeries(b); end
+    if isa(a, 'tse.NDTSeries') && isa(b, 'tse.NDTSeries')
+        [a, b] = alignND(a, b);
+        r = a;
+        r.values = op(a.values, b.values);
+    elseif isa(a, 'tse.NDTSeries')
+        checkOperand(a, b);
+        r = a;
+        r.values = op(a.values, b);
+    else
+        checkOperand(b, a);
+        r = b;
+        r.values = op(a, b.values);
+    end
+end
+
+function checkOperand(x, v)
+    if ~(isnumeric(v) || islogical(v))
+        error('tseries:noMatch', 'Cannot combine an NDTSeries with a %s.', class(v));
+    end
+    if ~isscalar(v) && ~isequal(size(v), size(x.values))
+        error('tseries:dimMismatch', ...
+            'An array combined with an NDTSeries must be a scalar or of size [%s].', ...
+            num2str(size(x.values)));
+    end
+end
+
+function [a, b] = alignND(a, b)
+    n = numel(a.axes);
+    if numel(b.axes) ~= n
+        error('tseries:dimMismatch', 'Cannot combine NDTSeries with %d and %d axes.', ...
+            n, numel(b.axes));
+    end
+    for k = 1:n
+        A = a.axes(k);
+        B = b.axes(k);
+        if A.kind ~= B.kind
+            error('tseries:dimMismatch', 'Axis %d is %s in one operand and %s in the other.', ...
+                k, A.kind, B.kind);
+        end
+        switch A.kind
+            case "names"
+                if ~isequal(A.names, B.names)
+                    error('tseries:dimMismatch', 'The names on axis %d differ.', k);
+                end
+            case "plain"
+                if A.length ~= B.length
+                    error('tseries:dimMismatch', 'Axis %d has lengths %d and %d.', ...
+                        k, A.length, B.length);
+                end
+            case "range"
+                fa = A.range.startMIT;
+                fb = B.range.startMIT;
+                checkFreq(fb, fa);
+                if A.length == B.length && fa == fb
+                    continue
+                end
+                lo = max(double(fa.value), double(fb.value));
+                hi = min(double(fa.value) + A.length, double(fb.value) + B.length) - 1;
+                len = max(hi - lo + 1, 0);
+                first = fa + (lo - double(fa.value));
+                a = cutRange(a, k, first, len);
+                b = cutRange(b, k, first, len);
+        end
+    end
+end
+
+function x = cutRange(x, k, first, len)
+    % the part of x on dates first .. first+len-1 of axis k
+    off = double(first.value) - double(x.axes(k).range.startMIT.value);
+    idx = repmat({':'}, 1, ndims(x.values));
+    idx{k} = off + (1:len);
+    x.axes(k) = tse.Axis(first, len);
+    x.values = reshape(x.values(idx{:}), axesSize(x.axes));
+end
+
+function r = catND(k, args)
+    if ~isnumeric(k) || ~isscalar(k) || k ~= fix(k) || k < 1
+        error('tseries:noMatch', 'cat(k, ...) needs an axis number k.');
+    end
+    for j = 1:numel(args)
+        if isa(args{j}, 'tse.TSeries') || isa(args{j}, 'tse.MVTSeries')
+            args{j} = tse.NDTSeries(args{j});
+        elseif ~isa(args{j}, 'tse.NDTSeries')
+            error('tseries:noMatch', 'cat joins NDTSeries, not %s.', class(args{j}));
+        end
+    end
+    r = args{1};
+    n = numel(r.axes);
+    if k > n
+        error('tseries:noMatch', 'Axis %d does not exist; the series has %d axes.', k, n);
+    end
+    for j = 2:numel(args)
+        b = args{j};
+        if numel(b.axes) ~= n
+            error('tseries:dimMismatch', 'cat needs series with the same number of axes.');
+        end
+        others = setdiff(1:n, k);
+        if ~isequal(r.axes(others), b.axes(others))
+            error('tseries:dimMismatch', 'cat: the axes other than axis %d must match.', k);
+        end
+        A = r.axes(k);
+        B = b.axes(k);
+        if A.kind ~= B.kind
+            error('tseries:dimMismatch', 'cat: axis %d is %s in one series and %s in another.', ...
+                k, A.kind, B.kind);
+        end
+        switch A.kind
+            case "names"
+                nm = [A.names, B.names];
+                if numel(unique(nm)) ~= numel(nm)
+                    error('tseries:noMatch', 'cat: the joined names are not unique.');
+                end
+                newAx = tse.Axis(nm);
+            case "plain"
+                newAx = tse.Axis(A.length + B.length);
+            case "range"
+                checkFreq(B.range.startMIT, A.range.startMIT);
+                if B.range.startMIT ~= A.range.startMIT + A.length
+                    error('tseries:noMatch', ...
+                        'cat: along a date axis each series must start right after the previous one.');
+                end
+                newAx = tse.Axis(A.range.startMIT, A.length + B.length);
+        end
+        v = cat(k, r.values, b.values);
+        r.axes(k) = newAx;
+        r.values = reshape(v, axesSize(r.axes));
+    end
+end
+
+function r = overlayND(args)
+    % first non-missing value wins; date axes are unioned (or cut to an
+    % MITRange given first); other axes must match
+    rng = [];
+    if isa(args{1}, 'tse.MITRange')
+        rng = args{1};
+        args = args(2:end);
+    end
+    for j = 1:numel(args)
+        if isa(args{j}, 'tse.TSeries') || isa(args{j}, 'tse.MVTSeries')
+            args{j} = tse.NDTSeries(args{j});
+        elseif ~isa(args{j}, 'tse.NDTSeries')
+            error('tseries:noMatch', 'overlay of NDTSeries needs NDTSeries arguments, not %s.', ...
+                class(args{j}));
+        end
+    end
+    first = args{1};
+    d = pickTimeDim(first, {});
+    others = setdiff(1:numel(first.axes), d);
+    if isempty(rng)
+        lo = Inf; hi = -Inf;
+        for j = 1:numel(args)
+            a = args{j};
+            if numel(a.axes) ~= numel(first.axes) || ~isequal(a.axes(others), first.axes(others)) ...
+                    || a.axes(d).kind ~= "range"
+                error('tseries:dimMismatch', 'overlay needs NDTSeries whose other axes match.');
+            end
+            checkFreq(a.axes(d).range.startMIT, first.axes(d).range.startMIT);
+            s0 = double(a.axes(d).range.startMIT.value);
+            lo = min(lo, s0);
+            hi = max(hi, s0 + a.axes(d).length - 1);
+        end
+        start = first.axes(d).range.startMIT + (lo - double(first.axes(d).range.startMIT.value));
+        rng = tse.MITRange(start, start + (hi - lo));
+    end
+    T = class(first.values);
+    r = resizeAxis(first, d, rng);
+    for j = 2:numel(args)
+        a = args{j};
+        if numel(a.axes) ~= numel(first.axes) || ~isequal(a.axes(others), first.axes(others))
+            error('tseries:dimMismatch', 'overlay needs NDTSeries whose other axes match.');
+        end
+        b = resizeAxis(a, d, rng);
+        fill = missingMask(r.values) & ~missingMask(b.values);
+        r.values(fill) = cast(b.values(fill), T);
     end
 end
 

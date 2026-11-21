@@ -9,10 +9,6 @@ NDTSeries is a MATLAB addition. Neither TimeSeriesEcon.jl nor TimeSeriesEconPy
 has a labelled N-d series. It follows DataEcon's N-d objects, so it can be
 stored in `.daec` files.
 
-!!! note "Work in progress"
-    Arithmetic, concatenation and `fconvert` for NDTSeries come in a later
-    step.
-
 ## Axes
 
 ```matlab
@@ -60,7 +56,7 @@ the length of axis `k`. The properties `axes` and `values` are read-only.
 | `rangeof(x)`, `firstdate(x)`, `lastdate(x)`, `frequencyof(x)` | Of the date axis; `tse.rangeof(x)` etc. work too |
 | `timedim(x)` | Index of the date axis |
 | `names(x)`, `names(x, k)` | Names of the only names axis, or of axis `k` |
-| `haskey(x, name)` | True if any names axis has `name` |
+| `haskey(x, name)` | True if any names axis has `name`; `'dims', k` looks on axis `k` only |
 | `rawdata(x)`, `double(x)`, `isnumeric(x)`, `islogical(x)`, `copy(x)` | |
 | `permute(x, order)` | Reorder the axes |
 | `squeeze(x)` | Drop length-1 axes |
@@ -171,6 +167,38 @@ sum(x, 'dims', [2 3])        % a TSeries
 `mapslices(x, f, 'dims', d)` applies `f` to each slice spanning `d` (default
 the date axis). A result the same size keeps the axes. A result of length 1
 along `d` drops those axes. Anything else comes back as a plain array.
+
+## Arithmetic
+
+Element-wise operators (`+ - .* ./ .\ .^`, comparisons, `& | ~`) and `log`,
+`exp`, `abs` and unary minus work on an NDTSeries. The other operand can be:
+
+- a scalar (`*` and `/` work with a scalar too)
+- a numeric array of the same size
+- another series whose axes line up: the same kinds in the same order, the
+  same names, the same plain lengths, and the same frequency on date axes
+
+Date axes are cut to the dates both operands have, as for an `MVTSeries`. A
+`TSeries` or `MVTSeries` operand counts as the NDTSeries it converts to.
+Broadcasting a smaller series across the other axes (for example adding a
+`TSeries` to every slice) is not supported yet. Comparisons give a logical
+NDTSeries.
+
+```matlab
+y = 100 * log(x);
+g = x ./ lag(x) - 1;          % dates cut to the overlap
+big = x > 10;                 % logical NDTSeries
+```
+
+## Combining and cleaning
+
+| Function | |
+|---|---|
+| `cat(k, a, b, ...)` | join along axis `k`: names are joined (and must stay unique), plain lengths add up, and along a date axis each series must start right after the previous one. The other axes must match. `[a, b]` is an error; use `cat`. |
+| `rename(x, old, new)` | rename names on the names axis that holds them; `'dims', k` picks the axis, and is required when a name is on more than one names axis |
+| `tse.strip_ts(x)` | drop leading and trailing dates where every value is missing |
+| `tse.overlay(a, b, ...)`, `tse.overlay(rng, a, b, ...)` | first non-missing value wins, over the union of the date ranges (or over `rng`); the other axes must match |
+| `tse.fconvert(F, x, ...)` | convert the date axis to frequency `F` with the usual options (`'dims', k` when there are several date axes) |
 
 ## Conversion
 

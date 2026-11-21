@@ -3,7 +3,7 @@ function m = firstdate(x, varargin)
     if isa(x, 'tse.TSeries') || isa(x, 'tse.MVTSeries')
         m = x.firstdate;
     elseif isa(x, 'tse.NDTSeries')
-        m = x.firstdate(varargin{:});
+        m = firstdate(x, varargin{:});
     elseif isa(x, 'tse.MITRange')
         m = x.startMIT;
     else
