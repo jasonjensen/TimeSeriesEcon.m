@@ -20,14 +20,14 @@ classdef TestNDTSeriesExtras < matlab.unittest.TestCase
             tc.verifyClass(y, 'tse.NDTSeries');
             tc.verifyTrue(isequal(y.axes, x.axes));
             tc.verifyEqual(y.values, 2 * v + 1);
-            tc.verifyEqual((x / 4).values, v / 4);
-            tc.verifyEqual((10 - x).values, 10 - v);
-            tc.verifyEqual((x .^ 2).values, v .^ 2);
-            tc.verifyEqual((x + v).values, 2 * v);
-            tc.verifyEqual((-x).values, -v);
-            tc.verifyEqual(log(x).values, log(v));
-            tc.verifyEqual(exp(x / 100).values, exp(v / 100), 'AbsTol', 1e-12);
-            tc.verifyEqual(abs(-x).values, v);
+            tc.verifyEqual(rawdata(x / 4), v / 4);
+            tc.verifyEqual(rawdata(10 - x), 10 - v);
+            tc.verifyEqual(rawdata(x .^ 2), v .^ 2);
+            tc.verifyEqual(rawdata(x + v), 2 * v);
+            tc.verifyEqual(rawdata(-x), -v);
+            tc.verifyEqual(rawdata(log(x)), log(v));
+            tc.verifyEqual(rawdata(exp(x / 100)), exp(v / 100), 'AbsTol', 1e-12);
+            tc.verifyEqual(rawdata(abs(-x)), v);
             tc.verifyError(@() x + ones(2, 2), 'tseries:dimMismatch');
             tc.verifyError(@() x * ones(4, 2, 3), 'tseries:noMatch');
             tc.verifyError(@() x + "a", 'tseries:noMatch');
@@ -39,8 +39,8 @@ classdef TestNDTSeriesExtras < matlab.unittest.TestCase
             tc.verifyClass(b, 'tse.NDTSeries');
             tc.verifyClass(b.values, 'logical');
             tc.verifyEqual(b.values, x.values > 12);
-            tc.verifyEqual(((x > 5) & (x < 9)).values, x.values > 5 & x.values < 9);
-            tc.verifyEqual((~(x == 3)).values, x.values ~= 3);
+            tc.verifyEqual(rawdata((x > 5) & (x < 9)), x.values > 5 & x.values < 9);
+            tc.verifyEqual(rawdata(~(x == 3)), x.values ~= 3);
             tc.verifyEqual(sum(x >= 20), 5);
         end
 
