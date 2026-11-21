@@ -4,8 +4,9 @@ function v = daec_assemble(objType, axes, values, jeltype)
 %   Plain axes give a plain array (one axis gives a column), one range axis
 %   gives a tse.TSeries, and a range axis followed by a names axis gives a
 %   tse.MVTSeries.  A stored range (type_range) gives a tse.MITRange, or
-%   1:n for a plain axis.  Anything else, such as names-by-dates or a 3-d
-%   array with a range axis, gives a tse.daec.Array.
+%   1:n for a plain axis.  Any other numeric or logical layout, such as
+%   names-by-dates or a 3-d array with a range axis, gives a tse.NDTSeries;
+%   other values (text, dates) in such a layout give a tse.daec.Array.
 %
 %   jeltype 'Bool' turns stored 0 and 1 back into logicals.
     e = daec_enums();
@@ -36,6 +37,8 @@ function v = daec_assemble(objType, axes, values, jeltype)
     elseif numericValues && isequal(kinds, ["range" "names"])
         v = tse.MVTSeries(class(values), axes(1).firstdate(), axes(2).names, values);
         v.values = keepComplex(v.values, values);
+    elseif numericValues
+        v = tse.NDTSeries(axes, values);
     else
         v = tse.daec.Array(axes, values);
     end
