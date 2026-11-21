@@ -13,6 +13,7 @@ tse.setoption(name, value)
 | `'bdaily_holidays_map'` | `[]` | a `TSeries{BDaily}` of logicals (`true` = working day). Populated by `set_holidays_map`; consulted by `fconvert` and `cleanedvalues` when called with `'skip_holidays', true`. |
 | `'bdaily_creation_bias'` | `'strict'` | stored for parity with the Julia/Python ports. The `bday` constructor takes an explicit `'bias'` argument per call. |
 | `'bdaily_skip_nans'` | `false` | default NaN-skipping flag for BDaily helpers. |
+| `'slicing_keeps_type'` | `false` | when `true`, slicing an `MVTSeries` or `NDTSeries` keeps its class instead of returning a `TSeries`, `MVTSeries` or numeric row. See [NDTSeries](ndtseries.md#keeping-the-type-when-slicing). MATLAB only. |
 | `'x13path'` | `''` | path to an X-13 executable (x13 is not implemented in this port). |
 
 ## Holidays
