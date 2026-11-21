@@ -17,6 +17,14 @@ function r = overlay(varargin)
         error('tseries:noMatch', 'overlay requires at least one argument.');
     end
 
+    % NDTSeries overlay (with optional MITRange first).
+    if isa(varargin{1}, 'tse.NDTSeries') ...
+            || (isa(varargin{1}, 'tse.MITRange') ...
+                && numel(varargin) >= 2 && isa(varargin{2}, 'tse.NDTSeries'))
+        r = tse.NDTSeries.overlayAll(varargin{:});
+        return
+    end
+
     % Struct overlay (workspace-like): all args are structs.
     if isstruct(varargin{1})
         r = overlayStructs(varargin{:});
