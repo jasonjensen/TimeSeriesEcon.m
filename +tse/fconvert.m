@@ -1,12 +1,13 @@
 function out = fconvert(varargin)
-%FCONVERT  Convert an MIT, MITRange, or TSeries to another frequency.
+%FCONVERT  Convert an MIT, MITRange, TSeries or MVTSeries to another frequency.
 %
 %   y = tse.fconvert(F_to, x, 'name', value, ...)
 %   y = tse.fconvert(fn, F_to, x, ...)        % custom aggregator/disaggregator
 %
 %   F_to may be a tse.Frequency instance (e.g. tse.Quarterly()), a class
 %   name ('Quarterly'), or an integer frequency code.  x may be an MIT, an
-%   MITRange, or a TSeries.
+%   MITRange, a TSeries or an MVTSeries.  An MVTSeries is converted column
+%   by column with the same options and keeps its column names.
 %
 %   Name-value options (subset depending on direction):
 %     'method'   : higher -> 'const'(default) | 'even' | 'linear'
@@ -38,6 +39,8 @@ function out = fconvert(varargin)
         out = range_convert(Fto, x, opts);
     elseif isa(x, 'tse.TSeries')
         out = tseries_convert(Fto, x, fn, opts);
+    elseif isa(x, 'tse.MVTSeries')
+        out = mvtseries_convert(Fto, x, fn, opts);
     else
         error('tseries:noMatch', 'fconvert: unsupported input of type %s.', class(x));
     end
@@ -441,6 +444,41 @@ function out = tseries_convert(F_to, t, fn, opts)
     end
     error('tseries:noMatch', 'Conversion of TSeries from %s to %s not implemented.', ...
         class(F_from), class(F_to));
+end
+
+% ---------- MVTSeries: column by column ------------------------------
+%
+% Each column goes through tseries_convert with the same options.  The
+% output range depends only on the input range and the options, never on
+% the values, so all converted columns share one range.
+
+function out = mvtseries_convert(F_to, x, fn, opts)
+    F_from = int2freq(x.frequency);
+    if freq_eq(F_to, F_from)
+        out = x;
+        return
+    end
+    names = x.colnames;
+    ncol = numel(names);
+    nrow = size(x.values, 1);
+    if ncol == 0
+        % no columns: convert an all-NaN column to find the target range
+        probe = tseries_convert(F_to, tse.TSeries(x.firstdate, nan(nrow, 1)), fn, opts);
+        out = tse.MVTSeries(probe.firstdate, names, zeros(numel(probe.values), 0));
+        return
+    end
+    cols = cell(1, ncol);
+    for k = 1:ncol
+        c = tseries_convert(F_to, tse.TSeries(x.firstdate, x.values(:, k)), fn, opts);
+        if k == 1
+            first = c;
+        elseif c.firstdate ~= first.firstdate || numel(c.values) ~= numel(first.values)
+            error('tseries:noMatch', ...
+                'fconvert: columns of the MVTSeries converted to different ranges.');
+        end
+        cols{k} = c.values(:);
+    end
+    out = tse.MVTSeries(first.firstdate, names, [cols{:}]);
 end
 
 % ---------- YP -> YP, to higher --------------------------------------
