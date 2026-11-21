@@ -10,9 +10,8 @@ has a labelled N-d series. It follows DataEcon's N-d objects, so it can be
 stored in `.daec` files.
 
 !!! note "Work in progress"
-    This page covers construction, shape, axes, indexing, conversion,
-    comparison and display. Time functions (`lag`, `diff`, `pct`, ...),
-    reductions and arithmetic come in later steps.
+    Arithmetic, concatenation and `fconvert` for NDTSeries come in a later
+    step.
 
 ## Axes
 
@@ -131,6 +130,47 @@ stays, with length 1. An `MVTSeries` slice (`m(mit)`, `m('a')`, `m(rng, 'a')`,
 (`x(mit, "gdp", 1)`, `m(mit, 'a')`) is the plain value, and dot access (`x.gdp`,
 `m.a`) drops the names axis as above. Use `toseries` or `squeeze` to convert
 explicitly. The default (`false`) matches Julia and Python.
+
+## Time functions
+
+These work along the date axis and keep every other axis. They take the same
+arguments as for a `TSeries`, plus `'dims', k` when there are several date
+axes.
+
+| Function | |
+|---|---|
+| `shift(x, k)`, `lag(x[, k])`, `lead(x[, k])` | move the dates |
+| `diff(x[, k])` | `x - lag(x)`; `diff(x, k)` as for a `TSeries` |
+| `pct(x[, shift], 'islog', tf)`, `apct(x[, islog])`, `ytypct(x)` | percent changes |
+| `cumsum(x[, d])`, `cumprod(x[, d])` | along the date axis, or axis `d` |
+| `moving(x, n)`, `moving_average(x, n)`, `moving_sum(x, n)` | moving windows |
+
+```matlab
+x = NDTSeries({qq(2020,1):qq(2024,4), ["gdp" "cpi"], 3}, @(sz) rand(sz) + 1);
+g = pct(x);                           % 19x2x3, from 2020Q2
+v = NDTSeries({yy(2019):yy(2021), mm(2020,1):mm(2020,12)}, 1);
+lag(v, 'dims', 2)                     % lag the monthly axis
+```
+
+## Reductions
+
+`sum`, `prod`, `mean`, `median`, `std`, `var`, `min`, `max`, `any`, `all` and
+`quantile(x, p, ...)` reduce over every value by default. With `'dims', d` they
+reduce along axis `d`, which can be a number, several numbers, or `"time"` for
+the date axis. That axis is dropped, and the result is handed back the same way
+as a slice: a value, a `TSeries`, an `MVTSeries` or an `NDTSeries`. Flags such as
+`'omitnan'`, and the weight of `std`/`var` (`std(x, 1, 'dims', 2)`), pass
+through.
+
+```matlab
+mean(x, 'dims', "time")      % names x plain NDTSeries of means
+sum(x, 'dims', 3)            % an MVTSeries (dates x names)
+sum(x, 'dims', [2 3])        % a TSeries
+```
+
+`mapslices(x, f, 'dims', d)` applies `f` to each slice spanning `d` (default
+the date axis). A result the same size keeps the axes. A result of length 1
+along `d` drops those axes. Anything else comes back as a plain array.
 
 ## Conversion
 
