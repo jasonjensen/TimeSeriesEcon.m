@@ -363,6 +363,7 @@ classdef MVTSeries
             if strcmp(S(1).type, '.')
                 name = S(1).subs;
                 if any(strcmp({'firstdate','colnames','values'}, name))
+                    warnShadowedColumn(x, name);
                     out = builtin('subsref', x, S(1));
                     if numel(S) > 1
                         out = subsref(out, S(2:end));
@@ -432,13 +433,15 @@ classdef MVTSeries
             if strcmp(S(1).type, '.')
                 name = string(S(1).subs);
                 if any(strcmp({'firstdate','colnames','values'}, char(name)))
+                    warnShadowedColumn(x, name);
                     x = builtin('subsasgn', x, S, val);
                     return
                 end
                 k = colIndexOf(x, name);
                 if isempty(k)
                     error('tseries:bounds', ...
-                        'Cannot append new column via dot-assignment. Use hcat(x, %s=val).', name);
+                        ['Cannot append new column via dot-assignment. ' ...
+                         'Use x = hcat(x, ''%s'', val).'], name);
                 end
                 if isa(val, 'tse.TSeries')
                     if ~eq(val.frequency, x.frequency)
@@ -508,6 +511,70 @@ classdef MVTSeries
         end
 
         % ---------- hcat / vcat ----------
+
+        function r = hcat(x, varargin)
+            %HCAT  Add columns to an MVTSeries.
+            %
+            %   r = hcat(x, 'name', val, 'name2', val2, ...)
+            %   r = hcat(x, name=val, name2=val2)      % R2021a+ syntax
+            %   r = hcat(x, y, ...)                    % same as [x, y, ...]
+            %
+            %   Each val is a TSeries (aligned by date; the range grows to
+            %   cover it), a scalar (fills the column), or a numeric vector
+            %   with one value per row of x.  MVTSeries arguments are
+            %   concatenated as with [x, y].  New names must not already be
+            %   columns.  Mirrors Julia's hcat(x; name=val).
+            parts = {x};
+            k = 1;
+            while k <= numel(varargin)
+                a = varargin{k};
+                if isa(a, 'tse.MVTSeries')
+                    parts{end+1} = a; %#ok<AGROW>
+                    k = k + 1;
+                    continue
+                end
+                if ~(ischar(a) || (isstring(a) && isscalar(a)))
+                    error('tseries:noMatch', ...
+                        'hcat expects MVTSeries arguments or name/value pairs.');
+                end
+                if k == numel(varargin)
+                    error('tseries:noMatch', 'hcat: missing value for column ''%s''.', a);
+                end
+                name = string(a);
+                val  = varargin{k+1};
+                if isa(val, 'tse.TSeries')
+                    if ~eq(val.frequency, x.frequency)
+                        mixed_freq_error(val.frequency, x.frequency);
+                    end
+                    v = val.values(:);
+                    col = tse.MVTSeries(class(v), val.firstdate, name, v);
+                elseif (isnumeric(val) || islogical(val)) && isscalar(val)
+                    col = tse.MVTSeries(class(val), rangeof(x), name, val);
+                elseif (isnumeric(val) || islogical(val)) && isvector(val)
+                    if numel(val) ~= size(x.values, 1)
+                        error('tseries:dimMismatch', ...
+                            'Vector length %d does not match column length %d.', ...
+                            numel(val), size(x.values, 1));
+                    end
+                    col = tse.MVTSeries(class(val), rangeof(x), name, val(:));
+                else
+                    error('tseries:noMatch', ...
+                        'Unsupported value for column %s.', name);
+                end
+                parts{end+1} = col; %#ok<AGROW>
+                k = k + 2;
+            end
+            names = strings(1, 0);
+            for j = 1:numel(parts)
+                names = [names, parts{j}.colnames]; %#ok<AGROW>
+            end
+            [u, ~, ic] = unique(names, 'stable');
+            if numel(u) < numel(names)
+                dup = u(accumarray(ic(:), 1) > 1);
+                error('tseries:noMatch', 'hcat: duplicate column name ''%s''.', dup(1));
+            end
+            r = horzcat(parts{:});
+        end
 
         function r = horzcat(varargin)
             % Concatenate MVTSeries column-wise (union of columns).
@@ -1097,6 +1164,17 @@ function ts = colTSeries(x, name)
         error('tseries:bounds', 'Unknown column: %s', name);
     end
     ts = tse.TSeries(x.firstdate, x.values(:, k));
+end
+
+function warnShadowedColumn(x, name)
+    % A column named like a field (firstdate, colnames, values) cannot be
+    % reached with dot syntax: x.values always returns the field.
+    if any(x.colnames == string(name))
+        warning('tseries:shadowedColumn', ...
+            ['Column ''%s'' is hidden by the MVTSeries field of the same name; ' ...
+             'x.%s refers to the field. Use x(''%s'') for the column, or ' ...
+             'rename it with rename_columns.'], name, name, name);
+    end
 end
 
 function k = colIndexOf(x, name)

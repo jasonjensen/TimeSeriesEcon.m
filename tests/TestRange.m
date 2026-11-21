@@ -77,6 +77,36 @@ classdef TestRange < matlab.unittest.TestCase
                 'tseries:mixedFreq');
         end
 
+        function colon_with_int_step(tc)
+            % a:s:b must build the same range as MITRange(a, s, b).
+            sr = tse.qq(1,1):2:tse.qq(4,4);
+            tc.verifyClass(sr, 'tse.MITRange');
+            tc.verifyEqual(length(sr), 8);
+            tc.verifyEqual(sr.step, 2);
+            tc.verifyTrue(isequal(sr, tse.MITRange(tse.qq(1,1), 2, tse.qq(4,4))));
+            m = tse.mm(2020,1):3:tse.mm(2020,12);
+            tc.verifyTrue(m(end) == tse.mm(2020,10));
+        end
+
+        function colon_with_negative_step(tc)
+            sr = tse.qq(2021,4):-1:tse.qq(2020,1);
+            tc.verifyEqual(length(sr), 8);
+            tc.verifyTrue(sr(1)   == tse.qq(2021,4));
+            tc.verifyTrue(sr(end) == tse.qq(2020,1));
+        end
+
+        function colon_with_duration_step(tc)
+            d = tse.qq(1,3) - tse.qq(1,1);
+            sr = tse.qq(1,1):d:tse.qq(4,4);
+            tc.verifyEqual(length(sr), 8);
+            tc.verifyEqual(sr.step, 2);
+        end
+
+        function colon_step_mixed_freq_throws(tc)
+            d = tse.mm(1,3) - tse.mm(1,1);
+            tc.verifyError(@() tse.qq(1,1):d:tse.qq(4,4), 'tseries:mixedFreq');
+        end
+
         function intersect_ranges(tc)
             r1 = tse.qq(2020,1) : tse.qq(2020,4);
             r2 = tse.qq(2020,3) : tse.qq(2021,2);
