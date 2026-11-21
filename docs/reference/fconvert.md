@@ -1,6 +1,7 @@
 # Frequency conversion (fconvert)
 
-`fconvert` converts an `MIT`, `MITRange`, or `TSeries` to another frequency.
+`fconvert` converts an `MIT`, `MITRange`, `TSeries` or `MVTSeries` to another
+frequency.
 
 ```matlab
 y = tse.fconvert(F_to, x, 'name', value, ...)
@@ -47,6 +48,22 @@ fconvert(@(v) median(v), Quarterly(), TSeries(mm(2020,1), (1:24)'))
 Supported pairs include YP↔YP (any direction), calendar (Daily/BDaily/Weekly)
 → YP/Weekly aggregation, YP/Weekly → Daily/BDaily disaggregation, and
 Daily↔BDaily. Ranges and single MITs convert with the same `F_to` argument.
+
+## MVTSeries
+
+An `MVTSeries` converts column by column, with the same options applied to
+every column, and keeps its column names. All columns share one range, so the
+result is an `MVTSeries` over the converted range.
+
+```matlab
+x = MVTSeries(qq(2020,1):qq(2021,4), {'gdp','cpi'}, [(1:8)', (11:18)']);
+fconvert(Monthly(), x, 'method', 'linear')
+fconvert(Yearly(), x, 'method', 'sum')
+fconvert(@(v) max(v) - min(v), Yearly(), x)   % custom aggregator per column
+```
+
+This is a MATLAB addition: the Julia and Python versions convert a `TSeries`
+but not an `MVTSeries`.
 
 !!! info "Julia ↔ MATLAB"
     Mirrors `TimeSeriesEcon.jl/src/fconvert`. Julia passes the target as a type

@@ -216,6 +216,15 @@ Recorded so nobody "fixes" them:
 - `compare` returns a `CompareResult` with a list of differences in Python;
   Julia and MATLAB return a logical.
 
+## MATLAB-only additions
+
+Features MATLAB has that neither sibling has. They are candidates to offer
+upstream; nothing here needs to match a sibling.
+
+- `fconvert` on an `MVTSeries` (column by column, same options as a
+  `TSeries`). Added as step 0 of the NDTSeries plan; Julia `fc0a0d0` and
+  Python `b02de6f` only convert MIT, range and `TSeries`.
+
 ## Not applicable
 
 | Python change | Why it does not apply |

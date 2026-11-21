@@ -57,7 +57,7 @@
 %   isweekly, isdaily, isbdaily, istypenan
 %
 % Transforms and helpers (functions)
-%   fconvert            - Convert MIT/range/series to another frequency
+%   fconvert            - Convert MIT/range/TSeries/MVTSeries to another frequency
 %   undiff              - Inverse of diff (cumulative sum)
 %   lookup              - Vectorised gather of values at MIT keys
 %   overlay             - First-valid-wins composition of series
