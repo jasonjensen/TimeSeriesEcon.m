@@ -5,6 +5,11 @@ function rng = rangeof(x, varargin)
 %   rangeof(x,'drop',k)   drop k periods (positive = from start,
 %                         negative = from end)
 
+    if isa(x, 'tse.NDTSeries')
+        rng = x.rangeof(varargin{:});   % accepts 'dims', k as well as 'drop'
+        return
+    end
+
     p = inputParser;
     addParameter(p, 'drop', 0, @(v) isnumeric(v) && isscalar(v));
     parse(p, varargin{:});

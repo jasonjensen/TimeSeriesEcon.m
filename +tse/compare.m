@@ -1,5 +1,5 @@
 function tf = compare(a, b, varargin)
-%COMPARE  Compare two TSeries / MVTSeries / structs / values under
+%COMPARE  Compare two TSeries / MVTSeries / NDTSeries / structs / values under
 %isapprox-style tolerance.  Returns a scalar logical.
 %
 %   compare(a, b, 'atol', val, 'rtol', val, 'nans', true|false,
@@ -109,6 +109,19 @@ function tf = compare(a, b, varargin)
         va = a(trng, cols).values;
         vb = b(trng, cols).values;
         tf = approxScalarOrArray(va, vb, atol, rtol, nansEqual);
+        return
+    end
+
+    if isa(a, 'tse.NDTSeries') && isa(b, 'tse.NDTSeries')
+        % Axes must match exactly; 'trange' and 'ignoreMissing' are not
+        % applied to N-d series yet.
+        if ~isequal(a.axes, b.axes)
+            tf = false; return
+        end
+        if isempty(a.values)
+            tf = true; return
+        end
+        tf = approxScalarOrArray(double(a.values), double(b.values), atol, rtol, nansEqual);
         return
     end
 

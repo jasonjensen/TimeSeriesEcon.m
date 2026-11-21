@@ -1,7 +1,9 @@
-function m = lastdate(x)
+function m = lastdate(x, varargin)
 %LASTDATE  Last MIT of a TSeries (or MITRange).
-    if isa(x, 'tse.TSeries') || isa(x, 'tse.MVTSeries')
-        n = length(x.values);
+    if isa(x, 'tse.NDTSeries')
+        m = x.lastdate(varargin{:});
+    elseif isa(x, 'tse.TSeries') || isa(x, 'tse.MVTSeries')
+        n = size(x.values, 1);   % rows; length() would count columns of a wide MVTSeries
         if n == 0
             m = x.firstdate - 1;
         else

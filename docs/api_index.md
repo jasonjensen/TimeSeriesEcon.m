@@ -12,6 +12,7 @@ also run `help tse` for the same overview, or `help tse.<name>` for any item.
 | `tse.MIT`, `tse.Duration`, `tse.MITRange` | [MIT & MITRange](reference/mit.md) |
 | `tse.TSeries` | [TSeries](reference/tseries.md) |
 | `tse.MVTSeries` | [MVTSeries](reference/mvtseries.md) |
+| `tse.NDTSeries`, `tse.Axis` | [NDTSeries](reference/ndtseries.md) |
 
 ## MIT constructors
 

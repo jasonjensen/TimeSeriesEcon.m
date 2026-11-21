@@ -62,10 +62,12 @@ Every stored array has one axis per dimension. An axis is plain (a length), a
 date range, or a list of names, and the axes can come in any order. A
 `tse.TSeries` is a single date axis, and a `tse.MVTSeries` is a date axis
 followed by a names axis. Other layouts, such as names by dates or a 3-d array
-with a date axis, read as a `tse.daec.Array`:
+with a date axis, read as a `tse.daec.Array`. Its axes are `tse.Axis` objects,
+the same as a [`tse.NDTSeries`](ndtseries.md) uses (`tse.daec.Axis` is an
+alias), and `tse.NDTSeries(a)` converts one:
 
 ```matlab
-ax = [tse.daec.Axis(["a" "b"]), tse.daec.Axis(tse.qq(2020, 1), 4)];
+ax = [tse.Axis(["a" "b"]), tse.Axis(tse.qq(2020, 1), 4)];
 x  = tse.daec.Array(ax, rand(2, 4));          % names by quarters
 tse.daec.writedb('data.daec', struct('x', x));
 
