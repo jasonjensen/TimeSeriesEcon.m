@@ -27,7 +27,7 @@ classdef File < handle
     %     writedb / readdb                   a struct, one catalog per field
     %                                        that is a struct
     %
-    %   tse.daec.Array values keep their axes in any order and are written
+    %   tse.NDTSeries and tse.daec.Array values keep their axes in any order and are written
     %   with the store function that matches their number of axes.
     %
     %   The names and behaviour follow TimeSeriesEcon.jl's DataEcon module.
@@ -624,7 +624,7 @@ classdef File < handle
                 id = storeArray(de, pid, name, value, 1);
             elseif isa(value, 'tse.MVTSeries')
                 id = storeArray(de, pid, name, value, 2);
-            elseif isa(value, 'tse.daec.Array')
+            elseif isa(value, 'tse.daec.Array') || isa(value, 'tse.NDTSeries')
                 id = storeArray(de, pid, name, value, []);
             elseif (ischar(value) && (isrow(value) || isempty(value))) ...
                     || ((isnumeric(value) || islogical(value) || isstring(value) ...
@@ -795,7 +795,7 @@ function [objType, axes, values] = arrayLayout(value, want)
         objType = T.type_mvtseries;
         axes = a.axes;
         values = a.values;
-    elseif isa(value, 'tse.daec.Array')
+    elseif isa(value, 'tse.daec.Array') || isa(value, 'tse.NDTSeries')
         axes = value.axes;
         values = value.values;
         kinds = [axes.kind];

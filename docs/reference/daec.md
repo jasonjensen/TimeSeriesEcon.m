@@ -48,7 +48,7 @@ name. Fields that cannot be written or read are skipped with a warning.
 | `tse.TSeries` | series on a date axis | `tse.TSeries` |
 | `tse.MVTSeries` | date axis × names axis | `tse.MVTSeries` |
 | `tse.MITRange` | range | `tse.MITRange` |
-| `tse.daec.Array` | axes in any order | `tse.daec.Array` (or a series, if it is one) |
+| `tse.NDTSeries`, `tse.daec.Array` | axes in any order | `tse.NDTSeries` (or a series, if it is one; text stays a `tse.daec.Array`) |
 | struct | catalog | struct |
 
 Numbers keep their width: an `int32` stays `int32` and a `single` stays
@@ -61,18 +61,18 @@ marker, so they come back as logical in MATLAB and as `Bool` in Julia.
 Every stored array has one axis per dimension. An axis is plain (a length), a
 date range, or a list of names, and the axes can come in any order. A
 `tse.TSeries` is a single date axis, and a `tse.MVTSeries` is a date axis
-followed by a names axis. Other layouts, such as names by dates or a 3-d array
-with a date axis, read as a `tse.daec.Array`. Its axes are `tse.Axis` objects,
-the same as a [`tse.NDTSeries`](ndtseries.md) uses (`tse.daec.Axis` is an
-alias), and `tse.NDTSeries(a)` converts one:
+followed by a names axis. Other numeric or logical layouts, such as names by
+dates or a 3-d array with a date axis, read as a
+[`tse.NDTSeries`](ndtseries.md), and an NDTSeries writes its axes as they are.
+Text arrays in such a layout read as a `tse.daec.Array`, which holds the same
+`tse.Axis` objects (`tse.daec.Axis` is an alias) and converts with
+`tse.NDTSeries(a)` when its values are numeric.
 
 ```matlab
-ax = [tse.Axis(["a" "b"]), tse.Axis(tse.qq(2020, 1), 4)];
-x  = tse.daec.Array(ax, rand(2, 4));          % names by quarters
-tse.daec.writedb('data.daec', struct('x', x));
-
-a = tse.daec.Array(db.gdp);   % the axes of a series
-s = a.toseries();             % and back
+x = tse.NDTSeries({["a" "b"], tse.qq(2020, 1):tse.qq(2020, 4)}, rand(2, 4));
+tse.daec.writedb('data.daec', struct('x', x));   % names by quarters
+db = tse.daec.readdb('data.daec');
+class(db.x)                                      % tse.NDTSeries
 ```
 
 ## Working with an open file

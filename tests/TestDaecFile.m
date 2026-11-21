@@ -167,14 +167,14 @@ classdef TestDaecFile < matlab.unittest.TestCase
 
         % ---- arrays with axes in any order ----
 
-        function names_by_dates_reads_as_array(tc)
+        function names_by_dates_reads_as_ndtseries(tc)
             % DataEcon's ndtseries test layout: names first, then dates
             axes = [tse.daec.Axis(["GDP" "CPI"]), tse.daec.Axis(tse.qq(2022, 3), 5)];
             a = tse.daec.Array(axes, [1.1 2.2 3.3 4.4 5.5; 1.2 2.3 3.4 4.5 5.6]);
             tse.daec.writedb(tc.file, struct('a', a));
             r = tse.daec.readdb(tc.file);
-            tc.verifyClass(r.a, 'tse.daec.Array');
-            tc.verifyTrue(isequal(r.a, a));
+            tc.verifyClass(r.a, 'tse.NDTSeries');
+            tc.verifyTrue(isequal(r.a, tse.NDTSeries(a)));
         end
 
         function three_d_with_a_range_axis(tc)
@@ -182,14 +182,34 @@ classdef TestDaecFile < matlab.unittest.TestCase
             a = tse.daec.Array(axes, reshape(1:24, 4, 2, 3));
             tse.daec.writedb(tc.file, struct('a', a));
             r = tse.daec.readdb(tc.file);
-            tc.verifyTrue(isequal(r.a, a));
+            tc.verifyClass(r.a, 'tse.NDTSeries');
+            tc.verifyTrue(isequal(r.a, tse.NDTSeries(a)));
         end
 
         function one_names_axis(tc)
             a = tse.daec.Array(tse.daec.Axis({'x', 'y', 'z'}), [1; 2; 3]);
             tse.daec.writedb(tc.file, struct('a', a));
             r = tse.daec.readdb(tc.file);
-            tc.verifyTrue(isequal(r.a, a));
+            tc.verifyTrue(isequal(r.a, tse.NDTSeries(a)));
+        end
+
+        function ndtseries_round_trip(tc)
+            x = tse.NDTSeries({tse.qq(2020, 1):tse.qq(2021, 2), ["a" "b"], 3}, ...
+                reshape(1:36, 6, 2, 3) / 7);
+            v = tse.NDTSeries({tse.yy(2019):tse.yy(2020), tse.mm(2020, 1):tse.mm(2020, 4)}, ...
+                reshape(1:8, 2, 4));
+            b = tse.NDTSeries({["x" "y"], 2}, logical([1 0; 0 1]));
+            tse.daec.writedb(tc.file, struct('x', x, 'v', v, 'b', b));
+            r = tse.daec.readdb(tc.file);
+            tc.verifyTrue(isequal(r.x, x));
+            tc.verifyTrue(isequal(r.v, v));
+            tc.verifyTrue(isequal(r.b, b));
+            % a date axis then a names axis is stored as an MVTSeries
+            m = tse.NDTSeries({tse.qq(2020, 1):tse.qq(2020, 3), ["a" "b"]}, rand(3, 2));
+            tse.daec.writedb(tc.file, struct('m', m));
+            r = tse.daec.readdb(tc.file);
+            tc.verifyClass(r.m, 'tse.MVTSeries');
+            tc.verifyEqual(r.m.values, m.values);
         end
 
         function array_of_a_series_reads_as_the_series(tc)
