@@ -1724,6 +1724,11 @@ function r = mvReduceValues(x, v, labelRows, op, varargin)
         return
     end
 
+    % std and var take the weight before the dimension: std(v, w, dim).
+    % Without one, std(v, 2) would read 2 as the weight.
+    if isempty(pos) && (isequal(op, @std) || isequal(op, @var))
+        pos = {0};
+    end
     if dims == 1
         r = op(v, pos{:}, 1);
         return

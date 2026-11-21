@@ -417,6 +417,149 @@ classdef NDTSeries
             end
         end
 
+        % ---------- time functions (along the date axis) ----------
+        %
+        % Each takes 'dims', k to pick the date axis when there are several.
+
+        function r = shift(x, k, varargin)
+            %SHIFT  shift(x, k) moves the dates back by k (like TSeries).
+            [d, ~] = timeArgs(x, varargin);
+            r = moveDates(x, d, -k);
+        end
+
+        function r = lag(x, varargin)
+            [d, pos] = timeArgs(x, varargin);
+            k = 1; if ~isempty(pos), k = pos{1}; end
+            r = moveDates(x, d, k);
+        end
+
+        function r = lead(x, varargin)
+            [d, pos] = timeArgs(x, varargin);
+            k = 1; if ~isempty(pos), k = pos{1}; end
+            r = moveDates(x, d, -k);
+        end
+
+        function r = diff(x, varargin)
+            %DIFF  diff(x) = x - lag(x); diff(x, k) as for TSeries.
+            [d, pos] = timeArgs(x, varargin);
+            k = -1; if ~isempty(pos), k = pos{1}; end
+            r = pairOp(x, d, k, @(a, b) a - b);
+        end
+
+        function r = pct(x, varargin)
+            %PCT  Percent change; pct(x, shift, 'islog', tf) as for TSeries.
+            [d, pos] = timeArgs(x, varargin);
+            s = -1;
+            if ~isempty(pos) && isnumeric(pos{1}), s = pos{1}; pos = pos(2:end); end
+            islog = optValue(pos, 'islog', false);
+            if islog
+                x.values = exp(x.values);
+            end
+            r = pairOp(x, d, s, @(a, b) (a - b) ./ b * 100);
+        end
+
+        function r = apct(x, varargin)
+            %APCT  Annualised percent change of one period.
+            [d, pos] = timeArgs(x, varargin);
+            islog = ~isempty(pos) && logical(pos{1});
+            N = annualPeriods(x, d, 'apct');
+            if islog
+                x.values = exp(x.values);
+            end
+            r = pairOp(x, d, -1, @(a, b) ((a ./ b) .^ N - 1) * 100);
+        end
+
+        function r = ytypct(x, varargin)
+            %YTYPCT  Percent change from the same period a year earlier.
+            [d, ~] = timeArgs(x, varargin);
+            N = annualPeriods(x, d, 'ytypct');
+            r = pairOp(x, d, -N, @(a, b) (a ./ b - 1) * 100);
+        end
+
+        function r = cumsum(x, varargin)
+            [d, ~] = dimArgs(x, varargin);
+            r = x;
+            r.values = cumsum(x.values, d);
+        end
+
+        function r = cumprod(x, varargin)
+            [d, ~] = dimArgs(x, varargin);
+            r = x;
+            r.values = cumprod(x.values, d);
+        end
+
+        function r = moving_sum(x, n, varargin)
+            r = movingImpl(x, n, false, varargin);
+        end
+
+        function r = moving_average(x, n, varargin)
+            r = movingImpl(x, n, true, varargin);
+        end
+
+        function r = moving(x, n, varargin)
+            r = movingImpl(x, n, true, varargin);
+        end
+
+        % ---------- reductions ----------
+        %
+        % sum(x) reduces over every value.  sum(x, 'dims', d) reduces along
+        % axis d (a number, a vector of numbers, or "time" for the date
+        % axis) and drops it; the result is handed back like a slice: a
+        % value, TSeries, MVTSeries or NDTSeries.
+
+        function r = sum(x, varargin),    r = reduceND(x, @(a, d, f) sum(a, d, f{:}), varargin); end
+        function r = prod(x, varargin),   r = reduceND(x, @(a, d, f) prod(a, d, f{:}), varargin); end
+        function r = mean(x, varargin),   r = reduceND(x, @(a, d, f) mean(a, d, f{:}), varargin); end
+        function r = median(x, varargin), r = reduceND(x, @(a, d, f) median(a, d, f{:}), varargin); end
+        function r = min(x, varargin),    r = reduceND(x, @(a, d, f) min(a, [], d, f{:}), varargin); end
+        function r = max(x, varargin),    r = reduceND(x, @(a, d, f) max(a, [], d, f{:}), varargin); end
+        function r = any(x, varargin),    r = reduceND(x, @(a, d, f) any(a, d), varargin); end
+        function r = all(x, varargin),    r = reduceND(x, @(a, d, f) all(a, d), varargin); end
+
+        function r = std(x, varargin)
+            [w, rest] = leadingWeight(varargin);
+            r = reduceND(x, @(a, d, f) std(a, w, d, f{:}), rest);
+        end
+
+        function r = var(x, varargin)
+            [w, rest] = leadingWeight(varargin);
+            r = reduceND(x, @(a, d, f) var(a, w, d, f{:}), rest);
+        end
+
+        function r = quantile(x, p, varargin)
+            if ~isscalar(p)
+                error('tseries:noMatch', 'NDTSeries quantile takes one probability at a time.');
+            end
+            r = reduceND(x, @(a, d, f) quantile(a, p, d), varargin);
+        end
+
+        function r = mapslices(x, f, varargin)
+            %MAPSLICES  Apply f to each slice along 'dims' (default the
+            %   date axis).  A result the same size keeps the axes; a result
+            %   of length 1 along dims drops those axes; anything else is
+            %   returned as a plain array.
+            [d, ~] = dimArgs(x, varargin);
+            res = mapslicesArray(x.values, f, d);
+            sz = axesSize(x.axes);
+            rs = size(res);
+            rs(end+1:numel(sz)) = 1;
+            if isequal(rs, sz)
+                r = x;
+                r.values = res;
+            elseif all(rs(d) == 1) && isequal(rs(setdiff(1:numel(sz), d)), sz(setdiff(1:numel(sz), d)))
+                keep = true(1, numel(x.axes));
+                keep(d) = false;
+                ax = x.axes(keep);
+                if isempty(ax)
+                    r = res;
+                else
+                    r = handBack(ax, reshape(res, axesSize(ax)), false);
+                end
+            else
+                r = res;
+            end
+        end
+
         % ---------- comparison ----------
 
         function tf = isequal(a, b)
@@ -829,6 +972,184 @@ function x = setKeys(x, keys, val)
     else
         error('tseries:dimMismatch', ...
             'Assignment of %d values into a selection of %d.', numel(val), prod(selSz));
+    end
+end
+
+% ---------- time-function helpers ----------
+
+function [d, pos] = timeArgs(x, args)
+    [opts, pos] = splitDims(args);
+    d = pickTimeDim(x, opts);
+end
+
+function [d, pos] = dimArgs(x, args)
+    % 'dims', k (number(s) or "time"), or a leading number; default: the
+    % date axis
+    [opts, pos] = splitDims(args);
+    if isempty(opts) && ~isempty(pos) && isnumeric(pos{1})
+        opts = {'dims', pos{1}};
+        pos = pos(2:end);
+    end
+    if isempty(opts)
+        d = pickTimeDim(x, {});
+    else
+        d = resolveDims(x, opts{2});
+    end
+end
+
+function d = resolveDims(x, d)
+    if (ischar(d) || isstring(d)) && strcmpi(d, 'time')
+        d = pickTimeDim(x, {});
+        return
+    end
+    n = numel(x.axes);
+    if ~isnumeric(d) || isempty(d) || any(d < 1 | d > n | d ~= fix(d)) || numel(unique(d)) ~= numel(d)
+        error('tseries:noMatch', 'dims must be axis numbers from 1 to %d, or "time".', n);
+    end
+    d = double(d(:)');
+end
+
+function v = optValue(args, name, default)
+    v = default;
+    for k = 1:2:numel(args) - 1
+        if (ischar(args{k}) || isstring(args{k})) && strcmpi(args{k}, name)
+            v = args{k + 1};
+        end
+    end
+end
+
+function r = moveDates(x, d, k)
+    % move the dates of axis d forward by k periods
+    ax = x.axes(d);
+    r = x;
+    r.axes(d) = tse.Axis(ax.range.startMIT + k, ax.length);
+end
+
+function r = pairOp(x, d, s, fn)
+    % combine each value with the one |s| periods away along axis d, as
+    % TSeries diff/pct do: s < 0 looks back, s > 0 looks ahead
+    ax = x.axes(d);
+    n = ax.length;
+    m = abs(s);
+    first = ax.range.startMIT;
+    if s < 0
+        first = first + m;
+    end
+    idxA = repmat({':'}, 1, ndims(x.values));
+    idxB = idxA;
+    if m >= n
+        sel = zeros(1, 0);
+        idxA{d} = sel;
+        out = x.values(idxA{:});
+    else
+        if s < 0
+            idxA{d} = m+1:n;
+            idxB{d} = 1:n-m;
+        else
+            idxA{d} = 1:n-m;
+            idxB{d} = m+1:n;
+        end
+        out = fn(double(x.values(idxA{:})), double(x.values(idxB{:})));
+    end
+    r = x;
+    r.axes(d) = tse.Axis(first, size(out, d));
+    r.values = reshape(out, axesSize(r.axes));
+end
+
+function N = annualPeriods(x, d, fname)
+    F = tse.frequencyof(x.axes(d).range);
+    if ~isa(F, 'tse.YPFrequency')
+        error('tseries:noMatch', '%s for frequency %s not implemented.', fname, class(F));
+    end
+    N = double(F.PeriodsPerYear);
+end
+
+function r = movingImpl(x, n, avg, args)
+    [d, ~] = timeArgs(x, args);
+    if ~(isnumeric(n) && isscalar(n) && n ~= 0 && n == fix(n))
+        error('tseries:noMatch', 'moving window n must be a non-zero integer.');
+    end
+    n = double(n);
+    an = abs(n);
+    ax = x.axes(d);
+    len = ax.length - an;
+    if len < 0
+        error('tseries:dimMismatch', 'Window %d is larger than the series length.', an);
+    end
+    first = ax.range.startMIT;
+    if n > 0
+        first = first + (n - 1);
+    end
+    idx = repmat({':'}, 1, ndims(x.values));
+    idx{d} = 1:len+1;
+    out = zeros(size(x.values(idx{:})));
+    for i = 1:an
+        idx{d} = i:i+len;
+        out = out + double(x.values(idx{:}));
+    end
+    if avg
+        out = out / an;
+    end
+    r = x;
+    r.axes(d) = tse.Axis(first, len + 1);
+    r.values = reshape(out, axesSize(r.axes));
+end
+
+function [w, rest] = leadingWeight(args)
+    w = 0;
+    rest = args;
+    if ~isempty(args) && isnumeric(args{1})
+        w = args{1};
+        rest = args(2:end);
+    end
+end
+
+function r = reduceND(x, op, args)
+    [opts, flags] = splitDims(args);
+    if isempty(opts)
+        r = op(x.values(:), 1, flags);
+        return
+    end
+    d = resolveDims(x, opts{2});
+    v = op(x.values, d, flags);
+    keep = true(1, numel(x.axes));
+    keep(d) = false;
+    ax = x.axes(keep);
+    if isempty(ax)
+        r = v;
+    else
+        r = handBack(ax, reshape(v, axesSize(ax)), false);
+    end
+end
+
+function out = mapslicesArray(A, f, dims)
+    % apply f to each slice of A spanning dims (see MVTSeries mapslices)
+    sz = size(A);
+    sz(end+1:max(dims)) = 1;
+    nd = numel(sz);
+    other = setdiff(1:nd, dims);
+    if isempty(other)
+        out = f(A);
+        return
+    end
+    iterSz = sz(other);
+    sliceIdx = repmat({':'}, 1, nd);
+    out = [];
+    for k = 1:prod(iterSz)
+        sub = cell(1, numel(other));
+        [sub{:}] = ind2sub([iterSz 1], k);
+        for kk = 1:numel(other)
+            sliceIdx{other(kk)} = sub{kk};
+        end
+        chunk = f(A(sliceIdx{:}));
+        if isempty(out)
+            cs = size(chunk);
+            cs(end+1:nd) = 1;
+            outSz = sz;
+            outSz(dims) = cs(dims);
+            out = zeros(outSz, class(chunk));
+        end
+        out(sliceIdx{:}) = chunk;
     end
 end
 
