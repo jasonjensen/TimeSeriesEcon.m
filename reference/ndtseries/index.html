@@ -1,0 +1,1871 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A time-series language for macroeconomics, ported from TimeSeriesEcon.jl to MATLAB.">
+      
+      
+      
+      
+        <link rel="prev" href="../mvtseries/">
+      
+      
+        <link rel="next" href="../workspace/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
+    
+    
+      
+        <title>NDTSeries - TimeSeriesEcon.m</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ndtseries" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="TimeSeriesEcon.m" class="md-header__button md-logo" aria-label="TimeSeriesEcon.m" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            TimeSeriesEcon.m
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              NDTSeries
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jasonjensen/timeseriesecon.m" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jasonjensen/timeseriesecon.m
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="TimeSeriesEcon.m" class="md-nav__button md-logo" aria-label="TimeSeriesEcon.m" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    TimeSeriesEcon.m
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jasonjensen/timeseriesecon.m" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jasonjensen/timeseriesecon.m
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/1_timeseriesecon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. TimeSeriesEcon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frequencies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frequencies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MIT & MITRange
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tseries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TSeries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mvtseries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MVTSeries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NDTSeries
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NDTSeries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Axes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#construction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Construction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shape-and-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shape and axes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Indexing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Indexing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keeping-the-type-when-slicing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keeping the type when slicing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#time-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reductions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reductions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arithmetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arithmetic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combining-and-cleaning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combining and cleaning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conversion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-and-display" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison and display
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workspace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workspaces (structs)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../math/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Math (shift, diff, moving, undiff)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics (mean, std, cor)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../indexing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Indexing (lookup)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fconvert/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frequency conversion (fconvert)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recursive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recursive (rec)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../linalg/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Linear algebra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../various/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Misc helpers (overlay, compare, reindex)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plotting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../x13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    X-13ARIMA-SEATS (x13)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../daec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DataEcon files (daec)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design notes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design notes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/decisions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/frequency_model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frequency model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/migration_from_julia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration from Julia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/migration_from_python/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration from Python
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/iris_interop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IRIS interop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/dynare_interop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dynare interop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Axes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#construction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Construction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shape-and-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shape and axes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Indexing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Indexing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keeping-the-type-when-slicing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keeping the type when slicing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#time-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reductions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reductions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arithmetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arithmetic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combining-and-cleaning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combining and cleaning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conversion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-and-display" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison and display
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="ndtseries">NDTSeries<a class="headerlink" href="#ndtseries" title="Permanent link">&para;</a></h1>
+<p><code>tse.NDTSeries</code> is an N-dimensional series: an N-d array where each dimension
+has a <code>tse.Axis</code>. An axis is a date range, a list of names, or a plain length,
+and the axes can come in any order. A <code>TSeries</code> is the one-axis case (dates),
+and an <code>MVTSeries</code> is the two-axis case (dates, then names).</p>
+<p>NDTSeries is a MATLAB addition. Neither TimeSeriesEcon.jl nor TimeSeriesEconPy
+has a labelled N-d series. It follows DataEcon's N-d objects, so it can be
+stored in <code>.daec</code> files.</p>
+<h2 id="axes">Axes<a class="headerlink" href="#axes" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">tse</span><span class="p">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">qq</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span><span class="n">qq</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="w">   </span><span class="c">% range axis</span>
+<span class="n">tse</span><span class="p">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">qq</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w">           </span><span class="c">% range axis from a first date and a length</span>
+<span class="n">tse</span><span class="p">.</span><span class="n">Axis</span><span class="p">([</span><span class="s">"gdp"</span><span class="w"> </span><span class="s">"cpi"</span><span class="p">])</span><span class="w">           </span><span class="c">% names axis (string array or cellstr)</span>
+<span class="n">tse</span><span class="p">.</span><span class="n">Axis</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w">                       </span><span class="c">% plain axis of length 3</span>
+</code></pre></div>
+<p>An axis has <code>kind</code> (<code>"range"</code>, <code>"names"</code> or <code>"plain"</code>), <code>length</code>, <code>range</code>
+(range axes) and <code>names</code> (names axes). <code>labels(ax)</code> gives a label for each
+position, and <code>describe(ax)</code> gives a one-line summary.</p>
+<p><code>tse.daec.Axis(...)</code> still works, and returns a <code>tse.Axis</code>.</p>
+<h2 id="construction">Construction<a class="headerlink" href="#construction" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nb">import</span><span class="w"> </span><span class="n">tse</span><span class="o">.*</span>
+<span class="nb">rng</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">qq</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span><span class="n">qq</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span><span class="mi">4</span><span class="p">);</span>
+
+<span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">({</span><span class="nb">rng</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s">"gdp"</span><span class="w"> </span><span class="s">"cpi"</span><span class="p">],</span><span class="w"> </span><span class="mi">3</span><span class="p">});</span><span class="w">           </span><span class="c">% NaN-filled 8×2×3</span>
+<span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">({</span><span class="nb">rng</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s">"gdp"</span><span class="w"> </span><span class="s">"cpi"</span><span class="p">],</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">        </span><span class="c">% filled with 0</span>
+<span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">({</span><span class="nb">rng</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s">"gdp"</span><span class="w"> </span><span class="s">"cpi"</span><span class="p">]},</span><span class="w"> </span><span class="nb">rand</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span><span class="w">  </span><span class="c">% values of matching size</span>
+<span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">({</span><span class="nb">rng</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="p">@(</span><span class="n">sz</span><span class="p">)</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="n">sz</span><span class="p">));</span><span class="w">         </span><span class="c">% values from the size</span>
+<span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">(</span><span class="s">'int64'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="nb">rng</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">              </span><span class="c">% typed</span>
+<span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">([</span><span class="n">Axis</span><span class="p">([</span><span class="s">"a"</span><span class="w"> </span><span class="s">"b"</span><span class="p">]),</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="nb">rng</span><span class="p">)]);</span><span class="w">      </span><span class="c">% from tse.Axis objects</span>
+
+<span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">(</span><span class="n">ts</span><span class="p">);</span><span class="w">      </span><span class="c">% from a TSeries</span>
+<span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">(</span><span class="n">mvts</span><span class="p">);</span><span class="w">    </span><span class="c">% from an MVTSeries</span>
+<span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span><span class="w">     </span><span class="c">% from a tse.daec.Array</span>
+</code></pre></div>
+<p>The axes argument is a cell array with one entry per dimension (each entry is
+anything <code>tse.Axis</code> accepts, or a <code>tse.Axis</code>), a <code>tse.Axis</code> array, or a single
+<code>MITRange</code>. Values must be numeric or logical, and <code>size(values, k)</code> must equal
+the length of axis <code>k</code>. The properties <code>axes</code> and <code>values</code> are read-only.</p>
+<h2 id="shape-and-axes">Shape and axes<a class="headerlink" href="#shape-and-axes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>size(x)</code>, <code>size(x, d)</code>, <code>[m, n, ...] = size(x)</code></td>
+<td>Axis lengths, like an array</td>
+</tr>
+<tr>
+<td><code>naxes(x)</code>, <code>ndims(x)</code>, <code>numel(x)</code>, <code>length(x)</code>, <code>isempty(x)</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>rangeof(x)</code>, <code>firstdate(x)</code>, <code>lastdate(x)</code>, <code>frequencyof(x)</code></td>
+<td>Of the date axis; <code>tse.rangeof(x)</code> etc. work too</td>
+</tr>
+<tr>
+<td><code>timedim(x)</code></td>
+<td>Index of the date axis</td>
+</tr>
+<tr>
+<td><code>names(x)</code>, <code>names(x, k)</code></td>
+<td>Names of the only names axis, or of axis <code>k</code></td>
+</tr>
+<tr>
+<td><code>haskey(x, name)</code></td>
+<td>True if any names axis has <code>name</code>; <code>'dims', k</code> looks on axis <code>k</code> only</td>
+</tr>
+<tr>
+<td><code>rawdata(x)</code>, <code>double(x)</code>, <code>isnumeric(x)</code>, <code>islogical(x)</code>, <code>copy(x)</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>permute(x, order)</code></td>
+<td>Reorder the axes</td>
+</tr>
+<tr>
+<td><code>squeeze(x)</code></td>
+<td>Drop length-1 axes</td>
+</tr>
+</tbody>
+</table>
+<p>When a series has more than one date axis (for example vintage by date), the
+date functions need <code>'dims', k</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">v</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">({</span><span class="n">qq</span><span class="p">(</span><span class="mi">2019</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span><span class="n">qq</span><span class="p">(</span><span class="mi">2019</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span><span class="w"> </span><span class="n">mm</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span><span class="n">mm</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">12</span><span class="p">)});</span>
+<span class="n">firstdate</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s">'dims'</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">          </span><span class="c">% 2020M1</span>
+<span class="n">rangeof</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s">'dims'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">'drop'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="c">% 2019Q2:2019Q4</span>
+</code></pre></div>
+<h2 id="indexing">Indexing<a class="headerlink" href="#indexing" title="Permanent link">&para;</a></h2>
+<p>Give one key per axis. The kind of key depends on the kind of axis:</p>
+<table>
+<thead>
+<tr>
+<th>Axis</th>
+<th>Keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>range</td>
+<td>an <code>MIT</code>, a step-1 <code>MITRange</code>, consecutive <code>MIT</code>s, or <code>:</code></td>
+</tr>
+<tr>
+<td>names</td>
+<td>a name (char or string), several names (string array or cellstr), positions, a logical mask, or <code>:</code></td>
+</tr>
+<tr>
+<td>plain</td>
+<td>positions, a logical mask, or <code>:</code></td>
+</tr>
+</tbody>
+</table>
+<p>A single key (one MIT, one name, one position) drops its axis. What is left
+then decides the result:</p>
+<ul>
+<li>no axes left: the plain value</li>
+<li>one date axis: a <code>TSeries</code></li>
+<li>a date axis then a names axis: an <code>MVTSeries</code></li>
+<li>anything else: an <code>NDTSeries</code></li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">({</span><span class="n">qq</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span><span class="n">qq</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span><span class="w"> </span><span class="p">[</span><span class="s">"gdp"</span><span class="w"> </span><span class="s">"cpi"</span><span class="p">],</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="n">x</span><span class="p">(</span><span class="n">qq</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="s">"gdp"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w">     </span><span class="c">% a number</span>
+<span class="n">x</span><span class="p">(:,</span><span class="w"> </span><span class="s">"gdp"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w">              </span><span class="c">% TSeries</span>
+<span class="n">x</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">                  </span><span class="c">% MVTSeries</span>
+<span class="n">x</span><span class="p">(:,</span><span class="w"> </span><span class="p">{</span><span class="s">'gdp'</span><span class="p">},</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">            </span><span class="c">% a cell keeps the names axis: one-column MVTSeries</span>
+<span class="n">x</span><span class="p">(</span><span class="n">qq</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span><span class="k">end</span><span class="p">,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="p">:)</span><span class="w">     </span><span class="c">% NDTSeries, 3x2x3</span>
+<span class="n">x</span><span class="p">.</span><span class="n">gdp</span><span class="w">                       </span><span class="c">% drops the names axis: NDTSeries 4x3</span>
+</code></pre></div>
+<p><code>end</code> is the last date on a date axis and the length on other axes.</p>
+<p>Assignment takes the same keys. The value can be a scalar, an array with the
+right number of elements, or a series. A <code>TSeries</code> or <code>MVTSeries</code> is lined up on
+the dates you select. Assigning to dates outside the range grows the date axis
+and fills the gap with <code>NaN</code>, like a <code>TSeries</code>. Names cannot be added by
+assignment.</p>
+<div class="highlight"><pre><span></span><code><span class="n">x</span><span class="p">(</span><span class="n">qq</span><span class="p">(</span><span class="mi">2021</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="s">"cpi"</span><span class="p">,</span><span class="w"> </span><span class="p">:)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">     </span><span class="c">% grows the date axis to 2021Q1</span>
+<span class="n">x</span><span class="p">.</span><span class="n">gdp</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="n">x</span><span class="p">.</span><span class="n">gdp</span><span class="p">(</span><span class="n">qq</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<span class="n">x</span><span class="p">.</span><span class="n">values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">7</span><span class="p">;</span><span class="w">                 </span><span class="c">% values can be set if the size stays the same</span>
+</code></pre></div>
+<p><code>resize(x, rng)</code> changes the date range (with <code>'dims', k</code> when there are
+several date axes). <code>find</code>, <code>LinearIndices</code> and <code>isassigned(x, keys...)</code> work
+as for an <code>MVTSeries</code>.</p>
+<h3 id="keeping-the-type-when-slicing">Keeping the type when slicing<a class="headerlink" href="#keeping-the-type-when-slicing" title="Permanent link">&para;</a></h3>
+<p>With <code>tse.setoption('slicing_keeps_type', true)</code>, slicing never changes the
+class. An <code>NDTSeries</code> slice stays an <code>NDTSeries</code>, and an axis given a single key
+stays, with length 1. An <code>MVTSeries</code> slice (<code>m(mit)</code>, <code>m('a')</code>, <code>m(rng, 'a')</code>,
+<code>m(mit, names)</code>) stays an <code>MVTSeries</code>. In both modes, a single element
+(<code>x(mit, "gdp", 1)</code>, <code>m(mit, 'a')</code>) is the plain value, and dot access (<code>x.gdp</code>,
+<code>m.a</code>) drops the names axis as above. Use <code>toseries</code> or <code>squeeze</code> to convert
+explicitly. The default (<code>false</code>) matches Julia and Python.</p>
+<h2 id="time-functions">Time functions<a class="headerlink" href="#time-functions" title="Permanent link">&para;</a></h2>
+<p>These work along the date axis and keep every other axis. They take the same
+arguments as for a <code>TSeries</code>, plus <code>'dims', k</code> when there are several date
+axes.</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>shift(x, k)</code>, <code>lag(x[, k])</code>, <code>lead(x[, k])</code></td>
+<td>move the dates</td>
+</tr>
+<tr>
+<td><code>diff(x[, k])</code></td>
+<td><code>x - lag(x)</code>; <code>diff(x, k)</code> as for a <code>TSeries</code></td>
+</tr>
+<tr>
+<td><code>pct(x[, shift], 'islog', tf)</code>, <code>apct(x[, islog])</code>, <code>ytypct(x)</code></td>
+<td>percent changes</td>
+</tr>
+<tr>
+<td><code>cumsum(x[, d])</code>, <code>cumprod(x[, d])</code></td>
+<td>along the date axis, or axis <code>d</code></td>
+</tr>
+<tr>
+<td><code>moving(x, n)</code>, <code>moving_average(x, n)</code>, <code>moving_sum(x, n)</code></td>
+<td>moving windows</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="n">x</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">({</span><span class="n">qq</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span><span class="n">qq</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span><span class="w"> </span><span class="p">[</span><span class="s">"gdp"</span><span class="w"> </span><span class="s">"cpi"</span><span class="p">],</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="p">@(</span><span class="n">sz</span><span class="p">)</span><span class="w"> </span><span class="nb">rand</span><span class="p">(</span><span class="n">sz</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="n">g</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">pct</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w">                           </span><span class="c">% 19x2x3, from 2020Q2</span>
+<span class="n">v</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NDTSeries</span><span class="p">({</span><span class="n">yy</span><span class="p">(</span><span class="mi">2019</span><span class="p">):</span><span class="n">yy</span><span class="p">(</span><span class="mi">2021</span><span class="p">),</span><span class="w"> </span><span class="n">mm</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span><span class="n">mm</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span><span class="mi">12</span><span class="p">)},</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="nb">lag</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s">'dims'</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">                     </span><span class="c">% lag the monthly axis</span>
+</code></pre></div>
+<h2 id="reductions">Reductions<a class="headerlink" href="#reductions" title="Permanent link">&para;</a></h2>
+<p><code>sum</code>, <code>prod</code>, <code>mean</code>, <code>median</code>, <code>std</code>, <code>var</code>, <code>min</code>, <code>max</code>, <code>any</code>, <code>all</code> and
+<code>quantile(x, p, ...)</code> reduce over every value by default. With <code>'dims', d</code> they
+reduce along axis <code>d</code>, which can be a number, several numbers, or <code>"time"</code> for
+the date axis. That axis is dropped, and the result is handed back the same way
+as a slice: a value, a <code>TSeries</code>, an <code>MVTSeries</code> or an <code>NDTSeries</code>. Flags such as
+<code>'omitnan'</code>, and the weight of <code>std</code>/<code>var</code> (<code>std(x, 1, 'dims', 2)</code>), pass
+through.</p>
+<div class="highlight"><pre><span></span><code><span class="nb">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">'dims'</span><span class="p">,</span><span class="w"> </span><span class="s">"time"</span><span class="p">)</span><span class="w">      </span><span class="c">% names x plain NDTSeries of means</span>
+<span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">'dims'</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w">            </span><span class="c">% an MVTSeries (dates x names)</span>
+<span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">'dims'</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="w"> </span><span class="mi">3</span><span class="p">])</span><span class="w">        </span><span class="c">% a TSeries</span>
+</code></pre></div>
+<p><code>mapslices(x, f, 'dims', d)</code> applies <code>f</code> to each slice spanning <code>d</code> (default
+the date axis). A result the same size keeps the axes. A result of length 1
+along <code>d</code> drops those axes. Anything else comes back as a plain array.</p>
+<h2 id="arithmetic">Arithmetic<a class="headerlink" href="#arithmetic" title="Permanent link">&para;</a></h2>
+<p>Element-wise operators (<code>+ - .* ./ .\ .^</code>, comparisons, <code>&amp; | ~</code>) and <code>log</code>,
+<code>exp</code>, <code>abs</code> and unary minus work on an NDTSeries. The other operand can be:</p>
+<ul>
+<li>a scalar (<code>*</code> and <code>/</code> work with a scalar too)</li>
+<li>a numeric array of the same size</li>
+<li>another series whose axes line up: the same kinds in the same order, the
+  same names, the same plain lengths, and the same frequency on date axes</li>
+</ul>
+<p>Date axes are cut to the dates both operands have, as for an <code>MVTSeries</code>. A
+<code>TSeries</code> or <code>MVTSeries</code> operand counts as the NDTSeries it converts to.
+Broadcasting a smaller series across the other axes (for example adding a
+<code>TSeries</code> to every slice) is not supported yet. Comparisons give a logical
+NDTSeries.</p>
+<div class="highlight"><pre><span></span><code><span class="n">y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">log</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+<span class="n">g</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="nb">lag</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">          </span><span class="c">% dates cut to the overlap</span>
+<span class="n">big</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">                 </span><span class="c">% logical NDTSeries</span>
+</code></pre></div>
+<h2 id="combining-and-cleaning">Combining and cleaning<a class="headerlink" href="#combining-and-cleaning" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cat(k, a, b, ...)</code></td>
+<td>join along axis <code>k</code>: names are joined (and must stay unique), plain lengths add up, and along a date axis each series must start right after the previous one. The other axes must match. <code>[a, b]</code> is an error; use <code>cat</code>.</td>
+</tr>
+<tr>
+<td><code>rename(x, old, new)</code></td>
+<td>rename names on the names axis that holds them; <code>'dims', k</code> picks the axis, and is required when a name is on more than one names axis</td>
+</tr>
+<tr>
+<td><code>tse.strip_ts(x)</code></td>
+<td>drop leading and trailing dates where every value is missing</td>
+</tr>
+<tr>
+<td><code>tse.overlay(a, b, ...)</code>, <code>tse.overlay(rng, a, b, ...)</code></td>
+<td>first non-missing value wins, over the union of the date ranges (or over <code>rng</code>); the other axes must match</td>
+</tr>
+<tr>
+<td><code>tse.fconvert(F, x, ...)</code></td>
+<td>convert the date axis to frequency <code>F</code> with the usual options (<code>'dims', k</code> when there are several date axes)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conversion">Conversion<a class="headerlink" href="#conversion" title="Permanent link">&para;</a></h2>
+<p><code>toseries(x)</code> gives a <code>TSeries</code> for one date axis, and an <code>MVTSeries</code> for a date
+axis and a names axis (in either order). <code>tse.daec.Array(x)</code> gives the storage
+form.</p>
+<h2 id="comparison-and-display">Comparison and display<a class="headerlink" href="#comparison-and-display" title="Permanent link">&para;</a></h2>
+<p><code>isequal</code>, <code>isequaln</code> and <code>tse.compare</code> (with <code>'atol'</code>, <code>'rtol'</code> and <code>'nans'</code>)
+compare the axes and the values. <code>disp(x)</code> lists the axes and prints 2-d
+slices labelled by the other axes. It shows at most 5 slices and 40 rows;
+<code>showall(x)</code> prints everything, and <code>summary(x)</code> prints only the axes.</p>
+<div class="highlight"><pre><span></span><code>  8×2×3 NDTSeries of double
+    axis 1: range  2020Q1:2021Q4
+    axis 2: names  gdp, cpi
+    axis 3: plain  1:3
+
+  (:, :, 1)
+            gdp  cpi
+  2020Q1      0    0
+  ...
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>
