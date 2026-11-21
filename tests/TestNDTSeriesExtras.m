@@ -115,6 +115,30 @@ classdef TestNDTSeriesExtras < matlab.unittest.TestCase
             tc.verifyError(@() rename(x, "zz", "y"), 'tseries:bounds');
         end
 
+        function rename_with_shared_names(tc)
+            % from-by-to style: the same names on two axes
+            x = tse.NDTSeries({["us" "ca"], ["us" "ca"]}, [1 2; 3 4]);
+            tc.verifyError(@() rename(x, "us", "usa"), 'tseries:bounds');
+            y = rename(x, "us", "usa", 'dims', 2);
+            tc.verifyEqual(names(y, 1), ["us" "ca"]);
+            tc.verifyEqual(names(y, 2), ["usa" "ca"]);
+            z = rename(x, ["us" "ca"], ["US" "CA"], 'dims', 1);
+            tc.verifyEqual(names(z, 1), ["US" "CA"]);
+            tc.verifyEqual(names(z, 2), ["us" "ca"]);
+            tc.verifyError(@() rename(x, "zz", "y", 'dims', 1), 'tseries:bounds');
+            q = tse.NDTSeries({tse.qq(2020,1):tse.qq(2020,2), ["a" "b"]}, 1);
+            tc.verifyError(@() rename(q, "a", "c", 'dims', 1), 'tseries:noMatch');  % not a names axis
+            tc.verifyError(@() rename(q, "a", "c", 'dims', 3), 'tseries:noMatch');
+            % dot access is ambiguous too; positional indexing is not
+            tc.verifyError(@() x.us, 'tseries:bounds');
+            tc.verifyEqual(reshape(rawdata(x("us", :)), 1, []), [1 2]);
+            % haskey can look on one axis
+            w = tse.NDTSeries({["a" "b"], ["c" "d"]}, 0);
+            tc.verifyTrue(haskey(w, "c"));
+            tc.verifyTrue(haskey(w, "c", 'dims', 2));
+            tc.verifyFalse(haskey(w, "c", 'dims', 1));
+        end
+
         function strip_missing_dates(tc)
             v = nan(5, 2);
             v(2, 1) = 1;

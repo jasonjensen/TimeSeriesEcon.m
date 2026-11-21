@@ -56,7 +56,7 @@ the length of axis `k`. The properties `axes` and `values` are read-only.
 | `rangeof(x)`, `firstdate(x)`, `lastdate(x)`, `frequencyof(x)` | Of the date axis; `tse.rangeof(x)` etc. work too |
 | `timedim(x)` | Index of the date axis |
 | `names(x)`, `names(x, k)` | Names of the only names axis, or of axis `k` |
-| `haskey(x, name)` | True if any names axis has `name` |
+| `haskey(x, name)` | True if any names axis has `name`; `'dims', k` looks on axis `k` only |
 | `rawdata(x)`, `double(x)`, `isnumeric(x)`, `islogical(x)`, `copy(x)` | |
 | `permute(x, order)` | Reorder the axes |
 | `squeeze(x)` | Drop length-1 axes |
@@ -195,7 +195,7 @@ big = x > 10;                 % logical NDTSeries
 | Function | |
 |---|---|
 | `cat(k, a, b, ...)` | join along axis `k`: names are joined (and must stay unique), plain lengths add up, and along a date axis each series must start right after the previous one. The other axes must match. `[a, b]` is an error; use `cat`. |
-| `rename(x, old, new)` | rename names on the names axis that holds them |
+| `rename(x, old, new)` | rename names on the names axis that holds them; `'dims', k` picks the axis, and is required when a name is on more than one names axis |
 | `tse.strip_ts(x)` | drop leading and trailing dates where every value is missing |
 | `tse.overlay(a, b, ...)`, `tse.overlay(rng, a, b, ...)` | first non-missing value wins, over the union of the date ranges (or over `rng`); the other axes must match |
 | `tse.fconvert(F, x, ...)` | convert the date axis to frequency `F` with the usual options (`'dims', k` when there are several date axes) |

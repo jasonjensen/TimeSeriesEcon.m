@@ -176,10 +176,18 @@ classdef NDTSeries
             n = x.axes(k).names;
         end
 
-        function tf = haskey(x, name)
+        function tf = haskey(x, name, varargin)
             %HASKEY  True if any names axis contains name.
+            %
+            %   haskey(x, name, 'dims', k) looks on axis k only.
             tf = false;
-            for k = find([x.axes.kind] == "names")
+            ks = find([x.axes.kind] == "names");
+            if numel(varargin) == 2 && strcmpi(string(varargin{1}), "dims")
+                ks = intersect(ks, varargin{2});
+            elseif ~isempty(varargin)
+                error('tseries:noMatch', 'haskey options are ''dims'', k.');
+            end
+            for k = ks
                 if any(x.axes(k).names == string(name))
                     tf = true;
                     return
@@ -628,25 +636,46 @@ classdef NDTSeries
             error('tseries:noMatch', 'Use cat(k, a, b, ...) to join NDTSeries along axis k.');
         end
 
-        function x = rename(x, old, new)
+        function x = rename(x, old, new, varargin)
             %RENAME  rename(x, old, new) renames old to new on the names axis
             %   that holds old.  old and new can be lists of the same length.
+            %
+            %   rename(x, old, new, 'dims', k) renames on names axis k only.
+            %   Use it when old is on more than one names axis; without it
+            %   that case is an error.
+            k = [];
+            if ~isempty(varargin)
+                if numel(varargin) ~= 2 || ~strcmpi(string(varargin{1}), "dims")
+                    error('tseries:noMatch', 'rename options are ''dims'', k.');
+                end
+                k = varargin{2};
+                if ~(isnumeric(k) && isscalar(k) && k == round(k) && k >= 1 && k <= numel(x.axes)) ...
+                        || x.axes(k).kind ~= "names"
+                    error('tseries:noMatch', 'rename: ''dims'' must be the number of a names axis.');
+                end
+            end
             old = string(old);
             new = string(new);
             if numel(old) ~= numel(new)
                 error('tseries:noMatch', 'rename needs as many new names as old ones.');
             end
             for j = 1:numel(old)
-                k = namesAxisOf(x, old(j));
                 if isempty(k)
+                    kj = namesAxisOf(x, old(j), "use rename(x, old, new, 'dims', k)");
+                elseif any(x.axes(k).names == old(j))
+                    kj = k;
+                else
+                    kj = [];
+                end
+                if isempty(kj)
                     error('tseries:bounds', 'Unknown name %s.', old(j));
                 end
-                nm = x.axes(k).names;
+                nm = x.axes(kj).names;
                 nm(nm == old(j)) = new(j);
                 if numel(unique(nm)) ~= numel(nm)
                     error('tseries:noMatch', 'Renaming %s to %s repeats a name.', old(j), new(j));
                 end
-                x.axes(k) = tse.Axis(nm);
+                x.axes(kj) = tse.Axis(nm);
             end
         end
 
@@ -844,8 +873,11 @@ function tf = keepTypeOption()
     tf = logical(tse.getoption('slicing_keeps_type'));
 end
 
-function k = namesAxisOf(x, name)
+function k = namesAxisOf(x, name, hint)
     % the names axis holding name; empty if none; error if ambiguous
+    if nargin < 3
+        hint = "index with x(...) and put the name in the position of its axis";
+    end
     k = [];
     if ~(ischar(name) || isstring(name))
         return
@@ -857,8 +889,8 @@ function k = namesAxisOf(x, name)
     end
     if numel(k) > 1
         error('tseries:bounds', ...
-            'Name %s is on more than one axis (%s); index with x(...) instead.', ...
-            char(name), num2str(k));
+            'Name %s is on more than one names axis (%s); %s.', ...
+            char(name), num2str(k), char(hint));
     end
 end
 
